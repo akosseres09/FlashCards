@@ -53,7 +53,7 @@ export class AuthService {
         const currentUser = this.auth.currentUser;
         if (currentUser) {
             const actionCodeSettings: ActionCodeSettings = {
-                url: environment.hostUrl,
+                url: environment.hostUrl + '/projects',
                 handleCodeInApp: true,
             };
             return sendEmailVerification(currentUser, actionCodeSettings);
