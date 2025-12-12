@@ -1,0 +1,57 @@
+<header class="bg-slate-800 border-b border-slate-700 p-4 shadow-lg z-10">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-4">
+            <div class="w-6 h-6 rounded-lg flex items-center justify-center">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-6 w-6 text-blue-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                    />
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold text-white leading-tight">Flashcards</h1>
+            </div>
+        </div>
+        <div>
+            <nav>
+                <ul class="flex gap-5 cursor-pointer text-lg font-semibold">
+                    @if (!user) {
+                    <li>
+                        <a
+                            routerLink="/auth/login"
+                            routerLinkActive="text-blue-400"
+                            class="text-slate-300 hover:text-blue-400 transition-colors duration-200"
+                            >Login</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            routerLink="/auth/signup"
+                            routerLinkActive="text-blue-400"
+                            class="text-slate-300 hover:text-blue-400 transition-colors duration-200"
+                            >Signup</a
+                        >
+                    </li>
+                    } @else {
+                    <li>
+                        <span
+                            (click)="logout()"
+                            class="text-slate-300 hover:text-blue-400 transition-colors duration-200"
+                            >Logout
+                        </span>
+                    </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
