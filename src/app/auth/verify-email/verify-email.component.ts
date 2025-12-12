@@ -27,8 +27,6 @@ export class VerifyEmailComponent implements OnInit {
             if (user) {
                 this.userEmail = user.email || '';
             }
-
-            this.resendVerificationEmail();
         });
     }
 

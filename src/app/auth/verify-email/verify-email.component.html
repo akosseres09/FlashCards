@@ -22,9 +22,7 @@
                     {{ successMessage }}
                 </p>
             </div>
-            }
-
-            @if (errorMessage) {
+            } @if (errorMessage) {
             <div class="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-lg">
                 <p class="text-red-400 text-sm flex items-center gap-2">
                     <lucide-icon name="circle-x" class="w-5 h-5"></lucide-icon>
@@ -64,7 +62,7 @@
                     type="button"
                     (click)="checkEmailVerification()"
                     [disabled]="isLoading"
-                    class="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                    class="w-full cursor-pointer flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                     @if (isLoading) {
                     <lucide-icon name="loader-circle" class="w-5 h-5 animate-spin"></lucide-icon>
@@ -79,13 +77,13 @@
                     type="button"
                     (click)="resendVerificationEmail()"
                     [disabled]="!canResend || isLoading"
-                    class="w-full flex justify-center items-center gap-2 py-3 px-4 border border-slate-600 rounded-lg shadow-sm text-sm font-medium text-white bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                    class="w-full cursor-pointer flex justify-center items-center gap-2 py-3 px-4 border border-slate-600 rounded-lg shadow-sm text-sm font-medium text-white bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                     @if (!canResend) {
                     <span>Resend in {{ resendCooldown }}s</span>
                     } @else {
                     <lucide-icon name="mail-check" class="w-5 h-5"></lucide-icon>
-                    <span>Resend Verification Email</span>
+                    <span>Send Verification Email</span>
                     }
                 </button>
             </div>
@@ -102,7 +100,7 @@
             <button
                 type="button"
                 (click)="logout()"
-                class="w-full flex justify-center items-center gap-2 py-2 px-4 text-sm font-medium text-slate-400 hover:text-slate-300 transition-colors"
+                class="w-full cursor-pointer flex justify-center items-center gap-2 py-2 px-4 text-sm font-medium text-slate-400 hover:text-slate-300 transition-colors"
             >
                 <lucide-icon name="log-in" class="w-4 h-4 rotate-180"></lucide-icon>
                 <span>Sign out and use a different account</span>
