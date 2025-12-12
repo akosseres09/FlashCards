@@ -38,8 +38,16 @@
                             (click)="toggleDropdown()"
                             class="cursor-pointer text-slate-400 hover:text-slate-300 transition-colors duration-200 flex items-center gap-2"
                         >
+                            @if(user.photoURL) {
+                            <img
+                                [src]="user.photoURL"
+                                alt="User Avatar"
+                                class="w-8 h-8 rounded-full object-cover"
+                            />
+                            } @else {
                             <span>{{ user.email }}</span>
-                            @if(isDropdownOpen) {
+
+                            } @if(isDropdownOpen) {
                             <lucide-icon
                                 name="chevron-down"
                                 [size]="20"

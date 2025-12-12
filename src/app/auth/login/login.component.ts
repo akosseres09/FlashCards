@@ -57,8 +57,8 @@ export class LoginComponent {
         this.errorMessage = '';
 
         try {
-            const credential = await this.authService.loginWithGoogle();
-            console.log(credential);
+            await this.authService.loginWithGoogle();
+            this.router.navigate(['/projects']);
         } catch (error: any) {
             this.errorMessage = this.getErrorMessage(error.code);
         } finally {
