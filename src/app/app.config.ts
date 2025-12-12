@@ -23,6 +23,11 @@ import {
     Eye,
     EyeOff,
     LoaderCircle,
+    LogIn,
+    UserPlus,
+    House,
+    CircleX,
+    MailCheck,
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -54,6 +59,11 @@ export const appConfig: ApplicationConfig = {
                 Eye,
                 EyeOff,
                 LoaderCircle,
+                LogIn,
+                UserPlus,
+                House,
+                CircleX,
+                MailCheck,
             })
         ),
     ],

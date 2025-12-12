@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { unauthenticatedGuard } from './guards/unauthenticated/unauthenticated.guard';
+import { unverifiedGuard } from './guards/unverified/unverified.guard';
 
 export const routes: Routes = [
     {
@@ -19,16 +21,27 @@ export const routes: Routes = [
                 path: 'login',
                 loadComponent: () =>
                     import('./auth/login/login.component').then((m) => m.LoginComponent),
+                canActivate: [unauthenticatedGuard],
             },
             {
                 path: 'signup',
                 loadComponent: () =>
                     import('./auth/signup/signup.component').then((m) => m.SignupComponent),
+                canActivate: [unauthenticatedGuard],
+            },
+            {
+                path: 'verify-email',
+                loadComponent: () =>
+                    import('./auth/verify-email/verify-email.component').then(
+                        (m) => m.VerifyEmailComponent
+                    ),
+                canActivate: [unverifiedGuard],
             },
             {
                 path: 'not-found',
                 loadComponent: () =>
                     import('./auth/not-found/not-found.component').then((m) => m.NotFoundComponent),
+                canActivate: [unauthenticatedGuard],
             },
             {
                 path: '**',
