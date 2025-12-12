@@ -28,6 +28,10 @@ import {
     House,
     CircleX,
     MailCheck,
+    Settings,
+    LogOut,
+    ChevronDown,
+    ChevronUp,
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -64,6 +68,10 @@ export const appConfig: ApplicationConfig = {
                 House,
                 CircleX,
                 MailCheck,
+                LogOut,
+                Settings,
+                ChevronDown,
+                ChevronUp,
             })
         ),
     ],

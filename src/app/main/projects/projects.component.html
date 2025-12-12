@@ -1,0 +1,17 @@
+<div class="max-w-7xl mx-auto flex">
+    @if (isLoading) {
+    <div
+        class="mt-10 w-100 mx-auto text-2xl flex items-center justify-center gap-2 text-blue-400 animate-pulse"
+    >
+        <lucide-icon
+            name="loader-circle"
+            [size]="30"
+            [strokeWidth]="2"
+            [absoluteStrokeWidth]="true"
+            class="animate-spin"
+        >
+        </lucide-icon>
+        Loading Data...
+    </div>
+    }
+</div>

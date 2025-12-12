@@ -1,13 +1,9 @@
 import { Routes } from '@angular/router';
 import { unauthenticatedGuard } from './guards/unauthenticated/unauthenticated.guard';
 import { unverifiedGuard } from './guards/unverified/unverified.guard';
+import { authenticatedGuard } from './guards/authenticated/authenticated.guard';
 
 export const routes: Routes = [
-    {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: 'auth/login',
-    },
     {
         path: 'auth',
         loadComponent: () => import('./layouts/auth/auth.component').then((m) => m.AuthComponent),
@@ -46,6 +42,23 @@ export const routes: Routes = [
             {
                 path: '**',
                 redirectTo: 'not-found',
+            },
+        ],
+    },
+    {
+        path: '',
+        loadComponent: () => import('./layouts/main/main.component').then((m) => m.MainComponent),
+        canActivate: [authenticatedGuard],
+        children: [
+            {
+                path: '',
+                pathMatch: 'full',
+                redirectTo: 'projects',
+            },
+            {
+                path: 'projects',
+                loadComponent: () =>
+                    import('./main/projects/projects.component').then((m) => m.ProjectsComponent),
             },
         ],
     },
