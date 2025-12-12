@@ -35,6 +35,13 @@ import {
     Github,
     Linkedin,
     Twitter,
+    FolderOpen,
+    Plus,
+    FileText,
+    Clock,
+    Play,
+    Pencil,
+    Trash2,
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -77,7 +84,14 @@ export const appConfig: ApplicationConfig = {
                 ChevronUp,
                 Github,
                 Linkedin,
-                Twitter
+                Twitter,
+                FolderOpen,
+                Plus,
+                FileText,
+                Clock,
+                Play,
+                Pencil,
+                Trash2,
             })
         ),
     ],

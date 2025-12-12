@@ -1,0 +1,49 @@
+import { inject, Injectable } from '@angular/core';
+import {
+    addDoc,
+    collection,
+    collectionData,
+    deleteDoc,
+    doc,
+    Firestore,
+    setDoc,
+    updateDoc,
+    writeBatch,
+} from '@angular/fire/firestore';
+import { Project } from '../../models/Project';
+import { Observable } from 'rxjs';
+
+@Injectable({
+    providedIn: 'root',
+})
+export class ProjectService {
+    PROJECTS_COLLECTION = 'projects';
+    firestore = inject(Firestore);
+
+    getOne(id: string) {
+        const ref = collection(this.firestore, this.PROJECTS_COLLECTION);
+        return doc(ref, id);
+    }
+
+    getAll() {
+        return collectionData(collection(this.firestore, this.PROJECTS_COLLECTION)) as Observable<
+            Project[]
+        >;
+    }
+
+    addOne(project: Project) {
+        const ref = doc(collection(this.firestore, this.PROJECTS_COLLECTION));
+        project.id = ref.id;
+        return setDoc(ref, project);
+    }
+
+    update(id: string, project: Partial<Project>) {
+        const ref = doc(this.firestore, this.PROJECTS_COLLECTION + `/${id}`);
+        return updateDoc(ref, project);
+    }
+
+    delete(id: string) {
+        const ref = doc(this.firestore, this.PROJECTS_COLLECTION + `/${id}`);
+        return deleteDoc(ref);
+    }
+}
