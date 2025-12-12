@@ -35,6 +35,7 @@ export class SignupComponent {
                 email: ['', [Validators.required, Validators.email]],
                 password: ['', [Validators.required, Validators.minLength(6)]],
                 confirmPassword: ['', [Validators.required]],
+                agree: [false, [Validators.requiredTrue]],
             },
             { validators: this.passwordMatchValidator }
         );
@@ -69,7 +70,7 @@ export class SignupComponent {
 
             try {
                 await this.authService.signup(email, password);
-                this.router.navigate(['/']);
+                this.router.navigate(['/auth/verify-email']);
             } catch (error: any) {
                 this.errorMessage = this.getErrorMessage(error.code);
             } finally {
@@ -128,5 +129,9 @@ export class SignupComponent {
 
     get confirmPassword() {
         return this.signupForm.get('confirmPassword');
+    }
+
+    get agree() {
+        return this.signupForm.get('agree');
     }
 }

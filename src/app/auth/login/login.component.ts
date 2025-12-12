@@ -3,10 +3,11 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
     selector: 'app-login',
-    imports: [CommonModule, ReactiveFormsModule, RouterLink],
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, LucideAngularModule],
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss',
 })
@@ -56,8 +57,8 @@ export class LoginComponent {
         this.errorMessage = '';
 
         try {
-            await this.authService.loginWithGoogle();
-            this.router.navigate(['/']);
+            const credential = await this.authService.loginWithGoogle();
+            console.log(credential);
         } catch (error: any) {
             this.errorMessage = this.getErrorMessage(error.code);
         } finally {
