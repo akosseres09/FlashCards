@@ -23,10 +23,11 @@ export class ModalComponent implements OnChanges {
     @Input() projectId: string | null = null;
     @Input() projectName: string | null = null;
     @Input() projectDescription: string | null = null;
+    @Input() userId: string | null = null;
 
-    createProjectForm: FormGroup;
     private fb = inject(FormBuilder);
     private projectService = inject(ProjectService);
+    createProjectForm: FormGroup;
     isSaving: boolean = false;
     isEditMode: boolean = this.projectId !== null;
 
@@ -53,6 +54,10 @@ export class ModalComponent implements OnChanges {
         if (changes['projectDescription']) {
             this.projectDescription = changes['projectDescription'].currentValue;
             this.createProjectForm.get('description')?.setValue(this.projectDescription);
+        }
+
+        if (changes['userId']) {
+            this.userId = changes['userId'].currentValue;
         }
     }
 
@@ -95,6 +100,7 @@ export class ModalComponent implements OnChanges {
 
             const newProject: Project = {
                 id: '',
+                createdBy: this.userId as string,
                 name: this.createProjectForm.value.name,
                 description: this.createProjectForm.value.description,
                 cardCount: 0,

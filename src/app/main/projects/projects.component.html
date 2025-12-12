@@ -110,11 +110,12 @@
         }
     </div>
 
-    @if (isModalOpen) {
+    @if (isModalOpen && user) {
     <app-projects-modal
         [projectId]="editingProjectId"
         [projectName]="projectName"
         [projectDescription]="projectDescription"
+        [userId]="user.uid"
         (modalClosed)="closeModal()"
     ></app-projects-modal>
     }

@@ -6,12 +6,14 @@ import {
     deleteDoc,
     doc,
     Firestore,
+    query,
     setDoc,
     updateDoc,
+    where,
     writeBatch,
 } from '@angular/fire/firestore';
 import { Project } from '../../models/Project';
-import { Observable } from 'rxjs';
+import { Observable, reduce } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -29,6 +31,12 @@ export class ProjectService {
         return collectionData(collection(this.firestore, this.PROJECTS_COLLECTION)) as Observable<
             Project[]
         >;
+    }
+
+    getOwnProjects(userId: string) {
+        const ref = collection(this.firestore, this.PROJECTS_COLLECTION);
+        const q = query(ref, where('createdBy', '==', userId));
+        return collectionData(q) as Observable<Project[]>;
     }
 
     addOne(project: Project) {

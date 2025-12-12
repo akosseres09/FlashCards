@@ -3,6 +3,7 @@ export interface Project {
     name: string;
     description: string;
     cardCount: number;
+    createdBy: string;
     lastStudied: Date | null;
     createdAt: Date;
 }

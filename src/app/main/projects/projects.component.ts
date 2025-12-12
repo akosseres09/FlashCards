@@ -4,8 +4,10 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { Project } from '../../models/Project';
 import { ProjectService } from '../../services/project/project.service';
-import { Subscription } from 'rxjs';
+import { filter, Subscription, switchMap } from 'rxjs';
 import { ModalComponent } from './modal/modal.component';
+import { User } from '@angular/fire/auth';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
     selector: 'app-projects',
@@ -15,6 +17,7 @@ import { ModalComponent } from './modal/modal.component';
 })
 export class ProjectsComponent implements OnInit, OnDestroy {
     private projectService = inject(ProjectService);
+    private authService = inject(AuthService);
     private subscription: Subscription | null = null;
 
     isLoading: boolean = true;
@@ -24,22 +27,35 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     editingProjectId: string | null = null;
     projectName: string | null = null;
     projectDescription: string | null = null;
+    user: User | null = null;
 
     ngOnInit() {
         this.isLoading = true;
-        this.subscription = this.projectService.getAll().subscribe({
-            next: (projects) => {
-                this.projects = projects;
-                this.isLoading = false;
-            },
-            error: (error) => {
-                console.error('Error fetching projects:', error);
-                this.isLoading = false;
-            },
-        });
+        this.subscription = this.authService.user$
+            .pipe(
+                filter((user): user is User => !!user),
+                switchMap((user) => {
+                    this.user = user;
+                    return this.projectService.getOwnProjects(user.uid);
+                })
+            )
+            .subscribe({
+                next: (projects) => {
+                    this.projects = projects;
+                    this.isLoading = false;
+                },
+                error: (err) => {
+                    console.error(err);
+                    this.isLoading = false;
+                },
+            });
     }
 
-    openModal(id: string | null = null, projectName: string | null = null, projectDescription: string | null = null) {
+    openModal(
+        id: string | null = null,
+        projectName: string | null = null,
+        projectDescription: string | null = null
+    ) {
         this.isModalOpen = true;
         this.editingProjectId = id;
         this.projectName = projectName;
