@@ -24,7 +24,18 @@
         <div>
             <nav>
                 <ul class="flex gap-5 cursor-pointer text-lg font-semibold">
-                    @if (!user) {
+                    @if (user$ | async; as user) {
+                    <li>
+                        <span class="text-slate-400">{{ user.email }}</span>
+                    </li>
+                    <li>
+                        <span
+                            (click)="logout()"
+                            class="text-slate-300 hover:text-blue-400 transition-colors duration-200"
+                            >Logout
+                        </span>
+                    </li>
+                    } @else {
                     <li>
                         <a
                             routerLink="/auth/login"
@@ -40,14 +51,6 @@
                             class="text-slate-300 hover:text-blue-400 transition-colors duration-200"
                             >Signup</a
                         >
-                    </li>
-                    } @else {
-                    <li>
-                        <span
-                            (click)="logout()"
-                            class="text-slate-300 hover:text-blue-400 transition-colors duration-200"
-                            >Logout
-                        </span>
                     </li>
                     }
                 </ul>

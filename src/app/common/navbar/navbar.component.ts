@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 
@@ -9,11 +9,9 @@ import { AuthService } from '../../services/auth/auth.service';
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.scss',
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent {
     authService = inject(AuthService);
-    user = this.authService.getUser();
-
-    ngOnInit(): void {}
+    user$ = this.authService.user$;
 
     logout() {
         this.authService.logout();
