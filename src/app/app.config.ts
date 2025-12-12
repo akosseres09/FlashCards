@@ -32,6 +32,9 @@ import {
     LogOut,
     ChevronDown,
     ChevronUp,
+    Github,
+    Linkedin,
+    Twitter,
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -72,6 +75,9 @@ export const appConfig: ApplicationConfig = {
                 Settings,
                 ChevronDown,
                 ChevronUp,
+                Github,
+                Linkedin,
+                Twitter
             })
         ),
     ],
