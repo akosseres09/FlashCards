@@ -8,6 +8,7 @@ import { filter, Subscription, switchMap } from 'rxjs';
 import { ModalComponent } from './modal/modal.component';
 import { User } from '@angular/fire/auth';
 import { AuthService } from '../../services/auth/auth.service';
+import { ToastService } from '../../services/toast/toast.service';
 
 @Component({
     selector: 'app-projects',
@@ -18,6 +19,8 @@ import { AuthService } from '../../services/auth/auth.service';
 export class ProjectsComponent implements OnInit, OnDestroy {
     private projectService = inject(ProjectService);
     private authService = inject(AuthService);
+    private toastService = inject(ToastService);
+
     private subscription: Subscription | null = null;
 
     isLoading: boolean = true;
@@ -67,7 +70,15 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     }
 
     onProjectDeleted(id: string) {
-        this.projectService.delete(id);
+        this.projectService
+            .delete(id)
+            .then(() => {
+                this.toastService.show('Project deleted successfully');
+            })
+            .catch((err) => {
+                console.error(err);
+                this.toastService.show('Failed to delete project', 'error');
+            });
     }
 
     ngOnDestroy(): void {

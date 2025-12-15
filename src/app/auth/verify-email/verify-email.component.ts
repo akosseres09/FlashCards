@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { ToastService } from '../../services/toast/toast.service';
 
 @Component({
     selector: 'app-verify-email',
@@ -13,10 +14,9 @@ import { LucideAngularModule } from 'lucide-angular';
 export class VerifyEmailComponent implements OnInit {
     private authService = inject(AuthService);
     private router = inject(Router);
+    private toastService = inject(ToastService);
 
     userEmail: string = '';
-    errorMessage: string = '';
-    successMessage: string = '';
     isLoading: boolean = false;
     canResend: boolean = true;
     resendCooldown: number = 60;
@@ -34,15 +34,13 @@ export class VerifyEmailComponent implements OnInit {
         if (!this.canResend) return;
 
         this.isLoading = true;
-        this.errorMessage = '';
-        this.successMessage = '';
 
         try {
             await this.authService.sendVerificationEmail();
-            this.successMessage = 'Verification email sent! Please check your inbox.';
+            this.toastService.show('Verification email sent! Please check your inbox.', 'success');
             this.startCooldown();
         } catch (error: any) {
-            this.errorMessage = this.getErrorMessage(error.code || error);
+            this.toastService.show(this.getErrorMessage(error.code || error), 'error');
         } finally {
             this.isLoading = false;
         }
@@ -50,24 +48,26 @@ export class VerifyEmailComponent implements OnInit {
 
     async checkEmailVerification() {
         this.isLoading = true;
-        this.errorMessage = '';
 
         try {
             const user = this.authService.getUser();
             if (user) {
                 await user.reload();
                 if (user.emailVerified) {
-                    this.successMessage = 'Email verified successfully!';
-                    setTimeout(() => {
-                        this.router.navigate(['/']);
-                    }, 2000);
+                    this.toastService.show('Email verified successfully!', 'success');
+                    this.router.navigate(['/']);
                 } else {
-                    this.errorMessage =
-                        'Email not verified yet. Please check your inbox and click the verification link.';
+                    this.toastService.show(
+                        'Email not verified yet. Please check your inbox and click the verification link.',
+                        'info'
+                    );
                 }
             }
         } catch (error: any) {
-            this.errorMessage = 'Unable to check verification status. Please try again.';
+            this.toastService.show(
+                'Unable to check verification status. Please try again.',
+                'error'
+            );
         } finally {
             this.isLoading = false;
         }

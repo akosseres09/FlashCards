@@ -11,6 +11,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ProjectService } from '../../../services/project/project.service';
 import { Project } from '../../../models/Project';
 import { LucideAngularModule } from 'lucide-angular';
+import { ToastService } from '../../../services/toast/toast.service';
 
 @Component({
     selector: 'app-projects-modal',
@@ -27,6 +28,8 @@ export class ModalComponent implements OnChanges {
 
     private fb = inject(FormBuilder);
     private projectService = inject(ProjectService);
+    private toastService = inject(ToastService);
+
     createProjectForm: FormGroup;
     isSaving: boolean = false;
     isEditMode: boolean = this.projectId !== null;
@@ -85,9 +88,11 @@ export class ModalComponent implements OnChanges {
 
             try {
                 await this.projectService.update(this.projectId, updatedProject);
+                this.toastService.show('Project updated successfully', 'success');
                 this.onClose();
             } catch (error) {
                 console.error('Error updating project:', error);
+                this.toastService.show('Error updating project', 'error');
             } finally {
                 this.isSaving = false;
             }
@@ -110,9 +115,11 @@ export class ModalComponent implements OnChanges {
 
             try {
                 await this.projectService.addOne(newProject);
+                this.toastService.show('Project created successfully', 'success');
                 this.onClose();
             } catch (error) {
                 console.error('Error creating project:', error);
+                this.toastService.show('Error creating project', 'error');
             } finally {
                 this.isSaving = false;
             }

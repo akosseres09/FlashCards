@@ -11,6 +11,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { ToastService } from '../../services/toast/toast.service';
 
 @Component({
     selector: 'app-signup',
@@ -22,6 +23,7 @@ export class SignupComponent {
     private fb = inject(FormBuilder);
     private authService = inject(AuthService);
     private router = inject(Router);
+    private toastService = inject(ToastService);
 
     signupForm: FormGroup;
     errorMessage: string = '';
@@ -70,6 +72,7 @@ export class SignupComponent {
 
             try {
                 await this.authService.signup(email, password);
+                this.toastService.show('Signup successful! Please verify your email.');
                 this.router.navigate(['/auth/verify-email']);
             } catch (error: any) {
                 this.errorMessage = this.getErrorMessage(error.code);
