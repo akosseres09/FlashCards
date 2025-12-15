@@ -60,6 +60,11 @@ export const routes: Routes = [
                 loadComponent: () =>
                     import('./main/projects/projects.component').then((m) => m.ProjectsComponent),
             },
+            {
+                path: 'projects/:id',
+                loadComponent: () =>
+                    import('./main/projects/view/view.component').then((m) => m.ViewComponent),
+            },
         ],
     },
 ];

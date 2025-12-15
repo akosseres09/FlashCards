@@ -33,6 +33,8 @@ import {
     LogOut,
     ChevronDown,
     ChevronUp,
+    ChevronLeft,
+    ChevronRight,
     Github,
     Linkedin,
     Twitter,
@@ -44,6 +46,10 @@ import {
     Pencil,
     Trash2,
     X,
+    Upload,
+    HelpCircle,
+    CheckCircle,
+    RotateCw,
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -85,6 +91,8 @@ export const appConfig: ApplicationConfig = {
                 Settings,
                 ChevronDown,
                 ChevronUp,
+                ChevronLeft,
+                ChevronRight,
                 Github,
                 Linkedin,
                 Twitter,
@@ -96,6 +104,10 @@ export const appConfig: ApplicationConfig = {
                 Pencil,
                 Trash2,
                 X,
+                Upload,
+                HelpCircle,
+                CheckCircle,
+                RotateCw,
             })
         ),
     ],
