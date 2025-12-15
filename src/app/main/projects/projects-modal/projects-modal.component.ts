@@ -159,15 +159,16 @@ export class ProjectsModalComponent implements OnChanges {
     }
 
     get title() {
-        if (this.editMode) {
-            return 'Edit Project';
-        } else if (this.createMode) {
-            return 'Create New Project';
-        } else if (this.deleteMode) {
-            return 'Delete Project';
+        switch (this.mode) {
+            case 'create':
+                return 'Create New Project';
+            case 'edit':
+                return 'Edit Project';
+            case 'delete':
+                return 'Delete Project';
+            default:
+                return '';
         }
-
-        return '';
     }
 
     get name() {
