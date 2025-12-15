@@ -9,12 +9,16 @@ import { ModalComponent } from './modal/modal.component';
 import { User } from '@angular/fire/auth';
 import { AuthService } from '../../services/auth/auth.service';
 import { ToastService } from '../../services/toast/toast.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
     selector: 'app-projects',
-    imports: [CommonModule, LucideAngularModule, ReactiveFormsModule, ModalComponent],
+    imports: [CommonModule, LucideAngularModule, ReactiveFormsModule, ModalComponent, RouterLink],
     templateUrl: './projects.component.html',
     styleUrl: './projects.component.scss',
+    host: {
+        class: 'flex-1 flex flex-col',
+    },
 })
 export class ProjectsComponent implements OnInit, OnDestroy {
     private projectService = inject(ProjectService);

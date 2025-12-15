@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 py-12 px-4">
+<div class="bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 py-12 px-4 flex-1">
     <div class="max-w-7xl mx-auto">
         <div class="mb-8">
             <h1 class="text-4xl font-bold text-white mb-2">My Projects</h1>
@@ -85,12 +85,13 @@
                 </div>
 
                 <div class="flex gap-2">
-                    <button
+                    <a
+                        routerLink="/projects/{{ project.id }}"
                         class="flex-1 cursor-pointer flex items-center justify-center gap-2 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200"
                     >
                         <lucide-icon name="play" class="w-4 h-4"></lucide-icon>
                         <span>Study</span>
-                    </button>
+                    </a>
                     <button
                         (click)="openModal(project.id, project.name, project.description)"
                         class="flex cursor-pointer items-center justify-center p-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-all duration-200"
