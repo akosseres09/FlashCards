@@ -4,6 +4,7 @@ import {
     provideBrowserGlobalErrorListeners,
     provideZoneChangeDetection,
 } from '@angular/core';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
@@ -42,6 +43,7 @@ import {
     Play,
     Pencil,
     Trash2,
+    X,
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -63,6 +65,7 @@ export const appConfig: ApplicationConfig = {
         }),
         provideBrowserGlobalErrorListeners(),
         provideZoneChangeDetection({ eventCoalescing: true }),
+        provideAnimations(),
         provideRouter(routes),
         importProvidersFrom(
             LucideAngularModule.pick({
@@ -92,6 +95,7 @@ export const appConfig: ApplicationConfig = {
                 Play,
                 Pencil,
                 Trash2,
+                X,
             })
         ),
     ],
