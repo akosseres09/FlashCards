@@ -1,11 +1,12 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
     selector: 'app-modal',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, LucideAngularModule],
     templateUrl: './modal.component.html',
     styleUrl: './modal.component.scss',
     animations: [
