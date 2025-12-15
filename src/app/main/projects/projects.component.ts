@@ -5,7 +5,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { Project } from '../../models/Project';
 import { ProjectService } from '../../services/project/project.service';
 import { filter, Subscription, switchMap } from 'rxjs';
-import { ModalComponent } from './modal/modal.component';
+import { ProjectsModalComponent } from './projects-modal/projects-modal.component';
 import { User } from '@angular/fire/auth';
 import { AuthService } from '../../services/auth/auth.service';
 import { ToastService } from '../../services/toast/toast.service';
@@ -13,7 +13,13 @@ import { RouterLink } from '@angular/router';
 
 @Component({
     selector: 'app-projects',
-    imports: [CommonModule, LucideAngularModule, ReactiveFormsModule, ModalComponent, RouterLink],
+    imports: [
+        CommonModule,
+        LucideAngularModule,
+        ReactiveFormsModule,
+        ProjectsModalComponent,
+        RouterLink,
+    ],
     templateUrl: './projects.component.html',
     styleUrl: './projects.component.scss',
     host: {
@@ -28,9 +34,10 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     private subscription: Subscription | null = null;
 
     isLoading: boolean = true;
-    projects: Project[] = [];
     isModalOpen: boolean = false;
     isSaving: boolean = false;
+    projects: Project[] = [];
+    modalMode: 'edit' | 'create' | 'delete' = 'create';
     editingProjectId: string | null = null;
     projectName: string | null = null;
     projectDescription: string | null = null;
@@ -59,14 +66,18 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     }
 
     openModal(
-        id: string | null = null,
-        projectName: string | null = null,
-        projectDescription: string | null = null
+        mode: 'edit' | 'create' | 'delete' = 'create',
+        data: { id: string | null; name: string | null; description: string | null } = {
+            id: null,
+            name: null,
+            description: null,
+        }
     ) {
         this.isModalOpen = true;
-        this.editingProjectId = id;
-        this.projectName = projectName;
-        this.projectDescription = projectDescription;
+        this.modalMode = mode;
+        this.projectName = data.name;
+        this.editingProjectId = data.id;
+        this.projectDescription = data.description;
     }
 
     closeModal() {

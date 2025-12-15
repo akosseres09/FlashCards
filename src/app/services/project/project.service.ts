@@ -5,6 +5,7 @@ import {
     collectionData,
     deleteDoc,
     doc,
+    docData,
     Firestore,
     query,
     setDoc,
@@ -13,7 +14,7 @@ import {
     writeBatch,
 } from '@angular/fire/firestore';
 import { Project } from '../../models/Project';
-import { Observable, reduce } from 'rxjs';
+import { merge, Observable, reduce } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -23,8 +24,8 @@ export class ProjectService {
     firestore = inject(Firestore);
 
     getOne(id: string) {
-        const ref = collection(this.firestore, this.PROJECTS_COLLECTION);
-        return doc(ref, id);
+        const ref = doc(collection(this.firestore, this.PROJECTS_COLLECTION), id);
+        return docData(ref) as Observable<Project>;
     }
 
     getAll() {

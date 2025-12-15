@@ -93,14 +93,26 @@
                         <span>Study</span>
                     </a>
                     <button
-                        (click)="openModal(project.id, project.name, project.description)"
+                        (click)="
+                            openModal('edit', {
+                                id: project.id,
+                                name: project.name,
+                                description: project.description
+                            })
+                        "
                         class="flex cursor-pointer items-center justify-center p-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-all duration-200"
                     >
                         <lucide-icon name="pencil" class="w-4 h-4"></lucide-icon>
                     </button>
                     <button
                         class="flex cursor-pointer items-center justify-center p-2 bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-red-400 rounded-lg transition-all duration-200"
-                        (click)="onProjectDeleted(project.id)"
+                        (click)="
+                            openModal('delete', {
+                                id: project.id,
+                                name: project.name,
+                                description: project.description
+                            })
+                        "
                     >
                         <lucide-icon name="trash-2" class="w-4 h-4"></lucide-icon>
                     </button>
@@ -113,6 +125,7 @@
 
     @if (isModalOpen && user) {
     <app-projects-modal
+        [mode]="modalMode"
         [projectId]="editingProjectId"
         [projectName]="projectName"
         [projectDescription]="projectDescription"

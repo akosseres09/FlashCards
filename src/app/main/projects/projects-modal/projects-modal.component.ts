@@ -12,19 +12,21 @@ import { ProjectService } from '../../../services/project/project.service';
 import { Project } from '../../../models/Project';
 import { LucideAngularModule } from 'lucide-angular';
 import { ToastService } from '../../../services/toast/toast.service';
+import { ModalComponent } from '../../../common/modal/modal.component';
 
 @Component({
     selector: 'app-projects-modal',
-    imports: [LucideAngularModule, ReactiveFormsModule],
-    templateUrl: './modal.component.html',
-    styleUrl: './modal.component.scss',
+    imports: [LucideAngularModule, ReactiveFormsModule, ModalComponent],
+    templateUrl: './projects-modal.component.html',
+    styleUrl: './projects-modal.component.scss',
 })
-export class ModalComponent implements OnChanges {
+export class ProjectsModalComponent implements OnChanges {
     @Output() modalClosed: EventEmitter<void> = new EventEmitter<void>();
     @Input() projectId: string | null = null;
     @Input() projectName: string | null = null;
     @Input() projectDescription: string | null = null;
     @Input() userId: string | null = null;
+    @Input() mode: 'edit' | 'create' | 'delete' = 'create';
 
     private fb = inject(FormBuilder);
     private projectService = inject(ProjectService);
@@ -32,7 +34,6 @@ export class ModalComponent implements OnChanges {
 
     createProjectForm: FormGroup;
     isSaving: boolean = false;
-    isEditMode: boolean = this.projectId !== null;
 
     constructor() {
         this.createProjectForm = this.fb.group({
@@ -42,11 +43,12 @@ export class ModalComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        console.log(changes);
-
         if (changes['projectId']) {
             this.projectId = changes['projectId'].currentValue;
-            this.isEditMode = this.projectId !== null;
+        }
+
+        if (changes['mode']) {
+            this.mode = changes['mode'].currentValue;
         }
 
         if (changes['projectName']) {
@@ -70,10 +72,12 @@ export class ModalComponent implements OnChanges {
     }
 
     onSubmit() {
-        if (this.isEditMode) {
+        if (this.editMode) {
             this.onUpdate();
-        } else {
+        } else if (this.createMode) {
             this.onCreate();
+        } else if (this.deleteMode) {
+            this.onDelete();
         }
     }
 
@@ -128,11 +132,42 @@ export class ModalComponent implements OnChanges {
         }
     }
 
+    async onDelete() {
+        if (!this.projectId) {
+            return;
+        }
+
+        this.isSaving = true;
+
+        try {
+            await this.projectService.delete(this.projectId);
+            this.toastService.show('Project deleted successfully', 'success');
+            this.onClose();
+        } catch (error) {
+            console.error('Error deleting project:', error);
+            this.toastService.show('Error deleting project', 'error');
+        } finally {
+            this.isSaving = false;
+        }
+    }
+
     private markFormGroupTouched(formGroup: FormGroup) {
         Object.keys(formGroup.controls).forEach((key) => {
             const control = formGroup.get(key);
             control?.markAsTouched();
         });
+    }
+
+    get title() {
+        if (this.editMode) {
+            return 'Edit Project';
+        } else if (this.createMode) {
+            return 'Create New Project';
+        } else if (this.deleteMode) {
+            return 'Delete Project';
+        }
+
+        return '';
     }
 
     get name() {
@@ -141,5 +176,17 @@ export class ModalComponent implements OnChanges {
 
     get description() {
         return this.createProjectForm.get('description');
+    }
+
+    get editMode() {
+        return this.mode === 'edit';
+    }
+
+    get createMode() {
+        return this.mode === 'create';
+    }
+
+    get deleteMode() {
+        return this.mode === 'delete';
     }
 }

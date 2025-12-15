@@ -1,23 +1,18 @@
-<div
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-    (click)="onClose()"
->
-    <div
-        class="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 max-w-lg w-full"
-        (click)="$event.stopPropagation()"
-    >
-        <div class="flex items-center justify-between p-6 border-b border-slate-700">
-            <h2 class="text-2xl font-bold text-white">
-                {{ isEditMode ? 'Edit Project' : 'Create New Project' }}
-            </h2>
-            <button
-                (click)="onClose()"
-                class="cursor-pointer text-slate-400 hover:text-slate-300 transition-colors p-1 rounded-lg hover:bg-slate-700"
-            >
-                <lucide-icon name="circle-x" class="w-6 h-6"></lucide-icon>
-            </button>
-        </div>
-        <form [formGroup]="createProjectForm" (ngSubmit)="onSubmit()" class="p-6">
+<app-modal (closeChange)="onClose()">
+    <div modal-header class="flex items-center justify-between p-6 border-b border-slate-700">
+        <h2 class="text-2xl font-bold text-white">
+            {{ title }}
+        </h2>
+        <button
+            (click)="onClose()"
+            class="cursor-pointer text-slate-400 hover:text-slate-300 transition-colors p-1 rounded-lg hover:bg-slate-700"
+        >
+            <lucide-icon name="circle-x" class="w-6 h-6"></lucide-icon>
+        </button>
+    </div>
+    <div modal-body>
+        @if(editMode || createMode) {
+        <form [formGroup]="createProjectForm" (ngSubmit)="onSubmit()">
             <div class="space-y-5">
                 <div>
                     <label for="project-name" class="block text-sm font-medium text-slate-300 mb-2">
@@ -78,16 +73,50 @@
                 >
                     @if (isSaving) {
                     <lucide-icon name="loader-circle" class="w-5 h-5 animate-spin"></lucide-icon>
-                    <span>{{ isEditMode ? 'Saving...' : 'Creating...' }}</span>
+                    <span>{{ editMode ? 'Saving...' : 'Creating...' }}</span>
                     } @else {
                     <lucide-icon
-                        [name]="isEditMode ? 'pencil' : 'plus'"
+                        [name]="editMode ? 'pencil' : 'plus'"
                         class="w-5 h-5"
                     ></lucide-icon>
-                    <span>{{ isEditMode ? 'Save Changes' : 'Create Project' }}</span>
+                    <span>{{ editMode ? 'Save Changes' : 'Create Project' }}</span>
                     }
                 </button>
             </div>
         </form>
+        } @else if(deleteMode) {
+        <div class="space-y-6">
+            <p class="text-slate-300">
+                Are you sure you want to delete the project
+                <span class="font-semibold text-white">{{ projectName }}</span
+                >? This action cannot be undone and all associated flashcards will be permanently
+                removed.
+            </p>
+            <div class="flex gap-3 mt-6 pt-6 border-t border-slate-700">
+                <button
+                    type="button"
+                    (click)="onClose()"
+                    class="flex-1 cursor-pointer py-3 px-4 border border-slate-600 rounded-lg text-slate-300 font-medium hover:bg-slate-700 transition-all duration-200"
+                    [disabled]="isSaving"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="button"
+                    (click)="onSubmit()"
+                    class="flex-1 cursor-pointer flex items-center justify-center gap-2 py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    [disabled]="isSaving"
+                >
+                    @if (isSaving) {
+                    <lucide-icon name="loader-circle" class="w-5 h-5 animate-spin"></lucide-icon>
+                    <span>Deleting...</span>
+                    } @else {
+                    <lucide-icon name="trash-2" class="w-5 h-5"></lucide-icon>
+                    <span>Delete Project</span>
+                    }
+                </button>
+            </div>
+        </div>
+        }
     </div>
-</div>
+</app-modal>
