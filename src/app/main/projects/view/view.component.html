@@ -95,6 +95,17 @@
                             <p class="text-2xl text-white text-center font-medium">
                                 {{ currentQuestion.question }}
                             </p>
+                            <div
+                                *ngIf="currentQuestion.options?.length"
+                                class="w-full max-w-sm mx-auto text-left space-y-2 mt-2"
+                            >
+                                <div
+                                    *ngFor="let opt of currentQuestion.options"
+                                    class="bg-slate-700/30 p-2.5 rounded border border-slate-600/50 text-slate-300 text-sm"
+                                >
+                                    • {{ opt }}
+                                </div>
+                            </div>
                             <p class="text-slate-500 text-sm mt-6">
                                 Click or press Space to reveal answer
                             </p>
