@@ -54,7 +54,7 @@
                             <lucide-icon
                                 name="at-sign"
                                 [size]="20"
-                                color="#90a1b9"
+                                [color]="email?.invalid && email?.touched ? '#f87171' : '#90a1b9'"
                                 [strokeWidth]="2"
                                 [absoluteStrokeWidth]="true"
                             ></lucide-icon>
@@ -64,6 +64,8 @@
                             type="email"
                             formControlName="email"
                             class="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            [class.!border-red-400]="email?.invalid && email?.touched"
+                            [class.!text-red-400]="email?.invalid && email?.touched"
                             placeholder="you@example.com"
                         />
                     </div>
@@ -85,7 +87,9 @@
                             <lucide-icon
                                 name="lock-keyhole"
                                 [size]="20"
-                                color="#90a1b9"
+                                [color]="
+                                    password?.invalid && password?.touched ? '#f87171' : '#90a1b9'
+                                "
                                 [strokeWidth]="2"
                                 [absoluteStrokeWidth]="true"
                             ></lucide-icon>
@@ -95,6 +99,8 @@
                             [type]="showPassword ? 'text' : 'password'"
                             formControlName="password"
                             class="w-full pl-10 pr-12 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            [class.!border-red-400]="password?.invalid && password?.touched"
+                            [class.!text-red-400]="password?.invalid && password?.touched"
                             placeholder="••••••••"
                         />
                         <button
@@ -102,23 +108,15 @@
                             (click)="togglePasswordVisibility()"
                             class="absolute cursor-pointer inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-300 transition-colors"
                         >
-                            @if (showPassword) {
                             <lucide-icon
-                                name="eye-off"
+                                [name]="showPassword ? 'eye' : 'eye-off'"
                                 [size]="20"
-                                color="#90a1b9"
+                                [color]="
+                                    password?.invalid && password?.touched ? '#f87171' : '#90a1b9'
+                                "
                                 [strokeWidth]="2"
                                 [absoluteStrokeWidth]="true"
                             ></lucide-icon>
-                            } @else {
-                            <lucide-icon
-                                name="eye"
-                                [size]="20"
-                                color="#90a1b9"
-                                [strokeWidth]="2"
-                                [absoluteStrokeWidth]="true"
-                            ></lucide-icon>
-                            }
                         </button>
                     </div>
                     @if (password?.invalid && password?.touched) {
@@ -142,7 +140,11 @@
                             <lucide-icon
                                 name="circle-check"
                                 [size]="20"
-                                color="#90a1b9"
+                                [color]="
+                                    confirmPassword?.invalid && confirmPassword?.touched
+                                        ? '#f87171'
+                                        : '#90a1b9'
+                                "
                                 [strokeWidth]="2"
                                 [absoluteStrokeWidth]="true"
                             ></lucide-icon>
@@ -152,6 +154,12 @@
                             [type]="showConfirmPassword ? 'text' : 'password'"
                             formControlName="confirmPassword"
                             class="w-full pl-10 pr-12 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            [class.!border-red-400]="
+                                confirmPassword?.invalid && confirmPassword?.touched
+                            "
+                            [class.!text-red-400]="
+                                confirmPassword?.invalid && confirmPassword?.touched
+                            "
                             placeholder="••••••••"
                         />
                         <button
@@ -159,23 +167,17 @@
                             (click)="toggleConfirmPasswordVisibility()"
                             class="absolute cursor-pointer inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-300 transition-colors"
                         >
-                            @if (showConfirmPassword) {
                             <lucide-icon
-                                name="eye-off"
+                                [name]="showConfirmPassword ? 'eye' : 'eye-off'"
                                 [size]="20"
-                                color="#90a1b9"
+                                [color]="
+                                    confirmPassword?.invalid && confirmPassword?.touched
+                                        ? '#f87171'
+                                        : '#90a1b9'
+                                "
                                 [strokeWidth]="2"
                                 [absoluteStrokeWidth]="true"
                             ></lucide-icon>
-                            } @else {
-                            <lucide-icon
-                                name="eye"
-                                [size]="20"
-                                color="#90a1b9"
-                                [strokeWidth]="2"
-                                [absoluteStrokeWidth]="true"
-                            ></lucide-icon>
-                            }
                         </button>
                     </div>
                     @if (confirmPassword?.invalid && confirmPassword?.touched) {
@@ -194,9 +196,14 @@
                                 type="checkbox"
                                 formControlName="agree"
                                 class="h-4 w-4 text-blue-500 focus:ring-blue-500 border-slate-600 rounded bg-slate-700"
+                                [class.!border-red-400]="agree?.invalid && agree?.touched"
                             />
                         </div>
-                        <label for="terms" class="ml-2 block text-sm text-slate-300">
+                        <label
+                            for="terms"
+                            class="ml-2 block text-sm text-slate-300"
+                            [class.!text-red-400]="agree?.invalid && agree?.touched"
+                        >
                             I agree to the
                             <a href="#" class="text-blue-400 hover:text-blue-300 transition-colors"
                                 >Terms of Service</a
