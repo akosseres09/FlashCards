@@ -8,3 +8,7 @@ export interface Question {
     createdAt: Date;
     updatedAt?: Date;
 }
+
+export type QuestionWithoutId = Omit<Question, 'id'> & { id?: string };
+
+export type ViewQuestion = Pick<Question, 'question' | 'answer' | 'type' | 'options'>;

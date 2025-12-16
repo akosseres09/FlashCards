@@ -6,58 +6,90 @@ import {
     doc,
     docData,
     Firestore,
-    query,
     setDoc,
     updateDoc,
-    where,
     writeBatch,
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import { Question } from '../../models/Question';
+import { Question, QuestionWithoutId } from '../../models/Question';
+import { ProjectService } from '../project/project.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class QuestionService {
+    PROJECTS_COLLECTION = 'projects';
     QUESTIONS_COLLECTION = 'questions';
-    firestore = inject(Firestore);
+    private firestore = inject(Firestore);
+    private projectService = inject(ProjectService);
 
-    getOne(id: string) {
-        const ref = doc(collection(this.firestore, this.QUESTIONS_COLLECTION), id);
+    getOne(projectId: string, id: string) {
+        const ref = doc(
+            collection(
+                this.firestore,
+                this.PROJECTS_COLLECTION + `/${projectId}/` + this.QUESTIONS_COLLECTION
+            ),
+            id
+        );
         return docData(ref) as Observable<Question>;
     }
 
     getByProject(projectId: string) {
-        const ref = collection(this.firestore, this.QUESTIONS_COLLECTION);
-        const q = query(ref, where('projectId', '==', projectId));
-        return collectionData(q) as Observable<Question[]>;
+        const ref = collection(
+            this.firestore,
+            this.PROJECTS_COLLECTION + `/${projectId}/` + this.QUESTIONS_COLLECTION
+        );
+        return collectionData(ref) as Observable<Question[]>;
     }
 
-    addOne(question: Question) {
-        const ref = doc(collection(this.firestore, this.QUESTIONS_COLLECTION));
-        question.id = ref.id;
-        return setDoc(ref, question);
+    async addOne(question: QuestionWithoutId, projectId: string) {
+        const questionRef = doc(
+            collection(
+                this.firestore,
+                this.PROJECTS_COLLECTION + `/${projectId}/` + this.QUESTIONS_COLLECTION
+            )
+        );
+        question.id = questionRef.id;
+
+        return Promise.all([
+            setDoc(questionRef, question),
+            this.projectService.incrementCardCount(projectId, 1),
+        ]);
     }
 
-    async addMany(questions: Array<Partial<Question>>) {
+    async addMany(questions: Array<Partial<Question>>, projectId: string) {
         const batch = writeBatch(this.firestore);
         questions.forEach((question) => {
-            if (question.projectId) {
-                const ref = doc(collection(this.firestore, this.QUESTIONS_COLLECTION));
-                question.id = ref.id;
-                batch.set(ref, question);
-            }
+            const ref = doc(
+                collection(
+                    this.firestore,
+                    this.PROJECTS_COLLECTION + `/${projectId}/` + this.QUESTIONS_COLLECTION
+                )
+            );
+            question.id = ref.id;
+            batch.set(ref, question);
         });
-        await batch.commit();
+
+        return Promise.all([
+            batch.commit(),
+            this.projectService.incrementCardCount(projectId, questions.length),
+        ]);
     }
 
-    updateOne(id: string, question: Partial<Question>) {
-        const ref = doc(this.firestore, this.QUESTIONS_COLLECTION + `/${id}`);
+    updateOne(id: string, projectId: string, question: Partial<Question>) {
+        const ref = doc(
+            this.firestore,
+            this.PROJECTS_COLLECTION + `/${projectId}/` + this.QUESTIONS_COLLECTION + `/${id}`
+        );
+        question.updatedAt = new Date();
         return updateDoc(ref, question);
     }
 
-    deleteOne(id: string) {
-        const ref = doc(this.firestore, this.QUESTIONS_COLLECTION + `/${id}`);
-        return deleteDoc(ref);
+    deleteOne(id: string, projectId: string) {
+        const ref = doc(
+            this.firestore,
+            this.PROJECTS_COLLECTION + `/${projectId}/` + this.QUESTIONS_COLLECTION + `/${id}`
+        );
+        return Promise.all([deleteDoc(ref), this.projectService.incrementCardCount(projectId, -1)]);
     }
 }

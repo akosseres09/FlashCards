@@ -7,6 +7,7 @@ import {
     doc,
     docData,
     Firestore,
+    increment,
     query,
     setDoc,
     updateDoc,
@@ -21,7 +22,7 @@ import { merge, Observable, reduce } from 'rxjs';
 })
 export class ProjectService {
     PROJECTS_COLLECTION = 'projects';
-    firestore = inject(Firestore);
+    private firestore = inject(Firestore);
 
     getOne(id: string) {
         const ref = doc(collection(this.firestore, this.PROJECTS_COLLECTION), id);
@@ -38,6 +39,14 @@ export class ProjectService {
         const ref = collection(this.firestore, this.PROJECTS_COLLECTION);
         const q = query(ref, where('createdBy', '==', userId));
         return collectionData(q) as Observable<Project[]>;
+    }
+
+    incrementCardCount(projectId: string, incrementBy: number) {
+        const ref = doc(collection(this.firestore, this.PROJECTS_COLLECTION), projectId);
+        return updateDoc(ref, {
+            cardCount: increment(incrementBy),
+            updatedAt: new Date(),
+        });
     }
 
     addOne(project: Project) {

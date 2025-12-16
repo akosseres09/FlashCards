@@ -9,7 +9,7 @@ import { ProjectsModalComponent } from './projects-modal/projects-modal.componen
 import { User } from '@angular/fire/auth';
 import { AuthService } from '../../services/auth/auth.service';
 import { ToastService } from '../../services/toast/toast.service';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 
 @Component({
     selector: 'app-projects',
@@ -30,7 +30,7 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     private projectService = inject(ProjectService);
     private authService = inject(AuthService);
     private toastService = inject(ToastService);
-
+    private router = inject(Router);
     private subscription: Subscription | null = null;
 
     isLoading: boolean = true;
@@ -94,6 +94,15 @@ export class ProjectsComponent implements OnInit, OnDestroy {
                 console.error(err);
                 this.toastService.show('Failed to delete project', 'error');
             });
+    }
+
+    async navigateToStudy(projectId: string) {
+        try {
+            await this.projectService.update(projectId, { lastStudied: new Date() });
+            this.router.navigate(['/projects', projectId]);
+        } catch (error) {
+            console.error('Failed to update last studied date:', error);
+        }
     }
 
     ngOnDestroy(): void {
