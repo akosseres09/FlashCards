@@ -1,0 +1,26 @@
+<div
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+    (click)="onClose()"
+>
+    <div
+        [@modalAnimation]
+        class="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 max-w-lg w-full max-h-[90vh] overflow-y-auto flex flex-col my-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-500"
+        (click)="$event.stopPropagation()"
+    >
+        <div class="flex items-center justify-between p-6 border-b border-slate-700 shrink-0">
+            <ng-content select="[modal-header]"></ng-content>
+            <button
+                (click)="onClose()"
+                class="cursor-pointer text-slate-400 hover:text-slate-300 transition-colors p-1 rounded-lg hover:bg-slate-700"
+            >
+                <lucide-icon name="circle-x" class="w-6 h-6"></lucide-icon>
+            </button>
+        </div>
+        <div class="p-6 flex-1">
+            <ng-content select="[modal-body]"></ng-content>
+        </div>
+        <div class="shrink-0">
+            <ng-content select="[modal-footer]"></ng-content>
+        </div>
+    </div>
+</div>

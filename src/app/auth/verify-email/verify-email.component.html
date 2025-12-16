@@ -1,0 +1,124 @@
+<div
+    class="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 px-4 py-12"
+>
+    <div class="max-w-md w-full space-y-8">
+        <div class="text-center">
+            <div class="flex justify-center mb-4">
+                <div
+                    class="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/50 animate-pulse"
+                >
+                    <lucide-icon name="mail-check" class="w-10 h-10 text-white"></lucide-icon>
+                </div>
+            </div>
+            <h2 class="text-4xl font-bold text-white mb-2">Verify Your Email</h2>
+            <p class="text-slate-400 text-lg">Check your inbox for verification link</p>
+        </div>
+
+        <div class="bg-slate-800 rounded-2xl shadow-2xl p-8 border border-slate-700">
+            <div class="text-center mb-6">
+                <p class="text-slate-300 mb-2">We've sent a verification email to:</p>
+                <p class="text-blue-400 font-semibold text-lg">{{ userEmail }}</p>
+            </div>
+
+            <div class="bg-slate-700/50 border border-slate-600 rounded-lg p-4 mb-6">
+                <h3 class="text-white font-semibold mb-3 flex items-center gap-2">
+                    <lucide-icon name="circle-check" class="w-5 h-5 text-blue-400"></lucide-icon>
+                    <span>What to do next:</span>
+                </h3>
+                <ol class="space-y-2 text-slate-300 text-sm">
+                    <li class="flex items-start gap-2">
+                        <span class="text-blue-400 font-bold mt-0.5">1.</span>
+                        <span>Check your email inbox (and spam folder)</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-blue-400 font-bold mt-0.5">2.</span>
+                        <span>Click the verification link in the email</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-blue-400 font-bold mt-0.5">3.</span>
+                        <span>Come back here and click "I've Verified"</span>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="space-y-3">
+                <button
+                    type="button"
+                    (click)="checkEmailVerification()"
+                    [disabled]="isLoading"
+                    class="w-full cursor-pointer flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                >
+                    @if (isLoading) {
+                    <lucide-icon name="loader-circle" class="w-5 h-5 animate-spin"></lucide-icon>
+                    <span>Checking...</span>
+                    } @else {
+                    <lucide-icon name="circle-check" class="w-5 h-5"></lucide-icon>
+                    <span>I've Verified My Email</span>
+                    }
+                </button>
+
+                <button
+                    type="button"
+                    (click)="resendVerificationEmail()"
+                    [disabled]="!canResend || isLoading"
+                    class="w-full cursor-pointer flex justify-center items-center gap-2 py-3 px-4 border border-slate-600 rounded-lg shadow-sm text-sm font-medium text-white bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                >
+                    @if (!canResend) {
+                    <span>Resend in {{ resendCooldown }}s</span>
+                    } @else {
+                    <lucide-icon name="mail-check" class="w-5 h-5"></lucide-icon>
+                    <span>Send Verification Email</span>
+                    }
+                </button>
+            </div>
+
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-slate-600"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-4 bg-slate-800 text-slate-500">OR</span>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                (click)="logout()"
+                class="w-full cursor-pointer flex justify-center items-center gap-2 py-2 px-4 text-sm font-medium text-slate-400 hover:text-slate-300 transition-colors"
+            >
+                <lucide-icon name="log-in" class="w-4 h-4 rotate-180"></lucide-icon>
+                <span>Sign out and use a different account</span>
+            </button>
+        </div>
+
+        <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
+            <h3 class="text-white font-semibold mb-3 flex items-center gap-2">
+                <lucide-icon name="circle-check" class="w-5 h-5 text-yellow-400"></lucide-icon>
+                <span>Didn't receive the email?</span>
+            </h3>
+            <ul class="space-y-2 text-slate-400 text-sm">
+                <li class="flex items-start gap-2">
+                    <span class="text-blue-400 mt-1">•</span>
+                    <span>Check your spam or junk folder</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="text-blue-400 mt-1">•</span>
+                    <span>Make sure {{ userEmail }} is correct</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="text-blue-400 mt-1">•</span>
+                    <span>Wait a few minutes and try resending</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="text-center">
+            <p class="text-sm text-slate-500">
+                Still having trouble?
+                <a href="#" class="text-blue-400 hover:text-blue-300 transition-colors"
+                    >Contact Support</a
+                >
+            </p>
+        </div>
+    </div>
+</div>

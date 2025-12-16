@@ -43,12 +43,9 @@ __screenshots__/
 Thumbs.db
 
 
-# Environment files
-src/environments/environment.development.ts
-src/environments/environment.ts
-
 # Firebase files
 firebase-debug.log
 firebase-errors.log
 firestore-debug.log
 firestore-errors.log
+emulator

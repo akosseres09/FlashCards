@@ -1,0 +1,37 @@
+<div class="fixed top-5 right-5 flex flex-col gap-2 z-50 max-w-md">
+    @for (toast of toasts$ | async; track toast.id) {
+    <div
+        [@toastAnimation]
+        class="px-6 py-3 flex items-center gap-4 rounded shadow text-white font-semibold"
+        [ngClass]="{
+            'bg-green-500': toast.type === 'success',
+            'bg-red-500': toast.type === 'error',
+            'bg-blue-500': toast.type === 'info',
+            'bg-yellow-500': toast.type === 'warning'
+        }"
+    >
+        @if(toast.type === 'success') {
+        <lucide-icon name="check-circle"></lucide-icon>
+        } @else if(toast.type === 'error') {
+        <lucide-icon name="circle-x"></lucide-icon>
+        } @else if(toast.type === 'info') {
+        <lucide-icon name="info"></lucide-icon>
+        } @else if(toast.type === 'warning') {
+        <lucide-icon name="triangle-alert"></lucide-icon>
+        }
+        {{ toast.message }}
+        <button
+            [ngClass]="{
+                'hover:bg-green-400': toast.type === 'success',
+                'hover:bg-red-400': toast.type === 'error',
+                'hover:bg-blue-400': toast.type === 'info',
+                'hover:bg-yellow-400': toast.type === 'warning'
+            }"
+            class="cursor-pointer rounded-lg p-1 transition-colors duration-200"
+            (click)="removeToast(toast.id)"
+        >
+            <lucide-icon name="x"></lucide-icon>
+        </button>
+    </div>
+    }
+</div>

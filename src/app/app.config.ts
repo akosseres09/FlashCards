@@ -1,8 +1,10 @@
 import {
     ApplicationConfig,
+    importProvidersFrom,
     provideBrowserGlobalErrorListeners,
     provideZoneChangeDetection,
 } from '@angular/core';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
@@ -10,8 +12,47 @@ import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import { connectFirestoreEmulator } from '@firebase/firestore';
-import { connectAuthEmulator } from '@firebase/auth';
+import { connectAuthEmulator } from '@angular/fire/auth';
+import { connectFirestoreEmulator } from '@angular/fire/firestore';
+import { environment } from '../environments/environment';
+import {
+    LucideAngularModule,
+    AtSign,
+    Lock,
+    LockKeyhole,
+    CircleCheck,
+    Eye,
+    EyeOff,
+    LoaderCircle,
+    LogIn,
+    UserPlus,
+    House,
+    CircleX,
+    MailCheck,
+    Settings,
+    LogOut,
+    ChevronDown,
+    ChevronUp,
+    ChevronLeft,
+    ChevronRight,
+    Github,
+    Linkedin,
+    Twitter,
+    FolderOpen,
+    Plus,
+    FileText,
+    Clock,
+    Play,
+    Pencil,
+    Trash2,
+    X,
+    Upload,
+    HelpCircle,
+    CheckCircle,
+    RotateCw,
+    Info,
+    TriangleAlert,
+} from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -26,12 +67,52 @@ export const appConfig: ApplicationConfig = {
         provideAuth(() => {
             const auth = getAuth();
             if (environment.useEmulators) {
-                connectAuthEmulator(auth, 'http://localhost:9099');
+                connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
             }
             return auth;
         }),
         provideBrowserGlobalErrorListeners(),
         provideZoneChangeDetection({ eventCoalescing: true }),
+        provideAnimations(),
         provideRouter(routes),
+        importProvidersFrom(
+            LucideAngularModule.pick({
+                AtSign,
+                Lock,
+                LockKeyhole,
+                CircleCheck,
+                Eye,
+                EyeOff,
+                LoaderCircle,
+                LogIn,
+                UserPlus,
+                House,
+                CircleX,
+                MailCheck,
+                LogOut,
+                Settings,
+                ChevronDown,
+                ChevronUp,
+                ChevronLeft,
+                ChevronRight,
+                Github,
+                Linkedin,
+                Twitter,
+                FolderOpen,
+                Plus,
+                FileText,
+                Clock,
+                Play,
+                Pencil,
+                Trash2,
+                X,
+                Upload,
+                HelpCircle,
+                CheckCircle,
+                RotateCw,
+                Info,
+                TriangleAlert,
+            })
+        ),
     ],
 };

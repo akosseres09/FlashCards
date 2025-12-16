@@ -1,0 +1,118 @@
+<header class="bg-slate-800 border-b border-slate-700 p-4 shadow-lg z-10">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-4">
+            <div class="w-6 h-6 rounded-lg flex items-center justify-center">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-6 w-6 text-blue-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                    />
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold text-white leading-tight">Flashcards</h1>
+            </div>
+        </div>
+        <div>
+            <nav>
+                <ul class="flex gap-5 cursor-pointer text-lg font-semibold">
+                    @if (user$ | async; as user) {
+                    <li>
+                        <a
+                            routerLink="/projects"
+                            routerLinkActive="text-blue-400"
+                            class="text-slate-300 hover:text-blue-400 transition-colors duration-200"
+                            >Projects</a
+                        >
+                    </li>
+                    <li class="relative">
+                        <button
+                            (click)="toggleDropdown()"
+                            class="cursor-pointer text-slate-400 hover:text-slate-300 transition-colors duration-200 flex items-center gap-2"
+                        >
+                            @if(user.photoURL) {
+                            <img
+                                [src]="user.photoURL"
+                                alt="User Avatar"
+                                class="w-8 h-8 rounded-full object-cover"
+                            />
+                            } @else {
+                            <span>{{ user.email }}</span>
+
+                            } @if(isDropdownOpen) {
+                            <lucide-icon
+                                name="chevron-down"
+                                [size]="20"
+                                [absoluteStrokeWidth]="true"
+                            ></lucide-icon>
+                            } @else {
+                            <lucide-icon
+                                name="chevron-up"
+                                [size]="20"
+                                [absoluteStrokeWidth]="true"
+                            ></lucide-icon>
+                            }
+                        </button>
+                        @if (isDropdownOpen) {
+                        <div
+                            class="absolute right-0 mt-2 w-48 bg-slate-800 rounded-lg shadow-xl border border-slate-700 py-2 z-50"
+                        >
+                            <a
+                                routerLink="/settings"
+                                (click)="closeDropdown()"
+                                class="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-blue-400 transition-colors duration-200"
+                            >
+                                <lucide-icon
+                                    name="settings"
+                                    [size]="20"
+                                    [absoluteStrokeWidth]="true"
+                                ></lucide-icon>
+                                <span>Settings</span>
+                            </a>
+                            <div class="border-t border-slate-700 my-1"></div>
+                            <span
+                                (click)="logout()"
+                                class="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-red-400 transition-colors duration-200 cursor-pointer"
+                            >
+                                <lucide-icon
+                                    name="log-out"
+                                    [size]="20"
+                                    [absoluteStrokeWidth]="true"
+                                ></lucide-icon>
+                                <span>Logout</span>
+                            </span>
+                        </div>
+                        }
+                    </li>
+
+                    } @else {
+                    <li>
+                        <a
+                            routerLink="/auth/login"
+                            routerLinkActive="text-blue-400"
+                            class="text-slate-300 hover:text-blue-400 transition-colors duration-200"
+                            >Login</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            routerLink="/auth/signup"
+                            routerLinkActive="text-blue-400"
+                            class="text-slate-300 hover:text-blue-400 transition-colors duration-200"
+                            >Signup</a
+                        >
+                    </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
