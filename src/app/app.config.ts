@@ -52,6 +52,7 @@ import {
     RotateCw,
     Info,
     TriangleAlert,
+    Menu,
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -95,6 +96,7 @@ export const appConfig: ApplicationConfig = {
                 ChevronUp,
                 ChevronLeft,
                 ChevronRight,
+                Menu,
                 Github,
                 Linkedin,
                 Twitter,

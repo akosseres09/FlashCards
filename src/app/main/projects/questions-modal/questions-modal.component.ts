@@ -278,13 +278,13 @@ export class QuestionsModalComponent implements OnChanges {
     get submitButtonText() {
         switch (this.mode) {
             case 'create':
-                return this.isSaving ? 'Creating...' : 'Create Question';
+                return this.isSaving ? 'Creating...' : 'Create';
             case 'edit':
-                return this.isSaving ? 'Saving Changes...' : 'Save Changes';
+                return this.isSaving ? 'Saving Changes...' : 'Save';
             case 'delete':
-                return this.isSaving ? 'Deleting...' : 'Delete Question';
+                return this.isSaving ? 'Deleting...' : 'Delete';
             case 'json':
-                return this.isSaving ? 'Importing...' : 'Import Questions';
+                return this.isSaving ? 'Importing...' : 'Import';
             default:
                 return '';
         }
