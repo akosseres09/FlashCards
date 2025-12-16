@@ -12,8 +12,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { QuestionService } from '../../../services/question/question.service';
 import { ToastService } from '../../../services/toast/toast.service';
 import { LucideAngularModule } from 'lucide-angular';
-import { Question } from '../../../models/Question';
-import { Subscription } from 'rxjs';
+import { Question, QuestionWithoutId, ViewQuestion } from '../../../models/Question';
 
 @Component({
     selector: 'app-questions-modal',
@@ -26,6 +25,7 @@ export class QuestionsModalComponent implements OnChanges {
     @Input() projectId: string | null = null;
     @Input() questionId: string | null = null;
     @Input() mode: 'edit' | 'create' | 'delete' | 'json' = 'create';
+    @Input() questionData: ViewQuestion | null = null;
 
     protected questions: Question[] = [];
     private fb = inject(FormBuilder);
@@ -40,21 +40,112 @@ export class QuestionsModalComponent implements OnChanges {
     protected jsonForm = this.fb.group({
         questions: ['', Validators.required],
     });
-
     isSaving: boolean = false;
-    questionSubScription: Subscription | null = null;
 
-    ngOnChanges(changes: SimpleChanges): void {}
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['questionId']) {
+            this.questionId = changes['questionId'].currentValue;
+        }
 
-    onCreate() {}
+        if (changes['mode']) {
+            this.mode = changes['mode'].currentValue;
+        }
 
-    onEdit() {}
+        if (changes['projectId']) {
+            this.projectId = changes['projectId'].currentValue;
+        }
 
-    onDelete() {}
+        if (changes['questionData']) {
+            this.questionData = changes['questionData'].currentValue;
+            if (this.questionData) {
+                this.question?.setValue(this.questionData.question || '');
+                this.answer?.setValue(this.questionData.answer || '');
+                this.type?.setValue(this.questionData.type || 'Multiple Choice');
+                //this.options?.setValue(this.questionData.options || []);
+            }
+        }
+    }
+
+    async onCreate() {
+        if (!this.questionForm.valid || !this.projectId) return;
+
+        this.isSaving = true;
+        const newQuestion: QuestionWithoutId = {
+            question: this.question?.value as string,
+            answer: this.answer?.value as string,
+            type: this.type?.value as Question['type'],
+            options: this.options?.value as string[],
+            projectId: this.projectId,
+            createdAt: new Date(),
+        };
+
+        try {
+            await this.questionService.addOne(newQuestion, this.projectId);
+            this.toastService.show('Question created successfully.');
+        } catch (error: any) {
+            const message = error.message || 'Error creating question.';
+            this.toastService.show(message, 'error');
+        } finally {
+            this.isSaving = false;
+            this.onClose();
+        }
+    }
+
+    onEdit() {
+        if (!this.questionForm.valid) return;
+
+        this.isSaving = true;
+        const updatedQuestion: ViewQuestion = {
+            question: this.question?.value as string,
+            answer: this.answer?.value as string,
+            type: this.type?.value as Question['type'],
+            options: this.options?.value as string[],
+        };
+
+        try {
+            this.questionService.updateOne(
+                this.questionId as string,
+                this.projectId as string,
+                updatedQuestion
+            );
+            this.toastService.show('Question updated successfully.');
+        } catch (error: any) {
+            const message = error.message || 'Error updating question.';
+            this.toastService.show(message, 'error');
+        } finally {
+            this.isSaving = false;
+            this.onClose();
+        }
+    }
+
+    async onDelete() {
+        if (!this.questionId) {
+            this.onClose();
+            return;
+        }
+
+        this.isSaving = true;
+        try {
+            await this.questionService.deleteOne(this.questionId, this.projectId as string);
+            this.toastService.show('Question deleted successfully.');
+        } catch (error: any) {
+            const message = error.message || 'Error deleting question.';
+            this.toastService.show(message, 'error');
+        } finally {
+            this.isSaving = false;
+            this.onClose();
+        }
+    }
 
     onSubmit() {
         if (this.jsonMode) {
             this.onJson();
+        } else if (this.createMode) {
+            this.onCreate();
+        } else if (this.editMode) {
+            this.onEdit();
+        } else if (this.deleteMode) {
+            this.onDelete();
         }
     }
 
@@ -72,7 +163,7 @@ export class QuestionsModalComponent implements OnChanges {
                 question.projectId = this.projectId as string;
             });
 
-            await this.questionService.addMany(questions);
+            await this.questionService.addMany(questions, this.projectId as string);
             this.toastService.show('Questions imported successfully.');
         } catch (error: any) {
             const message = error.message || 'No questions imported! Invalid JSON format.';
@@ -121,5 +212,51 @@ export class QuestionsModalComponent implements OnChanges {
 
     get questionsForm() {
         return this.jsonForm.get('questions');
+    }
+
+    get question() {
+        return this.questionForm.get('question');
+    }
+
+    get answer() {
+        return this.questionForm.get('answer');
+    }
+
+    get type() {
+        return this.questionForm.get('type');
+    }
+
+    get options() {
+        return this.questionForm.get('options');
+    }
+
+    get submitButtonText() {
+        switch (this.mode) {
+            case 'create':
+                return this.isSaving ? 'Creating...' : 'Create Question';
+            case 'edit':
+                return this.isSaving ? 'Saving Changes...' : 'Save Changes';
+            case 'delete':
+                return this.isSaving ? 'Deleting...' : 'Delete Question';
+            case 'json':
+                return this.isSaving ? 'Importing...' : 'Import Questions';
+            default:
+                return '';
+        }
+    }
+
+    get submitButtonIcon() {
+        switch (this.mode) {
+            case 'create':
+                return this.isSaving ? 'loader-circle' : 'plus';
+            case 'edit':
+                return this.isSaving ? 'loader-circle' : 'pencil';
+            case 'delete':
+                return this.isSaving ? 'loader-circle' : 'trash-2';
+            case 'json':
+                return this.isSaving ? 'loader-circle' : 'upload';
+            default:
+                return '';
+        }
     }
 }

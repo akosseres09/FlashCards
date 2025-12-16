@@ -13,14 +13,14 @@
                 </div>
                 <div class="flex gap-3 items-center">
                     <button
-                        (click)="addQuestion()"
+                        (click)="openModal('create')"
                         class="cursor-pointer flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
                     >
                         <lucide-icon name="plus" class="w-4 h-4"></lucide-icon>
                         <span>Add Question</span>
                     </button>
                     <button
-                        (click)="importQuestions('json')"
+                        (click)="openModal('json')"
                         class="cursor-pointer flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-all duration-200"
                     >
                         <lucide-icon name="upload" class="w-4 h-4"></lucide-icon>
@@ -55,7 +55,7 @@
                 <h2 class="text-2xl font-bold text-white mb-2">No Questions Yet</h2>
                 <p class="text-slate-400 mb-6">Start by adding your first flashcard question</p>
                 <button
-                    (click)="addQuestion()"
+                    (click)="openModal('create')"
                     class="cursor-pointer inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
                 >
                     <lucide-icon name="plus" class="w-5 h-5"></lucide-icon>
@@ -120,14 +120,14 @@
 
                 <div class="flex justify-center gap-3 mt-6">
                     <button
-                        (click)="editQuestion(currentQuestion)"
+                        (click)="openModal('edit', currentQuestion)"
                         class="cursor-pointer flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-all duration-200"
                     >
                         <lucide-icon name="pencil" class="w-4 h-4"></lucide-icon>
                         <span>Edit</span>
                     </button>
                     <button
-                        (click)="deleteQuestion(currentQuestion)"
+                        (click)="openModal('delete')"
                         class="cursor-pointer flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-red-600 text-slate-300 hover:text-white rounded-lg transition-all duration-200"
                     >
                         <lucide-icon name="trash-2" class="w-4 h-4"></lucide-icon>
@@ -189,5 +189,7 @@
     (modalClosed)="onModalClose()"
     [mode]="modalMode"
     [projectId]="projectId"
+    [questionId]="currentQuestionId"
+    [questionData]="questionData"
 ></app-questions-modal>
 }

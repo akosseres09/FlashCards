@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { Project } from '../../../models/Project';
-import { Question } from '../../../models/Question';
+import { Question, ViewQuestion } from '../../../models/Question';
 import { ProjectService } from '../../../services/project/project.service';
 import { filter, map, Subscription, switchMap } from 'rxjs';
 import { QuestionsModalComponent } from '../questions-modal/questions-modal.component';
@@ -24,6 +24,7 @@ export class ViewComponent implements OnInit, OnDestroy {
     private questionService = inject(QuestionService);
     private subscription: Subscription | null = null;
 
+    questionData: ViewQuestion | null = null;
     projectId: string = '';
     project: Project | null = null;
     questions: Question[] = [];
@@ -105,28 +106,24 @@ export class ViewComponent implements OnInit, OnDestroy {
         return this.questions[this.currentIndex] || null;
     }
 
+    get currentQuestionId(): string | null {
+        return this.currentQuestion ? this.currentQuestion.id : null;
+    }
+
     onModalClose() {
         this.isModalOpen = false;
     }
 
-    addQuestion() {
-        // TODO: Open modal to add new question
-        console.log('Add question');
-    }
-
-    importQuestions(mode: 'create' | 'edit' | 'delete' | 'json') {
+    openModal(
+        mode: 'create' | 'edit' | 'delete' | 'json',
+        questionData: ViewQuestion | null = null
+    ) {
         this.modalMode = mode;
         this.isModalOpen = true;
-    }
 
-    editQuestion(question: Question) {
-        // TODO: Open modal to edit question
-        console.log('Edit question:', question.id);
-    }
-
-    deleteQuestion(question: Question) {
-        // TODO: Implement delete functionality
-        console.log('Delete question:', question.id);
+        if (questionData) {
+            this.questionData = questionData;
+        }
     }
 
     ngOnDestroy() {
