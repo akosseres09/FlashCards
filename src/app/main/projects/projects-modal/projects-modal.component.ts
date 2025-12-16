@@ -207,11 +207,11 @@ export class ProjectsModalComponent implements OnChanges {
     get submitButtonText() {
         switch (this.mode) {
             case 'create':
-                return this.isSaving ? 'Creating...' : 'Create Project';
+                return this.isSaving ? 'Creating...' : 'Create';
             case 'edit':
-                return this.isSaving ? 'Saving...' : 'Save Changes';
+                return this.isSaving ? 'Saving...' : 'Save';
             case 'delete':
-                return this.isSaving ? 'Deleting...' : 'Delete Project';
+                return this.isSaving ? 'Deleting...' : 'Delete';
             default:
                 return '';
         }

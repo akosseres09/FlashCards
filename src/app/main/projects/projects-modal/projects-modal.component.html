@@ -69,7 +69,7 @@
         <button
             type="button"
             (click)="onClose()"
-            class="flex-1 cursor-pointer py-3 px-4 border border-slate-600 rounded-lg text-slate-300 font-medium hover:bg-slate-700 transition-all duration-200"
+            class="flex-1 cursor-pointer py-3 px-6 border border-slate-600 rounded-lg text-slate-300 font-medium hover:bg-slate-700 transition-all duration-200"
             [disabled]="isSaving"
         >
             Cancel
@@ -77,7 +77,7 @@
         <button
             (click)="isSaving ? null : onSubmit()"
             type="submit"
-            class="flex-1 cursor-pointer flex items-center justify-center gap-2 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="flex-1 cursor-pointer flex items-center justify-center gap-2 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             [disabled]="isSaving"
             [class.bg-red-600]="deleteMode"
             [class.hover:bg-red-700]="deleteMode"
