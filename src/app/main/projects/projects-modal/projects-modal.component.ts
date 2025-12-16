@@ -92,7 +92,7 @@ export class ProjectsModalComponent implements OnChanges {
 
             try {
                 await this.projectService.update(this.projectId, updatedProject);
-                this.toastService.show('Project updated successfully', 'success');
+                this.toastService.show('Project updated successfully');
                 this.onClose();
             } catch (error) {
                 console.error('Error updating project:', error);
@@ -119,7 +119,7 @@ export class ProjectsModalComponent implements OnChanges {
 
             try {
                 await this.projectService.addOne(newProject);
-                this.toastService.show('Project created successfully', 'success');
+                this.toastService.show('Project created successfully');
                 this.onClose();
             } catch (error) {
                 console.error('Error creating project:', error);
@@ -141,7 +141,7 @@ export class ProjectsModalComponent implements OnChanges {
 
         try {
             await this.projectService.delete(this.projectId);
-            this.toastService.show('Project deleted successfully', 'success');
+            this.toastService.show('Project deleted successfully');
             this.onClose();
         } catch (error) {
             console.error('Error deleting project:', error);

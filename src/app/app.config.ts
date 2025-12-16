@@ -50,6 +50,8 @@ import {
     HelpCircle,
     CheckCircle,
     RotateCw,
+    Info,
+    TriangleAlert,
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -108,6 +110,8 @@ export const appConfig: ApplicationConfig = {
                 HelpCircle,
                 CheckCircle,
                 RotateCw,
+                Info,
+                TriangleAlert,
             })
         ),
     ],

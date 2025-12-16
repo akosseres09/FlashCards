@@ -37,7 +37,7 @@ export class VerifyEmailComponent implements OnInit {
 
         try {
             await this.authService.sendVerificationEmail();
-            this.toastService.show('Verification email sent! Please check your inbox.', 'success');
+            this.toastService.show('Verification email sent! Please check your inbox.');
             this.startCooldown();
         } catch (error: any) {
             this.toastService.show(this.getErrorMessage(error.code || error), 'error');
@@ -54,12 +54,12 @@ export class VerifyEmailComponent implements OnInit {
             if (user) {
                 await user.reload();
                 if (user.emailVerified) {
-                    this.toastService.show('Email verified successfully!', 'success');
+                    this.toastService.show('Email verified successfully!');
                     this.router.navigate(['/']);
                 } else {
                     this.toastService.show(
                         'Email not verified yet. Please check your inbox and click the verification link.',
-                        'info'
+                        'warning'
                     );
                 }
             }

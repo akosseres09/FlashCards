@@ -73,7 +73,7 @@ export class QuestionsModalComponent implements OnChanges {
             });
 
             await this.questionService.addMany(questions);
-            this.toastService.show('Questions imported successfully.', 'success');
+            this.toastService.show('Questions imported successfully.');
         } catch (error: any) {
             const message = error.message || 'No questions imported! Invalid JSON format.';
             this.toastService.show(message, 'error', 20000);

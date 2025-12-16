@@ -10,6 +10,15 @@
             'bg-yellow-500': toast.type === 'warning'
         }"
     >
+        @if(toast.type === 'success') {
+        <lucide-icon name="check-circle"></lucide-icon>
+        } @else if(toast.type === 'error') {
+        <lucide-icon name="circle-x"></lucide-icon>
+        } @else if(toast.type === 'info') {
+        <lucide-icon name="info"></lucide-icon>
+        } @else if(toast.type === 'warning') {
+        <lucide-icon name="triangle-alert"></lucide-icon>
+        }
         {{ toast.message }}
         <button
             [ngClass]="{
