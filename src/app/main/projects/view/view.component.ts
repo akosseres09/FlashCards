@@ -5,7 +5,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { Project } from '../../../models/Project';
 import { Question, ViewQuestion } from '../../../models/Question';
 import { ProjectService } from '../../../services/project/project.service';
-import { filter, map, Subscription, switchMap } from 'rxjs';
+import { filter, Subscription, switchMap } from 'rxjs';
 import { QuestionsModalComponent } from '../questions-modal/questions-modal.component';
 import { QuestionService } from '../../../services/question/question.service';
 
@@ -85,6 +85,16 @@ export class ViewComponent implements OnInit, OnDestroy {
 
     @HostListener('window:keydown', ['$event'])
     handleKeyDown(event: KeyboardEvent) {
+        const target = event.target as HTMLElement;
+        if (
+            target.tagName === 'INPUT' ||
+            target.tagName === 'TEXTAREA' ||
+            target.tagName === 'SELECT' ||
+            this.isModalOpen
+        ) {
+            return;
+        }
+
         switch (event.key) {
             case ' ':
             case 'Spacebar':
@@ -121,9 +131,7 @@ export class ViewComponent implements OnInit, OnDestroy {
         this.modalMode = mode;
         this.isModalOpen = true;
 
-        if (questionData) {
-            this.questionData = questionData;
-        }
+        this.questionData = questionData;
     }
 
     ngOnDestroy() {

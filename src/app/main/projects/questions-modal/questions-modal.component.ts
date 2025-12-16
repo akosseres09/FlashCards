@@ -12,7 +12,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { QuestionService } from '../../../services/question/question.service';
 import { ToastService } from '../../../services/toast/toast.service';
 import { LucideAngularModule } from 'lucide-angular';
-import { Question, QuestionWithoutId, ViewQuestion } from '../../../models/Question';
+import {
+    Question,
+    QUESTION_TYPES,
+    QuestionWithoutId,
+    ViewQuestion,
+} from '../../../models/Question';
 
 @Component({
     selector: 'app-questions-modal',
@@ -35,12 +40,32 @@ export class QuestionsModalComponent implements OnChanges {
         question: ['', Validators.required],
         answer: ['', Validators.required],
         type: ['Multiple Choice', Validators.required],
-        options: this.fb.array([]),
+        options: this.fb.array([this.fb.control('')]),
     });
     protected jsonForm = this.fb.group({
         questions: ['', Validators.required],
     });
     isSaving: boolean = false;
+    protected selectedType: Question['type'] = 'Multiple Choice';
+    protected selectionOptions = [...QUESTION_TYPES];
+
+    addOption() {
+        this.optionsArray.push(this.fb.control(''));
+    }
+
+    removeOption(index: number) {
+        if (this.optionsArray.length > 1) {
+            this.optionsArray.removeAt(index);
+        }
+    }
+
+    get optionsArray() {
+        return this.questionForm.get('options') as any;
+    }
+
+    get showOptions() {
+        return this.type?.value === 'Multiple Choice';
+    }
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['questionId']) {
@@ -61,7 +86,14 @@ export class QuestionsModalComponent implements OnChanges {
                 this.question?.setValue(this.questionData.question || '');
                 this.answer?.setValue(this.questionData.answer || '');
                 this.type?.setValue(this.questionData.type || 'Multiple Choice');
-                //this.options?.setValue(this.questionData.options || []);
+                this.selectedType = this.questionData.type || 'Multiple Choice';
+
+                if (this.questionData.options && this.questionData.options.length > 0) {
+                    this.optionsArray.clear();
+                    this.questionData.options.forEach((option: string) => {
+                        this.optionsArray.push(this.fb.control(option));
+                    });
+                }
             }
         }
     }
@@ -70,11 +102,15 @@ export class QuestionsModalComponent implements OnChanges {
         if (!this.questionForm.valid || !this.projectId) return;
 
         this.isSaving = true;
+        const optionsValue = this.showOptions
+            ? (this.optionsArray.value as string[]).filter((opt: string) => opt.trim() !== '')
+            : [];
+
         const newQuestion: QuestionWithoutId = {
             question: this.question?.value as string,
             answer: this.answer?.value as string,
             type: this.type?.value as Question['type'],
-            options: this.options?.value as string[],
+            options: optionsValue,
             projectId: this.projectId,
             createdAt: new Date(),
         };
@@ -95,11 +131,15 @@ export class QuestionsModalComponent implements OnChanges {
         if (!this.questionForm.valid) return;
 
         this.isSaving = true;
+        const optionsValue = this.showOptions
+            ? (this.optionsArray.value as string[]).filter((opt: string) => opt.trim() !== '')
+            : [];
+
         const updatedQuestion: ViewQuestion = {
             question: this.question?.value as string,
             answer: this.answer?.value as string,
             type: this.type?.value as Question['type'],
-            options: this.options?.value as string[],
+            options: optionsValue,
         };
 
         try {
@@ -176,6 +216,11 @@ export class QuestionsModalComponent implements OnChanges {
     }
 
     onClose() {
+        this.jsonForm.reset();
+        this.questionForm.reset();
+        this.optionsArray.clear();
+        this.optionsArray.push(this.fb.control(''));
+        this.selectedType = 'Multiple Choice';
         this.modalClosed.emit();
     }
 

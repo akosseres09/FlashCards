@@ -1,7 +1,9 @@
+export const QUESTION_TYPES = ['Multiple Choice', 'Definition', 'Concept', 'Yes/No'] as const;
+
 export interface Question {
     id: string;
     projectId: string;
-    type: 'Multiple Choice' | 'Definition' | 'Concept' | 'Yes/No';
+    type: (typeof QUESTION_TYPES)[number];
     question: string;
     answer: string;
     options?: string[];

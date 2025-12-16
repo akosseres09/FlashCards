@@ -1,5 +1,13 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import {
+    Component,
+    EventEmitter,
+    HostListener,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 
@@ -36,11 +44,20 @@ import { LucideAngularModule } from 'lucide-angular';
         ]),
     ],
 })
-export class ModalComponent {
+export class ModalComponent implements OnInit, OnDestroy {
     @Input() isOpen = false;
     @Output() closeChange = new EventEmitter<boolean>();
 
+    ngOnInit() {
+        document.body.style.overflow = 'hidden';
+    }
+
+    ngOnDestroy() {
+        document.body.style.overflow = '';
+    }
+
     onClose() {
+        document.body.style.overflow = '';
         this.closeChange.emit(false);
     }
 
