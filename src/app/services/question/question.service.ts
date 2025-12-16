@@ -12,7 +12,7 @@ import {
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Question, QuestionWithoutId } from '../../models/Question';
-import { ProjectService } from '../project/project.service';
+import { ProjectQuestionService } from '../project-question/project-question.service';
 
 @Injectable({
     providedIn: 'root',
@@ -21,7 +21,7 @@ export class QuestionService {
     PROJECTS_COLLECTION = 'projects';
     QUESTIONS_COLLECTION = 'questions';
     private firestore = inject(Firestore);
-    private projectService = inject(ProjectService);
+    private projQuestService = inject(ProjectQuestionService);
 
     getOne(projectId: string, id: string) {
         const ref = doc(
@@ -53,7 +53,7 @@ export class QuestionService {
 
         return Promise.all([
             setDoc(questionRef, question),
-            this.projectService.incrementCardCount(projectId, 1),
+            this.projQuestService.incrementCardCount(projectId, 1),
         ]);
     }
 
@@ -72,7 +72,7 @@ export class QuestionService {
 
         return Promise.all([
             batch.commit(),
-            this.projectService.incrementCardCount(projectId, questions.length),
+            this.projQuestService.incrementCardCount(projectId, questions.length),
         ]);
     }
 
@@ -90,6 +90,9 @@ export class QuestionService {
             this.firestore,
             this.PROJECTS_COLLECTION + `/${projectId}/` + this.QUESTIONS_COLLECTION + `/${id}`
         );
-        return Promise.all([deleteDoc(ref), this.projectService.incrementCardCount(projectId, -1)]);
+        return Promise.all([
+            deleteDoc(ref),
+            this.projQuestService.incrementCardCount(projectId, -1),
+        ]);
     }
 }

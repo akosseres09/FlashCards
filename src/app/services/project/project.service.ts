@@ -1,21 +1,19 @@
 import { inject, Injectable } from '@angular/core';
 import {
-    addDoc,
     collection,
     collectionData,
     deleteDoc,
     doc,
     docData,
     Firestore,
-    increment,
     query,
     setDoc,
     updateDoc,
     where,
-    writeBatch,
 } from '@angular/fire/firestore';
 import { Project } from '../../models/Project';
-import { merge, Observable, reduce } from 'rxjs';
+import { Observable } from 'rxjs';
+import { ProjectQuestionService } from '../project-question/project-question.service';
 
 @Injectable({
     providedIn: 'root',
@@ -23,6 +21,7 @@ import { merge, Observable, reduce } from 'rxjs';
 export class ProjectService {
     PROJECTS_COLLECTION = 'projects';
     private firestore = inject(Firestore);
+    private projQuestService = inject(ProjectQuestionService);
 
     getOne(id: string) {
         const ref = doc(collection(this.firestore, this.PROJECTS_COLLECTION), id);
@@ -41,14 +40,6 @@ export class ProjectService {
         return collectionData(q) as Observable<Project[]>;
     }
 
-    incrementCardCount(projectId: string, incrementBy: number) {
-        const ref = doc(collection(this.firestore, this.PROJECTS_COLLECTION), projectId);
-        return updateDoc(ref, {
-            cardCount: increment(incrementBy),
-            updatedAt: new Date(),
-        });
-    }
-
     addOne(project: Project) {
         const ref = doc(collection(this.firestore, this.PROJECTS_COLLECTION));
         project.id = ref.id;
@@ -61,7 +52,8 @@ export class ProjectService {
     }
 
     delete(id: string) {
-        const ref = doc(this.firestore, this.PROJECTS_COLLECTION + `/${id}`);
-        return deleteDoc(ref);
+        const projectRef = doc(this.firestore, this.PROJECTS_COLLECTION + `/${id}`);
+
+        return Promise.all([deleteDoc(projectRef), this.projQuestService.deleteByProject(id)]);
     }
 }
