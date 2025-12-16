@@ -50,30 +50,6 @@
                 </div>
             </div>
         </form>
-        <div modal-footer class="flex gap-3 mt-6 pt-6 border-t border-slate-700">
-            <button
-                type="button"
-                (click)="onClose()"
-                class="flex-1 cursor-pointer py-3 px-4 border border-slate-600 rounded-lg text-slate-300 font-medium hover:bg-slate-700 transition-all duration-200"
-                [disabled]="isSaving"
-            >
-                Cancel
-            </button>
-            <button
-                (click)="isSaving ? null : onSubmit()"
-                type="submit"
-                class="flex-1 cursor-pointer flex items-center justify-center gap-2 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                [disabled]="isSaving"
-            >
-                @if (isSaving) {
-                <lucide-icon name="loader-circle" class="w-5 h-5 animate-spin"></lucide-icon>
-                <span>{{ editMode ? 'Saving...' : 'Creating...' }}</span>
-                } @else {
-                <lucide-icon [name]="editMode ? 'pencil' : 'plus'" class="w-5 h-5"></lucide-icon>
-                <span>{{ editMode ? 'Save Changes' : 'Create Project' }}</span>
-                }
-            </button>
-        </div>
         } @else if(deleteMode) {
         <div class="space-y-6">
             <p class="text-slate-300">
@@ -83,30 +59,31 @@
                 removed.
             </p>
         </div>
-        <div modal-footer class="flex gap-3 mt-6 pt-6 border-t border-slate-700">
-            <button
-                type="button"
-                (click)="onClose()"
-                class="flex-1 cursor-pointer py-3 px-4 border border-slate-600 rounded-lg text-slate-300 font-medium hover:bg-slate-700 transition-all duration-200"
-                [disabled]="isSaving"
-            >
-                Cancel
-            </button>
-            <button
-                type="button"
-                (click)="isSaving ? null : onSubmit()"
-                class="flex-1 cursor-pointer flex items-center justify-center gap-2 py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                [disabled]="isSaving"
-            >
-                @if (isSaving) {
-                <lucide-icon name="loader-circle" class="w-5 h-5 animate-spin"></lucide-icon>
-                <span>Deleting...</span>
-                } @else {
-                <lucide-icon name="trash-2" class="w-5 h-5"></lucide-icon>
-                <span>Delete Project</span>
-                }
-            </button>
-        </div>
         }
+    </div>
+    <div modal-footer class="flex gap-3 p-6 border-t border-slate-700">
+        <button
+            type="button"
+            (click)="onClose()"
+            class="flex-1 cursor-pointer py-3 px-4 border border-slate-600 rounded-lg text-slate-300 font-medium hover:bg-slate-700 transition-all duration-200"
+            [disabled]="isSaving"
+        >
+            Cancel
+        </button>
+        <button
+            (click)="isSaving ? null : onSubmit()"
+            type="submit"
+            class="flex-1 cursor-pointer flex items-center justify-center gap-2 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="isSaving"
+            [class.bg-red-600]="deleteMode"
+            [class.hover:bg-red-700]="deleteMode"
+        >
+            <lucide-icon
+                [class.animate-spin]="isSaving"
+                [name]="submitButtonIcon"
+                class="w-5 h-5"
+            ></lucide-icon>
+            <span>{{ submitButtonText }}</span>
+        </button>
     </div>
 </app-modal>

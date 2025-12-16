@@ -190,4 +190,30 @@ export class ProjectsModalComponent implements OnChanges {
     get deleteMode() {
         return this.mode === 'delete';
     }
+
+    get submitButtonIcon() {
+        switch (this.mode) {
+            case 'create':
+                return this.isSaving ? 'loader-circle' : 'plus';
+            case 'edit':
+                return this.isSaving ? 'loader-circle' : 'pencil';
+            case 'delete':
+                return this.isSaving ? 'loader-circle' : 'trash-2';
+            default:
+                return '';
+        }
+    }
+
+    get submitButtonText() {
+        switch (this.mode) {
+            case 'create':
+                return this.isSaving ? 'Creating...' : 'Create Project';
+            case 'edit':
+                return this.isSaving ? 'Saving...' : 'Save Changes';
+            case 'delete':
+                return this.isSaving ? 'Deleting...' : 'Delete Project';
+            default:
+                return '';
+        }
+    }
 }
