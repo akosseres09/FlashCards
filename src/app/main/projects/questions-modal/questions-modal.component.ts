@@ -207,7 +207,7 @@ export class QuestionsModalComponent implements OnChanges {
             this.toastService.show('Questions imported successfully.');
         } catch (error: any) {
             const message = error.message || 'No questions imported! Invalid JSON format.';
-            this.toastService.show(message, 'error', 20000);
+            this.toastService.show(message, 'error');
         } finally {
             this.jsonForm.reset();
             this.isSaving = false;
