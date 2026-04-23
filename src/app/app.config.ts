@@ -1,19 +1,20 @@
 import {
     ApplicationConfig,
     importProvidersFrom,
+    provideAppInitializer,
     provideBrowserGlobalErrorListeners,
     provideZoneChangeDetection,
 } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { provideAuth, getAuth } from '@angular/fire/auth';
-import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { initializeApp, getApp, provideFirebaseApp } from '@angular/fire/app';
+import { provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
+import { getFirestore, connectFirestoreEmulator } from '@angular/fire/firestore';
 
 import { provideRouter } from '@angular/router';
+import { providePrimeNG } from 'primeng/config';
 
 import { routes } from './app.routes';
-import { connectAuthEmulator } from '@angular/fire/auth';
-import { connectFirestoreEmulator } from '@angular/fire/firestore';
+import { AppTheme } from './primeng-theme';
 import { environment } from '../environments/environment';
 import {
     LucideAngularModule,
@@ -55,27 +56,34 @@ import {
     Menu,
 } from 'lucide-angular';
 
+const app = initializeApp(environment.firebaseConfig);
+
 export const appConfig: ApplicationConfig = {
     providers: [
-        provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
-        provideFirestore(() => {
-            const firestore = getFirestore();
+        provideFirebaseApp(() => getApp()),
+        provideAppInitializer(() => {
             if (environment.useEmulators) {
-                connectFirestoreEmulator(firestore, '127.0.0.1', 8080);
+                connectFirestoreEmulator(getFirestore(), '127.0.0.1', 8080);
+                connectAuthEmulator(getAuth(), 'http://localhost:9099', { disableWarnings: true });
             }
-            return firestore;
         }),
-        provideAuth(() => {
-            const auth = getAuth();
-            if (environment.useEmulators) {
-                connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
-            }
-            return auth;
-        }),
+        provideAuth(() => getAuth()),
         provideBrowserGlobalErrorListeners(),
         provideZoneChangeDetection({ eventCoalescing: true }),
         provideAnimations(),
         provideRouter(routes),
+        providePrimeNG({
+            theme: {
+                preset: AppTheme,
+                options: {
+                    darkModeSelector: ':root',
+                    cssLayer: {
+                        name: 'primeng',
+                        order: 'tailwind-base, primeng, tailwind-utilities',
+                    },
+                },
+            },
+        }),
         importProvidersFrom(
             LucideAngularModule.pick({
                 AtSign,
@@ -114,7 +122,7 @@ export const appConfig: ApplicationConfig = {
                 RotateCw,
                 Info,
                 TriangleAlert,
-            })
+            }),
         ),
     ],
 };
