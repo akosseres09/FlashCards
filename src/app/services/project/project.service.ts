@@ -1,59 +1,65 @@
 import { inject, Injectable } from '@angular/core';
-import {
-    collection,
-    collectionData,
-    deleteDoc,
-    doc,
-    docData,
-    Firestore,
-    query,
-    setDoc,
-    updateDoc,
-    where,
-} from '@angular/fire/firestore';
-import { Project } from '../../models/Project';
 import { Observable } from 'rxjs';
+import { db, ProjectData, Schema } from '../../models/schema/db';
+import { Project } from '../../models/Project';
 import { ProjectQuestionService } from '../project-question/project-question.service';
+import { toData } from '../../utils/converter';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ProjectService {
-    PROJECTS_COLLECTION = 'projects';
-    private firestore = inject(Firestore);
     private projQuestService = inject(ProjectQuestionService);
 
-    getOne(id: string) {
-        const ref = doc(collection(this.firestore, this.PROJECTS_COLLECTION), id);
-        return docData(ref) as Observable<Project>;
+    getOne(id: string): Observable<Project> {
+        const typedId = id as Schema['projects']['Id'];
+        return new Observable<Project>((subscriber) => {
+            const off = db.projects
+                .get(typedId)
+                .on((doc) => {
+                    if (doc) subscriber.next(toData<ProjectData>(doc));
+                })
+                .catch((err) => subscriber.error(err));
+            return () => off();
+        });
     }
 
-    getAll() {
-        return collectionData(collection(this.firestore, this.PROJECTS_COLLECTION)) as Observable<
-            Project[]
-        >;
+    getAll(): Observable<Project[]> {
+        return new Observable<Project[]>((subscriber) => {
+            const off = db.projects
+                .all()
+                .on((docs) => subscriber.next(docs.map((doc) => toData<ProjectData>(doc))))
+                .catch((err) => subscriber.error(err));
+            return () => off();
+        });
     }
 
-    getOwnProjects(userId: string) {
-        const ref = collection(this.firestore, this.PROJECTS_COLLECTION);
-        const q = query(ref, where('createdBy', '==', userId));
-        return collectionData(q) as Observable<Project[]>;
+    getOwnProjects(userId: string): Observable<Project[]> {
+        return new Observable<Project[]>((subscriber) => {
+            const off = db.projects
+                .query(($) => $.field('createdBy').eq(userId))
+                .on((docs) => subscriber.next(docs.map((doc) => toData<ProjectData>(doc))))
+                .catch((err) => subscriber.error(err));
+            return () => off();
+        });
     }
 
-    addOne(project: Project) {
-        const ref = doc(collection(this.firestore, this.PROJECTS_COLLECTION));
-        project.id = ref.id;
-        return setDoc(ref, project);
+    addOne(project: Project): Promise<void> {
+        const { id: _id, ...data } = project;
+        return db.projects.add(data).then(() => undefined);
     }
 
-    update(id: string, project: Partial<Project>) {
-        const ref = doc(this.firestore, this.PROJECTS_COLLECTION + `/${id}`);
-        return updateDoc(ref, project);
+    update(id: string, project: Partial<Project>): Promise<void> {
+        const typedId = id as Schema['projects']['Id'];
+        const { id: _id, ...updateData } = project;
+        return db.projects.update(typedId, updateData).then(() => undefined);
     }
 
-    delete(id: string) {
-        const projectRef = doc(this.firestore, this.PROJECTS_COLLECTION + `/${id}`);
-
-        return Promise.all([deleteDoc(projectRef), this.projQuestService.deleteByProject(id)]);
+    delete(id: string): Promise<[void, void]> {
+        const typedId = id as Schema['projects']['Id'];
+        return Promise.all([
+            db.projects.remove(typedId).then(() => undefined),
+            this.projQuestService.deleteByProject(id),
+        ]);
     }
 }
