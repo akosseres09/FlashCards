@@ -1,15 +1,13 @@
-<div
-    class="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 px-4 py-12"
->
+<div class="min-h-screen flex items-center justify-center bg-surface px-4 py-12">
     <div class="max-w-md w-full space-y-8">
         <div class="text-center">
             <div class="flex justify-center mb-4">
                 <div
-                    class="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/50"
+                    class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        class="h-10 w-10 text-white"
+                        class="h-10 w-10 text-primary-foreground"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -23,28 +21,28 @@
                     </svg>
                 </div>
             </div>
-            <h2 class="text-4xl font-bold text-white mb-2">Create Account</h2>
-            <p class="text-slate-400 text-lg">Start your learning journey today</p>
+            <h2 class="text-4xl font-bold text-text-base mb-2">Create Account</h2>
+            <p class="text-text-muted text-lg">Start your learning journey today</p>
         </div>
-        <div class="bg-slate-800 rounded-2xl shadow-2xl p-8 border border-slate-700">
+        <div class="bg-surface-raised rounded-2xl shadow-2xl p-8 border border-surface-border">
             @if (errorMessage) {
-            <div class="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-lg">
-                <p class="text-red-400 text-sm flex items-center gap-2">
-                    <lucide-icon
-                        name="circle-x"
-                        [size]="20"
-                        color="#f87171"
-                        [strokeWidth]="2"
-                        [absoluteStrokeWidth]="true"
-                    ></lucide-icon>
-                    {{ errorMessage }}
-                </p>
-            </div>
+                <div class="mb-6 p-4 bg-error/10 border border-error/50 rounded-lg">
+                    <p class="text-error text-sm flex items-center gap-2">
+                        <lucide-icon
+                            name="circle-x"
+                            [size]="20"
+                            color="#f43f5e"
+                            [strokeWidth]="2"
+                            [absoluteStrokeWidth]="true"
+                        ></lucide-icon>
+                        {{ errorMessage }}
+                    </p>
+                </div>
             }
 
             <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="space-y-4">
                 <div>
-                    <label for="email" class="block text-sm font-medium text-slate-300 mb-2">
+                    <label for="email" class="block text-sm font-medium text-text-subtle mb-2">
                         Email Address
                     </label>
                     <div class="relative">
@@ -54,7 +52,7 @@
                             <lucide-icon
                                 name="at-sign"
                                 [size]="20"
-                                [color]="email?.invalid && email?.touched ? '#f87171' : '#90a1b9'"
+                                [color]="email?.invalid && email?.touched ? '#f43f5e' : '#94a3b8'"
                                 [strokeWidth]="2"
                                 [absoluteStrokeWidth]="true"
                             ></lucide-icon>
@@ -63,21 +61,24 @@
                             id="email"
                             type="email"
                             formControlName="email"
-                            class="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                            [class.!border-red-400]="email?.invalid && email?.touched"
-                            [class.!text-red-400]="email?.invalid && email?.touched"
+                            class="w-full pl-10 pr-4 py-3 bg-surface-overlay border border-surface-border rounded-lg text-text-base placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                            [class.!border-error]="email?.invalid && email?.touched"
+                            [class.!text-error]="email?.invalid && email?.touched"
                             placeholder="you@example.com"
                         />
                     </div>
                     @if (email?.invalid && email?.touched) {
-                    <p class="mt-2 text-sm text-red-400">
-                        @if (email?.errors?.['required']) { Email is required } @else if
-                        (email?.errors?.['email']) { Please enter a valid email }
-                    </p>
+                        <p class="mt-2 text-sm text-error">
+                            @if (email?.errors?.['required']) {
+                                Email is required
+                            } @else if (email?.errors?.['email']) {
+                                Please enter a valid email
+                            }
+                        </p>
                     }
                 </div>
                 <div>
-                    <label for="password" class="block text-sm font-medium text-slate-300 mb-2">
+                    <label for="password" class="block text-sm font-medium text-text-subtle mb-2">
                         Password
                     </label>
                     <div class="relative">
@@ -88,7 +89,7 @@
                                 name="lock-keyhole"
                                 [size]="20"
                                 [color]="
-                                    password?.invalid && password?.touched ? '#f87171' : '#90a1b9'
+                                    password?.invalid && password?.touched ? '#f43f5e' : '#94a3b8'
                                 "
                                 [strokeWidth]="2"
                                 [absoluteStrokeWidth]="true"
@@ -98,21 +99,21 @@
                             id="password"
                             [type]="showPassword ? 'text' : 'password'"
                             formControlName="password"
-                            class="w-full pl-10 pr-12 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                            [class.!border-red-400]="password?.invalid && password?.touched"
-                            [class.!text-red-400]="password?.invalid && password?.touched"
+                            class="w-full pl-10 pr-12 py-3 bg-surface-overlay border border-surface-border rounded-lg text-text-base placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                            [class.!border-error]="password?.invalid && password?.touched"
+                            [class.!text-error]="password?.invalid && password?.touched"
                             placeholder="••••••••"
                         />
                         <button
                             type="button"
                             (click)="togglePasswordVisibility()"
-                            class="absolute cursor-pointer inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-300 transition-colors"
+                            class="absolute cursor-pointer inset-y-0 right-0 pr-3 flex items-center text-text-muted hover:text-text-subtle transition-colors"
                         >
                             <lucide-icon
                                 [name]="showPassword ? 'eye' : 'eye-off'"
                                 [size]="20"
                                 [color]="
-                                    password?.invalid && password?.touched ? '#f87171' : '#90a1b9'
+                                    password?.invalid && password?.touched ? '#f43f5e' : '#94a3b8'
                                 "
                                 [strokeWidth]="2"
                                 [absoluteStrokeWidth]="true"
@@ -120,16 +121,19 @@
                         </button>
                     </div>
                     @if (password?.invalid && password?.touched) {
-                    <p class="mt-2 text-sm text-red-400">
-                        @if (password?.errors?.['required']) { Password is required } @else if
-                        (password?.errors?.['minlength']) { Password must be at least 6 characters }
-                    </p>
+                        <p class="mt-2 text-sm text-error">
+                            @if (password?.errors?.['required']) {
+                                Password is required
+                            } @else if (password?.errors?.['minlength']) {
+                                Password must be at least 6 characters
+                            }
+                        </p>
                     }
                 </div>
                 <div>
                     <label
                         for="confirmPassword"
-                        class="block text-sm font-medium text-slate-300 mb-2"
+                        class="block text-sm font-medium text-text-subtle mb-2"
                     >
                         Confirm Password
                     </label>
@@ -142,8 +146,8 @@
                                 [size]="20"
                                 [color]="
                                     confirmPassword?.invalid && confirmPassword?.touched
-                                        ? '#f87171'
-                                        : '#90a1b9'
+                                        ? '#f43f5e'
+                                        : '#94a3b8'
                                 "
                                 [strokeWidth]="2"
                                 [absoluteStrokeWidth]="true"
@@ -153,11 +157,11 @@
                             id="confirmPassword"
                             [type]="showConfirmPassword ? 'text' : 'password'"
                             formControlName="confirmPassword"
-                            class="w-full pl-10 pr-12 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                            [class.!border-red-400]="
+                            class="w-full pl-10 pr-12 py-3 bg-surface-overlay border border-surface-border rounded-lg text-text-base placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                            [class.!border-error]="
                                 confirmPassword?.invalid && confirmPassword?.touched
                             "
-                            [class.!text-red-400]="
+                            [class.!text-error]="
                                 confirmPassword?.invalid && confirmPassword?.touched
                             "
                             placeholder="••••••••"
@@ -165,15 +169,15 @@
                         <button
                             type="button"
                             (click)="toggleConfirmPasswordVisibility()"
-                            class="absolute cursor-pointer inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-300 transition-colors"
+                            class="absolute cursor-pointer inset-y-0 right-0 pr-3 flex items-center text-text-muted hover:text-text-subtle transition-colors"
                         >
                             <lucide-icon
                                 [name]="showConfirmPassword ? 'eye' : 'eye-off'"
                                 [size]="20"
                                 [color]="
                                     confirmPassword?.invalid && confirmPassword?.touched
-                                        ? '#f87171'
-                                        : '#90a1b9'
+                                        ? '#f43f5e'
+                                        : '#94a3b8'
                                 "
                                 [strokeWidth]="2"
                                 [absoluteStrokeWidth]="true"
@@ -181,11 +185,13 @@
                         </button>
                     </div>
                     @if (confirmPassword?.invalid && confirmPassword?.touched) {
-                    <p class="mt-2 text-sm text-red-400">
-                        @if (confirmPassword?.errors?.['required']) { Please confirm your password }
-                        @else if (confirmPassword?.errors?.['passwordMismatch']) { Passwords do not
-                        match }
-                    </p>
+                        <p class="mt-2 text-sm text-error">
+                            @if (confirmPassword?.errors?.['required']) {
+                                Please confirm your password
+                            } @else if (confirmPassword?.errors?.['passwordMismatch']) {
+                                Passwords do not match
+                            }
+                        </p>
                     }
                 </div>
                 <div class="space-y-2">
@@ -195,65 +201,66 @@
                                 id="terms"
                                 type="checkbox"
                                 formControlName="agree"
-                                class="h-4 w-4 text-blue-500 focus:ring-blue-500 border-slate-600 rounded bg-slate-700"
-                                [class.!border-red-400]="agree?.invalid && agree?.touched"
+                                class="h-4 w-4 text-primary focus:ring-primary border-surface-border rounded bg-surface-overlay"
+                                [class.!border-error]="agree?.invalid && agree?.touched"
                             />
                         </div>
                         <label
                             for="terms"
-                            class="ml-2 block text-sm text-slate-300"
-                            [class.!text-red-400]="agree?.invalid && agree?.touched"
+                            class="ml-2 block text-sm text-text-subtle"
+                            [class.!text-error]="agree?.invalid && agree?.touched"
                         >
                             I agree to the
-                            <a href="#" class="text-blue-400 hover:text-blue-300 transition-colors"
+                            <a href="#" class="text-primary hover:text-primary transition-colors"
                                 >Terms of Service</a
                             >
                             and
-                            <a href="#" class="text-blue-400 hover:text-blue-300 transition-colors"
+                            <a href="#" class="text-primary hover:text-primary transition-colors"
                                 >Privacy Policy</a
                             >
                         </label>
                     </div>
                     @if (agree?.invalid && agree?.touched) {
-                    <p class="text-sm text-red-400">
-                        @if (agree?.errors?.['required']) { Please agree to the terms and conditions
-                        }
-                    </p>
+                        <p class="text-sm text-error">
+                            @if (agree?.errors?.['required']) {
+                                Please agree to the terms and conditions
+                            }
+                        </p>
                     }
                 </div>
                 <button
                     type="submit"
                     [disabled]="isLoading"
-                    class="w-full cursor-pointer flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                    class="w-full cursor-pointer flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                     @if (isLoading) {
-                    <lucide-icon
-                        name="loader-circle"
-                        class="animate-spin"
-                        [size]="20"
-                        color="#ffffff"
-                        [strokeWidth]="2"
-                        [absoluteStrokeWidth]="true"
-                    ></lucide-icon>
-                    <span>Creating account...</span>
+                        <lucide-icon
+                            name="loader-circle"
+                            class="animate-spin"
+                            [size]="20"
+                            color="#ffffff"
+                            [strokeWidth]="2"
+                            [absoluteStrokeWidth]="true"
+                        ></lucide-icon>
+                        <span>Creating account...</span>
                     } @else {
-                    <span>Create Account</span>
+                        <span>Create Account</span>
                     }
                 </button>
             </form>
             <div class="relative my-6">
                 <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-slate-600"></div>
+                    <div class="w-full border-t border-surface-border"></div>
                 </div>
                 <div class="relative flex justify-center text-sm">
-                    <span class="px-4 bg-slate-800 text-slate-400">Or sign up with</span>
+                    <span class="px-4 bg-surface-raised text-text-muted">Or sign up with</span>
                 </div>
             </div>
             <button
                 type="button"
                 (click)="onGoogleSignup()"
                 [disabled]="isLoading"
-                class="w-full cursor-pointer flex justify-center items-center gap-3 py-3 px-4 border border-slate-600 rounded-lg shadow-sm text-sm font-medium text-white bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                class="w-full cursor-pointer flex justify-center items-center gap-3 py-3 px-4 border border-surface-border rounded-lg shadow-sm text-sm font-medium text-text-base bg-surface-overlay hover:bg-surface-border focus:outline-none focus:ring-2 focus:ring-surface-border disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
             >
                 <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -275,11 +282,11 @@
                 </svg>
                 <span>Sign up with Google</span>
             </button>
-            <p class="text-center mt-6 text-slate-400">
+            <p class="text-center mt-6 text-text-muted">
                 Already have an account?
                 <a
                     routerLink="/auth/login"
-                    class="font-medium text-blue-400 hover:text-blue-300 transition-colors"
+                    class="font-medium text-primary hover:text-primary transition-colors"
                 >
                     Sign in instead
                 </a>
