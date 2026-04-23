@@ -4,10 +4,12 @@ import { AuthService } from '../../services/auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { ToastService } from '../../services/toast/toast.service';
+import { ButtonModule } from 'primeng/button';
+import { DividerModule } from 'primeng/divider';
 
 @Component({
     selector: 'app-verify-email',
-    imports: [CommonModule, LucideAngularModule],
+    imports: [CommonModule, LucideAngularModule, ButtonModule, DividerModule],
     templateUrl: './verify-email.component.html',
     styleUrl: './verify-email.component.scss',
 })
@@ -59,14 +61,14 @@ export class VerifyEmailComponent implements OnInit {
                 } else {
                     this.toastService.show(
                         'Email not verified yet. Please check your inbox and click the verification link.',
-                        'warning'
+                        'warning',
                     );
                 }
             }
         } catch (error: any) {
             this.toastService.show(
                 'Unable to check verification status. Please try again.',
-                'error'
+                'error',
             );
         } finally {
             this.isLoading = false;

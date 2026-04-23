@@ -20,94 +20,89 @@
 
             <div class="bg-surface-overlay/50 border border-surface-border rounded-lg p-4 mb-6">
                 <h3 class="text-text-base font-semibold mb-3 flex items-center gap-2">
-                    <lucide-icon name="circle-check" class="w-5 h-5 text-primary"></lucide-icon>
+                    <i class="pi pi-check-circle text-primary"></i>
                     <span>What to do next:</span>
                 </h3>
                 <ol class="space-y-2 text-text-subtle text-sm">
-                    <li class="flex items-start gap-2">
+                    <li class="space-x-2">
                         <span class="text-primary font-bold mt-0.5">1.</span>
                         <span>Check your email inbox (and spam folder)</span>
                     </li>
-                    <li class="flex items-start gap-2">
+                    <li class="space-x-2">
                         <span class="text-primary font-bold mt-0.5">2.</span>
                         <span>Click the verification link in the email</span>
                     </li>
-                    <li class="flex items-start gap-2">
+                    <li class="space-x-2">
                         <span class="text-primary font-bold mt-0.5">3.</span>
                         <span>Come back here and click "I've Verified"</span>
                     </li>
                 </ol>
             </div>
 
-            <div class="space-y-3">
-                <button
+            <div class="flex flex-col gap-3">
+                <p-button
                     type="button"
-                    (click)="checkEmailVerification()"
-                    [disabled]="isLoading"
-                    class="w-full cursor-pointer flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                    (onClick)="checkEmailVerification()"
+                    [loading]="isLoading"
+                    [fluid]="true"
                 >
-                    @if (isLoading) {
-                        <lucide-icon
-                            name="loader-circle"
-                            class="w-5 h-5 animate-spin"
-                        ></lucide-icon>
-                        <span>Checking...</span>
-                    } @else {
-                        <lucide-icon name="circle-check" class="w-5 h-5"></lucide-icon>
+                    <span class="flex gap-2 items-center">
+                        <i class="pi pi-check"></i>
                         <span>I've Verified My Email</span>
-                    }
-                </button>
+                    </span>
+                </p-button>
 
-                <button
+                <p-button
                     type="button"
-                    (click)="resendVerificationEmail()"
+                    (onClick)="resendVerificationEmail()"
                     [disabled]="!canResend || isLoading"
-                    class="w-full cursor-pointer flex justify-center items-center gap-2 py-3 px-4 border border-surface-border rounded-lg shadow-sm text-sm font-medium text-text-base bg-surface-overlay hover:bg-surface-border focus:outline-none focus:ring-2 focus:ring-surface-border disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                    severity="secondary"
+                    [text]="true"
+                    [fluid]="true"
                 >
-                    @if (!canResend) {
-                        <span>Resend in {{ resendCooldown }}s</span>
-                    } @else {
-                        <lucide-icon name="mail-check" class="w-5 h-5"></lucide-icon>
-                        <span>Send Verification Email</span>
-                    }
-                </button>
+                    <span class="flex gap-2 items-center text-text-subtle">
+                        @if (!canResend) {
+                            Resend in {{ resendCooldown }}s
+                        } @else {
+                            <i class="pi pi-envelope"></i>
+                            Send Verification Email
+                        }
+                    </span>
+                </p-button>
             </div>
 
-            <div class="relative my-6">
-                <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-surface-border"></div>
-                </div>
-                <div class="relative flex justify-center text-sm">
-                    <span class="px-4 bg-surface-raised text-text-muted">OR</span>
-                </div>
-            </div>
+            <p-divider align="center">
+                <span class="text-text-muted text-sm">OR</span>
+            </p-divider>
 
-            <button
+            <p-button
                 type="button"
-                (click)="logout()"
-                class="w-full cursor-pointer flex justify-center items-center gap-2 py-2 px-4 text-sm font-medium text-text-muted hover:text-text-subtle transition-colors"
+                (onClick)="logout()"
+                severity="warn"
+                [text]="true"
+                [fluid]="true"
             >
-                <lucide-icon name="log-in" class="w-4 h-4 rotate-180"></lucide-icon>
+                <i class="pi pi-sign-out"></i>
                 <span>Sign out and use a different account</span>
-            </button>
+            </p-button>
         </div>
 
-        <div class="bg-surface-raised/50 rounded-xl p-6 border border-surface-border/50">
+        <div class="bg-surface-raised rounded-xl p-6 border border-surface-border/50">
             <h3 class="text-text-base font-semibold mb-3 flex items-center gap-2">
-                <lucide-icon name="circle-check" class="w-5 h-5 text-tertiary"></lucide-icon>
+                <i class="pi pi-info-circle text-warning"></i>
                 <span>Didn't receive the email?</span>
             </h3>
             <ul class="space-y-2 text-text-muted text-sm">
-                <li class="flex items-start gap-2">
-                    <span class="text-primary mt-1">•</span>
+                <li class="space-x-2">
+                    <span class="text-warning mt-1">•</span>
                     <span>Check your spam or junk folder</span>
                 </li>
-                <li class="flex items-start gap-2">
-                    <span class="text-primary mt-1">•</span>
+                <li class="space-x-2">
+                    <span class="text-warning mt-1">•</span>
                     <span>Make sure {{ userEmail }} is correct</span>
                 </li>
-                <li class="flex items-start gap-2">
-                    <span class="text-primary mt-1">•</span>
+                <li class="space-x-2">
+                    <span class="text-warning mt-1">•</span>
                     <span>Wait a few minutes and try resending</span>
                 </li>
             </ul>

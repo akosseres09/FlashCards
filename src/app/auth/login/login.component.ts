@@ -4,10 +4,32 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
+import { MessageModule } from 'primeng/message';
+import { DividerModule } from 'primeng/divider';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { AuthErrorCodes } from '@angular/fire/auth';
+import { LogoComponent } from '../../common/logo/logo.component';
 
 @Component({
     selector: 'app-login',
-    imports: [CommonModule, ReactiveFormsModule, RouterLink, LucideAngularModule],
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        RouterLink,
+        LucideAngularModule,
+        ButtonModule,
+        InputTextModule,
+        PasswordModule,
+        MessageModule,
+        DividerModule,
+        IconFieldModule,
+        InputIconModule,
+        LogoComponent,
+    ],
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss',
 })
@@ -75,15 +97,15 @@ export class LoginComponent {
 
     private getErrorMessage(errorCode: string): string {
         switch (errorCode) {
-            case 'auth/user-not-found':
-            case 'auth/wrong-password':
-            case 'auth/invalid-credential':
+            case AuthErrorCodes.INVALID_EMAIL:
+            case AuthErrorCodes.INVALID_PASSWORD:
+            case AuthErrorCodes.INVALID_IDP_RESPONSE:
                 return 'Invalid email or password';
-            case 'auth/too-many-requests':
+            case AuthErrorCodes.TOO_MANY_ATTEMPTS_TRY_LATER:
                 return 'Too many failed attempts. Please try again later';
-            case 'auth/user-disabled':
+            case AuthErrorCodes.USER_DISABLED:
                 return 'This account has been disabled';
-            case 'auth/popup-closed-by-user':
+            case AuthErrorCodes.POPUP_CLOSED_BY_USER:
                 return 'Sign-in popup was closed';
             default:
                 return 'An error occurred. Please try again';

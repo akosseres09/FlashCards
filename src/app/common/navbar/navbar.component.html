@@ -1,226 +1,161 @@
-<header class="bg-surface-raised border-b border-surface-border p-4 shadow-lg z-10">
-    <div class="max-w-7xl mx-auto flex flex-row justify-between items-center gap-4">
-        <div class="flex items-center gap-4">
-            <div class="w-6 h-6 rounded-lg flex items-center justify-center">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-6 w-6 text-primary"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                    />
+<header class="bg-surface-raised border-b border-surface-border px-6 py-3 shadow-lg z-10">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+
+        <!-- Brand -->
+        <a routerLink="/" class="flex items-center gap-3 no-underline">
+            <div class="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
             </div>
-            <div>
-                <h1 class="text-xl md:text-3xl font-bold text-text-base leading-tight">
-                    Flashcards
-                </h1>
-            </div>
-        </div>
-        <div>
-            <button
-                (click)="toggleMobileMenu()"
-                class="md:hidden text-text-muted hover:text-primary transition-colors duration-200 p-2"
-            >
-                <lucide-icon name="menu" [size]="28"></lucide-icon>
-            </button>
+            <span class="text-xl font-bold text-text-base tracking-tight">Flashcards</span>
+        </a>
 
-            <nav class="hidden md:block">
-                <ul class="flex gap-5 cursor-pointer text-lg font-semibold">
-                    @if (user$ | async; as user) {
-                        <li>
-                            <a
-                                routerLink="/projects"
-                                routerLinkActive="text-primary"
-                                class="text-text-subtle hover:text-primary transition-colors duration-200"
-                                >Projects</a
-                            >
-                        </li>
-                        <li class="relative">
-                            <button
-                                (click)="toggleDropdown()"
-                                class="cursor-pointer text-text-muted hover:text-text-subtle transition-colors duration-200 flex items-center gap-2"
-                            >
-                                @if (user.photoURL) {
-                                    <img
-                                        [src]="user.photoURL"
-                                        alt="User Avatar"
-                                        class="w-8 h-8 rounded-full object-cover"
-                                    />
-                                } @else {
-                                    <span>{{ user.email }}</span>
-                                }
-                                @if (isDropdownOpen) {
-                                    <lucide-icon
-                                        name="chevron-up"
-                                        [size]="20"
-                                        [absoluteStrokeWidth]="true"
-                                    ></lucide-icon>
-                                } @else {
-                                    <lucide-icon
-                                        name="chevron-down"
-                                        [size]="20"
-                                        [absoluteStrokeWidth]="true"
-                                    ></lucide-icon>
-                                }
-                            </button>
-                            @if (isDropdownOpen) {
-                                <div
-                                    class="absolute right-0 mt-2 w-48 bg-surface-raised rounded-lg shadow-xl border border-surface-border py-2 z-50"
-                                >
-                                    <a
-                                        routerLink="/settings"
-                                        (click)="closeDropdown()"
-                                        class="flex items-center gap-2 px-4 py-2 text-sm text-text-subtle hover:bg-surface-overlay hover:text-primary transition-colors duration-200"
-                                    >
-                                        <lucide-icon
-                                            name="settings"
-                                            [size]="20"
-                                            [absoluteStrokeWidth]="true"
-                                        ></lucide-icon>
-                                        <span>Settings</span>
-                                    </a>
-                                    <div class="border-t border-surface-border my-1"></div>
-                                    <span
-                                        (click)="logout()"
-                                        class="flex items-center gap-2 px-4 py-2 text-sm text-text-subtle hover:bg-surface-overlay hover:text-error transition-colors duration-200 cursor-pointer"
-                                    >
-                                        <lucide-icon
-                                            name="log-out"
-                                            [size]="20"
-                                            [absoluteStrokeWidth]="true"
-                                        ></lucide-icon>
-                                        <span>Logout</span>
-                                    </span>
-                                </div>
-                            }
-                        </li>
-                    } @else {
-                        <li>
-                            <a
-                                routerLink="/auth/login"
-                                routerLinkActive="text-primary"
-                                class="text-text-subtle hover:text-primary transition-colors duration-200"
-                                >Login</a
-                            >
-                        </li>
-                        <li>
-                            <a
-                                routerLink="/auth/signup"
-                                routerLinkActive="text-primary"
-                                class="text-text-subtle hover:text-primary transition-colors duration-200"
-                                >Signup</a
-                            >
-                        </li>
-                    }
-                </ul>
-            </nav>
-
-            @if (isMobileMenuOpen) {
-                <div
-                    [@backdropFade]
-                    class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-                    (click)="closeMobileMenu()"
-                ></div>
-                <div
-                    [@slideInLeft]
-                    class="fixed top-0 right-0 h-full w-72 bg-surface-raised shadow-2xl z-50 md:hidden transform transition-transform duration-300 ease-in-out"
+        <!-- Desktop nav -->
+        <nav class="hidden md:flex items-center gap-1">
+            @if (user$ | async; as user) {
+                <a
+                    routerLink="/projects"
+                    routerLinkActive="!text-primary !bg-primary/10"
+                    class="px-4 py-2 rounded-lg text-sm font-semibold text-text-subtle hover:text-primary hover:bg-surface-overlay transition-all duration-200 no-underline"
                 >
-                    <div class="flex flex-col h-full">
-                        <div
-                            class="flex items-center justify-between p-4 border-b border-surface-border"
-                        >
-                            <h2 class="text-xl font-bold text-text-base">Menu</h2>
-                            <button
-                                (click)="closeMobileMenu()"
-                                class="text-text-muted hover:text-text-subtle transition-colors p-1"
+                    Projects
+                </a>
+
+                <!-- User avatar button -->
+                <p-button
+                    (onClick)="userMenu.toggle($event)"
+                    [text]="true"
+                    severity="secondary"
+                    styleClass="!px-2 !py-1.5 rounded-lg flex items-center gap-2"
+                    aria-label="User menu"
+                >
+                    @if (user.photoURL) {
+                        <p-avatar [image]="user.photoURL" shape="circle" size="normal" />
+                    } @else {
+                        <p-avatar [label]="(user.email?.charAt(0) ?? 'U').toUpperCase()" shape="circle" size="normal" />
+                    }
+                    <lucide-icon name="chevron-down" [size]="13" class="text-text-muted"></lucide-icon>
+                </p-button>
+
+                <p-popover #userMenu styleClass="!p-0 !overflow-hidden">
+                    <div class="flex flex-col min-w-48">
+                        <div class="px-4 py-3 border-b border-surface-border">
+                            <p class="text-xs text-text-muted mb-0.5">Signed in as</p>
+                            <p class="text-sm font-semibold text-text-base truncate">{{ user.email }}</p>
+                        </div>
+                        <div class="p-1">
+                            <a
+                                routerLink="/settings"
+                                (click)="userMenu.hide()"
+                                class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-text-subtle hover:text-primary hover:bg-surface-overlay rounded-md transition-colors no-underline"
                             >
-                                <lucide-icon name="x" [size]="24"></lucide-icon>
+                                <lucide-icon name="settings" [size]="15" [absoluteStrokeWidth]="true"></lucide-icon>
+                                Settings
+                            </a>
+                            <hr class="border-surface-border my-1" />
+                            <button
+                                (click)="logout(); userMenu.hide()"
+                                class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-text-subtle hover:text-error hover:bg-error/5 rounded-md transition-colors w-full text-left cursor-pointer"
+                            >
+                                <lucide-icon name="log-out" [size]="15" [absoluteStrokeWidth]="true"></lucide-icon>
+                                Logout
                             </button>
                         </div>
-                        <nav class="flex-1 overflow-y-auto p-4">
-                            @if (user$ | async; as user) {
-                                <div class="space-y-2">
-                                    <div
-                                        class="flex items-center gap-3 p-3 bg-surface-overlay rounded-lg mb-4"
-                                    >
-                                        @if (user.photoURL) {
-                                            <img
-                                                [src]="user.photoURL"
-                                                alt="User Avatar"
-                                                class="w-10 h-10 rounded-full object-cover"
-                                            />
-                                        }
-                                        <div class="flex-1 overflow-hidden">
-                                            <p class="text-sm text-text-muted">Signed in as</p>
-                                            <p class="text-text-base text-sm truncate">
-                                                {{ user.email }}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <a
-                                        routerLink="/projects"
-                                        routerLinkActive="bg-primary text-primary-foreground"
-                                        (click)="closeMobileMenu()"
-                                        class="flex items-center gap-3 px-4 py-3 text-text-subtle hover:bg-surface-overlay rounded-lg transition-colors duration-200"
-                                    >
-                                        <lucide-icon name="folder-open" [size]="20"></lucide-icon>
-                                        <span class="font-medium">Projects</span>
-                                    </a>
-
-                                    <a
-                                        routerLink="/settings"
-                                        (click)="closeMobileMenu()"
-                                        class="flex items-center gap-3 px-4 py-3 text-text-subtle hover:bg-surface-overlay rounded-lg transition-colors duration-200"
-                                    >
-                                        <lucide-icon name="settings" [size]="20"></lucide-icon>
-                                        <span class="font-medium">Settings</span>
-                                    </a>
-
-                                    <div class="border-t border-surface-border my-3"></div>
-
-                                    <button
-                                        (click)="logout()"
-                                        class="w-full flex items-center gap-3 px-4 py-3 text-text-subtle hover:bg-surface-overlay hover:text-error rounded-lg transition-colors duration-200"
-                                    >
-                                        <lucide-icon name="log-out" [size]="20"></lucide-icon>
-                                        <span class="font-medium">Logout</span>
-                                    </button>
-                                </div>
-                            } @else {
-                                <div class="space-y-2">
-                                    <a
-                                        routerLink="/auth/login"
-                                        routerLinkActive="bg-primary text-primary-foreground"
-                                        (click)="closeMobileMenu()"
-                                        class="flex items-center gap-3 px-4 py-3 text-text-subtle hover:bg-surface-overlay rounded-lg transition-colors duration-200"
-                                    >
-                                        <lucide-icon name="log-in" [size]="20"></lucide-icon>
-                                        <span class="font-medium">Login</span>
-                                    </a>
-
-                                    <a
-                                        routerLink="/auth/signup"
-                                        routerLinkActive="bg-primary text-primary-foreground"
-                                        (click)="closeMobileMenu()"
-                                        class="flex items-center gap-3 px-4 py-3 text-text-subtle hover:bg-surface-overlay rounded-lg transition-colors duration-200"
-                                    >
-                                        <lucide-icon name="user-plus" [size]="20"></lucide-icon>
-                                        <span class="font-medium">Sign Up</span>
-                                    </a>
-                                </div>
-                            }
-                        </nav>
                     </div>
-                </div>
+                </p-popover>
+
+            } @else {
+                <a
+                    routerLink="/auth/login"
+                    routerLinkActive="!text-primary"
+                    class="px-4 py-2 rounded-lg text-sm font-semibold text-text-subtle hover:text-primary transition-colors duration-200 no-underline"
+                >
+                    Login
+                </a>
+                <p-button [routerLink]="['/auth/signup']" label="Sign Up" size="small" />
             }
+        </nav>
+
+        <!-- Mobile hamburger (wrapped in div so responsive hiding works on host) -->
+        <div class="md:hidden">
+            <p-button
+                (onClick)="toggleMobileMenu()"
+                [text]="true"
+                severity="secondary"
+                styleClass="!p-2"
+                aria-label="Open navigation menu"
+            >
+                <lucide-icon name="menu" [size]="24"></lucide-icon>
+            </p-button>
         </div>
+
     </div>
 </header>
+
+<!-- Mobile Drawer -->
+<p-drawer
+    [(visible)]="isMobileMenuOpen"
+    position="right"
+    [style]="{ width: '17rem' }"
+>
+    <ng-template pTemplate="header">
+        <div class="flex items-center gap-3">
+            <div class="w-7 h-7 bg-primary rounded-lg flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+            </div>
+            <span class="font-bold text-text-base tracking-tight">Flashcards</span>
+        </div>
+    </ng-template>
+
+    <div class="flex flex-col gap-1 py-2">
+        @if (user$ | async; as user) {
+
+            <!-- User info -->
+            <div class="flex items-center gap-3 p-3 mb-2 bg-surface-overlay rounded-xl border border-surface-border">
+                @if (user.photoURL) {
+                    <p-avatar [image]="user.photoURL" shape="circle" size="large" />
+                } @else {
+                    <p-avatar [label]="(user.email?.charAt(0) ?? 'U').toUpperCase()" shape="circle" size="large" />
+                }
+                <div class="min-w-0">
+                    <p class="text-xs text-text-muted">Signed in as</p>
+                    <p class="text-sm font-semibold text-text-base truncate">{{ user.email }}</p>
+                </div>
+            </div>
+
+            <a routerLink="/projects" routerLinkActive="!bg-primary/10 !text-primary" (click)="closeMobileMenu()"
+                class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-text-subtle font-medium hover:bg-surface-overlay transition-colors no-underline">
+                <lucide-icon name="folder-open" [size]="18"></lucide-icon>
+                Projects
+            </a>
+            <a routerLink="/settings" (click)="closeMobileMenu()"
+                class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-text-subtle font-medium hover:bg-surface-overlay transition-colors no-underline">
+                <lucide-icon name="settings" [size]="18"></lucide-icon>
+                Settings
+            </a>
+
+            <hr class="border-surface-border my-1" />
+
+            <button (click)="logout()"
+                class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-text-subtle font-medium hover:bg-error/5 hover:text-error transition-colors w-full cursor-pointer">
+                <lucide-icon name="log-out" [size]="18"></lucide-icon>
+                Logout
+            </button>
+
+        } @else {
+            <a routerLink="/auth/login" routerLinkActive="!bg-primary/10 !text-primary" (click)="closeMobileMenu()"
+                class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-text-subtle font-medium hover:bg-surface-overlay transition-colors no-underline">
+                <lucide-icon name="log-in" [size]="18"></lucide-icon>
+                Login
+            </a>
+            <a routerLink="/auth/signup" routerLinkActive="!bg-primary/10 !text-primary" (click)="closeMobileMenu()"
+                class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-text-subtle font-medium hover:bg-surface-overlay transition-colors no-underline">
+                <lucide-icon name="user-plus" [size]="18"></lucide-icon>
+                Sign Up
+            </a>
+        }
+    </div>
+</p-drawer>

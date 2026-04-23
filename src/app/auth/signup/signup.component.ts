@@ -10,12 +10,33 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule } from 'lucide-angular';
 import { ToastService } from '../../services/toast/toast.service';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
+import { MessageModule } from 'primeng/message';
+import { DividerModule } from 'primeng/divider';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { CheckboxModule } from 'primeng/checkbox';
+import { LogoComponent } from '../../common/logo/logo.component';
 
 @Component({
     selector: 'app-signup',
-    imports: [CommonModule, ReactiveFormsModule, RouterLink, LucideAngularModule],
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        RouterLink,
+        ButtonModule,
+        InputTextModule,
+        PasswordModule,
+        MessageModule,
+        DividerModule,
+        IconFieldModule,
+        InputIconModule,
+        CheckboxModule,
+        LogoComponent,
+    ],
     templateUrl: './signup.component.html',
     styleUrl: './signup.component.scss',
 })
@@ -28,8 +49,6 @@ export class SignupComponent {
     signupForm: FormGroup;
     errorMessage: string = '';
     isLoading: boolean = false;
-    showPassword: boolean = false;
-    showConfirmPassword: boolean = false;
 
     constructor() {
         this.signupForm = this.fb.group(
@@ -39,7 +58,7 @@ export class SignupComponent {
                 confirmPassword: ['', [Validators.required]],
                 agree: [false, [Validators.requiredTrue]],
             },
-            { validators: this.passwordMatchValidator }
+            { validators: this.passwordMatchValidator },
         );
     }
 
@@ -55,14 +74,6 @@ export class SignupComponent {
         return null;
     }
 
-    togglePasswordVisibility() {
-        this.showPassword = !this.showPassword;
-    }
-
-    toggleConfirmPasswordVisibility() {
-        this.showConfirmPassword = !this.showConfirmPassword;
-    }
-
     async onSubmit() {
         if (this.signupForm.valid) {
             this.isLoading = true;
@@ -75,7 +86,7 @@ export class SignupComponent {
                 this.toastService.show('Signup successful! Please verify your email.');
                 this.router.navigate(['/auth/verify-email']);
             } catch (error: any) {
-                this.errorMessage = this.getErrorMessage(error.code);
+                this.errorMessage = 'An error occurred. Please try again.';
             } finally {
                 this.isLoading = false;
             }
@@ -84,42 +95,11 @@ export class SignupComponent {
         }
     }
 
-    async onGoogleSignup() {
-        this.isLoading = true;
-        this.errorMessage = '';
-
-        try {
-            await this.authService.loginWithGoogle();
-            this.router.navigate(['/']);
-        } catch (error: any) {
-            this.errorMessage = this.getErrorMessage(error.code);
-        } finally {
-            this.isLoading = false;
-        }
-    }
-
     private markFormGroupTouched(formGroup: FormGroup) {
         Object.keys(formGroup.controls).forEach((key) => {
             const control = formGroup.get(key);
             control?.markAsTouched();
         });
-    }
-
-    private getErrorMessage(errorCode: string): string {
-        switch (errorCode) {
-            case 'auth/email-already-in-use':
-                return 'An account with this email already exists';
-            case 'auth/invalid-email':
-                return 'Invalid email address';
-            case 'auth/weak-password':
-                return 'Password is too weak. Please use a stronger password';
-            case 'auth/operation-not-allowed':
-                return 'Account creation is currently disabled';
-            case 'auth/popup-closed-by-user':
-                return 'Sign-up popup was closed';
-            default:
-                return 'An error occurred. Please try again';
-        }
     }
 
     get email() {
