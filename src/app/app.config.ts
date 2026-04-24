@@ -5,6 +5,7 @@ import {
     provideBrowserGlobalErrorListeners,
     provideZoneChangeDetection,
 } from '@angular/core';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { initializeApp, getApp, provideFirebaseApp } from '@angular/fire/app';
 import { provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
 import { getFirestore, connectFirestoreEmulator } from '@angular/fire/firestore';
@@ -59,7 +60,7 @@ const app = initializeApp(environment.firebaseConfig);
 
 export const appConfig: ApplicationConfig = {
     providers: [
-        provideFirebaseApp(() => getApp()),
+        provideFirebaseApp(() => getApp(app.name)),
         provideAppInitializer(() => {
             if (environment.useEmulators) {
                 connectFirestoreEmulator(getFirestore(), '127.0.0.1', 8080);
@@ -69,6 +70,7 @@ export const appConfig: ApplicationConfig = {
         provideAuth(() => getAuth()),
         provideBrowserGlobalErrorListeners(),
         provideZoneChangeDetection({ eventCoalescing: true }),
+        provideAnimations(),
         provideRouter(
             routes,
             withComponentInputBinding(),

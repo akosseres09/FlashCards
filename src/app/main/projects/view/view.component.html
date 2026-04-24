@@ -12,20 +12,19 @@
                     </a>
                 </div>
                 <div class="flex gap-3 items-center">
-                    <button
-                        (click)="openModal('create')"
-                        class="cursor-pointer flex items-center gap-2 px-8 py-4 sm:px-4 sm:py-2 bg-primary hover:bg-primary-hover text-primary-foreground font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
-                    >
-                        <lucide-icon name="plus" class="w-4 h-4"></lucide-icon>
-                        <span class="hidden sm:block">Add Question</span>
-                    </button>
-                    <button
-                        (click)="openModal('json')"
-                        class="cursor-pointer flex items-center gap-2 px-8 py-4 sm:px-4 sm:py-2 bg-surface-overlay hover:bg-surface-border text-text-base font-semibold rounded-lg transition-all duration-200"
-                    >
-                        <lucide-icon name="upload" class="w-4 h-4"></lucide-icon>
-                        <span class="hidden sm:block">Import Questions</span>
-                    </button>
+                    <p-button
+                        (onClick)="openModal('create')"
+                        label="Add Question"
+                        icon="pi pi-plus"
+                        styleClass="transform hover:scale-[1.02] [&_.p-button-label]:hidden [&_.p-button-label]:sm:inline"
+                    />
+                    <p-button
+                        (onClick)="openModal('json')"
+                        label="Import Questions"
+                        icon="pi pi-upload"
+                        severity="secondary"
+                        styleClass="[&_.p-button-label]:hidden [&_.p-button-label]:sm:inline"
+                    />
                 </div>
             </div>
             @if (project()) {
@@ -37,10 +36,7 @@
         @if (isLoading()) {
             <div class="flex-1 flex items-center justify-center">
                 <div class="text-center">
-                    <lucide-icon
-                        name="loader-circle"
-                        class="w-12 h-12 text-primary animate-spin mx-auto mb-4"
-                    ></lucide-icon>
+                    <p-progressSpinner styleClass="w-12 h-12 mx-auto mb-4" strokeWidth="4" />
                     <p class="text-text-muted text-lg">Loading flashcards...</p>
                 </div>
             </div>
@@ -59,13 +55,12 @@
                     <p class="text-text-muted mb-6">
                         Start by adding your first flashcard question
                     </p>
-                    <button
-                        (click)="openModal('create')"
-                        class="cursor-pointer inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-hover text-primary-foreground font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
-                    >
-                        <lucide-icon name="plus" class="w-5 h-5"></lucide-icon>
-                        <span>Add First Question</span>
-                    </button>
+                    <p-button
+                        (onClick)="openModal('create')"
+                        label="Add First Question"
+                        icon="pi pi-plus"
+                        styleClass="transform hover:scale-[1.02]"
+                    />
                 </div>
             </div>
         } @else {
@@ -77,14 +72,11 @@
                         of
                         <span class="text-text-base font-semibold">{{ questions().length }}</span>
                     </p>
-                    <div
-                        class="w-48 sm:w-64 md:w-96 h-2 bg-surface-overlay rounded-full mt-2 mx-auto overflow-hidden"
-                    >
-                        <div
-                            class="h-full bg-primary transition-all duration-300"
-                            [style.width.%]="((currentIndex() + 1) / questions().length) * 100"
-                        ></div>
-                    </div>
+                    <p-progressbar
+                        [value]="((currentIndex() + 1) / questions().length) * 100"
+                        [showValue]="false"
+                        styleClass="w-48 sm:w-64 md:w-96 mt-2 mx-auto"
+                    />
                 </div>
 
                 @if (currentQuestion) {
@@ -158,50 +150,50 @@
                         </div>
 
                         <div class="flex justify-center gap-3 mt-6">
-                            <button
-                                (click)="openModal('edit', currentQuestion)"
-                                class="w-[100px] cursor-pointer flex items-center justify-center gap-2 px-4 py-2 bg-surface-overlay hover:bg-primary text-text-base rounded-lg transition-all duration-200"
-                            >
-                                <lucide-icon name="pencil" class="w-4 h-4"></lucide-icon>
-                                <span>Edit</span>
-                            </button>
-                            <button
-                                (click)="openModal('delete')"
-                                class="w-[100px] cursor-pointer flex items-center justify-center gap-2 px-4 py-2 bg-surface-overlay hover:bg-error text-text-base hover:text-primary-foreground rounded-lg transition-all duration-200"
-                            >
-                                <lucide-icon name="trash-2" class="w-4 h-4"></lucide-icon>
-                                <span>Delete</span>
-                            </button>
+                            <p-button
+                                (onClick)="openModal('edit', currentQuestion)"
+                                label="Edit"
+                                icon="pi pi-pencil"
+                                severity="secondary"
+                                styleClass="w-[100px]"
+                            />
+                            <p-button
+                                (onClick)="openModal('delete')"
+                                label="Delete"
+                                icon="pi pi-trash"
+                                severity="danger"
+                                styleClass="w-[100px]"
+                            />
                         </div>
                     </div>
                 }
 
                 <div class="flex flex-row items-center gap-4">
-                    <button
-                        (click)="previousCard()"
+                    <p-button
+                        (onClick)="previousCard()"
                         [disabled]="currentIndex() === 0"
-                        class="sm:w-[150px] cursor-pointer flex items-center justify-center gap-2 px-6 py-3 bg-surface-overlay hover:bg-surface-border text-text-base font-semibold rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <lucide-icon name="chevron-left" class="w-5 h-5"></lucide-icon>
-                        <span class="hidden sm:block">Previous</span>
-                    </button>
+                        label="Previous"
+                        icon="pi pi-chevron-left"
+                        severity="secondary"
+                        styleClass="sm:w-[150px] [&_.p-button-label]:hidden [&_.p-button-label]:sm:inline"
+                    />
 
-                    <button
-                        (click)="flipCard()"
-                        class="sm:w-[150px] cursor-pointer flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-primary-hover text-primary-foreground font-semibold rounded-lg transition-all duration-200"
-                    >
-                        <lucide-icon name="rotate-cw" class="w-5 h-5"></lucide-icon>
-                        <span class="hidden sm:block">Flip Card</span>
-                    </button>
+                    <p-button
+                        (onClick)="flipCard()"
+                        label="Flip Card"
+                        icon="pi pi-refresh"
+                        styleClass="sm:w-[150px] [&_.p-button-label]:hidden [&_.p-button-label]:sm:inline"
+                    />
 
-                    <button
-                        (click)="nextCard()"
+                    <p-button
+                        (onClick)="nextCard()"
                         [disabled]="currentIndex() === questions().length - 1"
-                        class="sm:w-[150px] cursor-pointer flex items-center justify-center gap-2 px-6 py-3 bg-surface-overlay hover:bg-surface-border text-text-base font-semibold rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <span class="hidden sm:block">Next</span>
-                        <lucide-icon name="chevron-right" class="w-5 h-5"></lucide-icon>
-                    </button>
+                        label="Next"
+                        icon="pi pi-chevron-right"
+                        iconPos="right"
+                        severity="secondary"
+                        styleClass="sm:w-[150px] [&_.p-button-label]:hidden [&_.p-button-label]:sm:inline"
+                    />
                 </div>
 
                 <div class="hidden md:flex mt-8 gap-6 text-sm text-text-muted">

@@ -7,10 +7,19 @@ import { ToastService } from '../../../services/toast/toast.service';
 import { ModalComponent } from '../../../common/modal/modal.component';
 import { ButtonModule } from 'primeng/button';
 import { ProjectData } from '../../../models/schema/db';
+import { InputText } from 'primeng/inputtext';
+import { Textarea } from 'primeng/textarea';
 
 @Component({
     selector: 'app-projects-modal',
-    imports: [LucideAngularModule, ReactiveFormsModule, ModalComponent, ButtonModule],
+    imports: [
+        LucideAngularModule,
+        ReactiveFormsModule,
+        ModalComponent,
+        ButtonModule,
+        InputText,
+        Textarea,
+    ],
     templateUrl: './projects-modal.component.html',
     styleUrl: './projects-modal.component.scss',
 })

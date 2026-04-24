@@ -5,16 +5,28 @@ import { QuestionService } from '../../../services/question/question.service';
 import { ToastService } from '../../../services/toast/toast.service';
 import { LucideAngularModule } from 'lucide-angular';
 import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
+import { SelectModule } from 'primeng/select';
 import {
     Question,
     QUESTION_TYPES,
     QuestionWithoutId,
     ViewQuestion,
 } from '../../../models/Question';
+import { CustomValidators } from '../../../shared/validators/validators';
 
 @Component({
     selector: 'app-questions-modal',
-    imports: [ModalComponent, ReactiveFormsModule, LucideAngularModule, ButtonModule],
+    imports: [
+        ModalComponent,
+        ReactiveFormsModule,
+        LucideAngularModule,
+        ButtonModule,
+        InputTextModule,
+        TextareaModule,
+        SelectModule,
+    ],
     templateUrl: './questions-modal.component.html',
     styleUrl: './questions-modal.component.scss',
 })
@@ -40,7 +52,7 @@ export class QuestionsModalComponent {
         });
     });
     protected jsonForm = this.fb.group({
-        questions: ['', Validators.required],
+        questions: ['', [Validators.required, CustomValidators.json]],
     });
     isSaving = signal<boolean>(false);
     protected selectedType = signal<Question['type']>('Multiple Choice');

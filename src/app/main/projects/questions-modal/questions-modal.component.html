@@ -14,17 +14,13 @@
                         >
                             Question Type <span class="text-error">*</span>
                         </label>
-                        <select
+                        <p-select
                             id="question-type"
                             formControlName="type"
-                            class="w-full px-4 py-3 bg-surface-overlay border border-surface-border rounded-lg text-text-base placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                        >
-                            @for (item of selectionOptions; track $index) {
-                                <option value="{{ item }}" [selected]="item === selectedType()">
-                                    {{ item }}
-                                </option>
-                            }
-                        </select>
+                            [options]="selectionOptions"
+                            styleClass="w-full"
+                            appendTo="body"
+                        />
                         @if (type?.invalid && type?.touched) {
                             <p class="mt-1 text-sm text-error">
                                 @if (type?.errors?.['required']) {
@@ -41,11 +37,13 @@
                             Question <span class="text-error">*</span>
                         </label>
                         <input
+                            pInputText
                             id="question-text"
                             type="text"
                             formControlName="question"
-                            class="w-full px-4 py-3 bg-surface-overlay border border-surface-border rounded-lg text-text-base placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                            [class.!border-error]="question?.invalid && question?.touched"
+                            class="w-full"
+                            [class.ng-invalid]="question?.invalid && question?.touched"
+                            [class.ng-dirty]="question?.touched"
                             placeholder="e.g., What is the capital of France?"
                         />
                         @if (question?.invalid && question?.touched) {
@@ -64,11 +62,13 @@
                             Answer <span class="text-error">*</span>
                         </label>
                         <input
+                            pInputText
                             id="answer-text"
                             type="text"
                             formControlName="answer"
-                            class="w-full px-4 py-3 bg-surface-overlay border border-surface-border rounded-lg text-text-base placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                            [class.!border-error]="answer?.invalid && answer?.touched"
+                            class="w-full"
+                            [class.ng-invalid]="answer?.invalid && answer?.touched"
+                            [class.ng-dirty]="answer?.touched"
                             placeholder="e.g., Paris"
                         />
                         @if (answer?.invalid && answer?.touched) {
@@ -88,9 +88,10 @@
                                 @for (control of optionsArray.controls; track $index) {
                                     <div class="flex items-center gap-2">
                                         <input
+                                            pInputText
                                             type="text"
                                             [formControl]="control"
-                                            class="flex-1 px-4 py-3 bg-surface-overlay border border-surface-border rounded-lg text-text-base placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                            class="flex-1"
                                             [placeholder]="'Option ' + ($index + 1)"
                                         />
                                         @if (optionsArray.controls.length > 1) {
@@ -129,17 +130,22 @@
                             Questions JSON <span class="text-error">*</span>
                         </label>
                         <textarea
+                            pTextarea
                             id="questions-json"
                             formControlName="questions"
                             rows="10"
-                            class="w-full px-4 py-3 bg-surface-overlay border border-surface-border rounded-lg text-text-base placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
+                            class="w-full resize-none"
+                            [class.ng-invalid]="questionsForm?.invalid && questionsForm?.touched"
+                            [class.ng-dirty]="questionsForm?.touched"
                             placeholder='e.g., [{"question": "What is 2 + 2?", "answer": "4", "type": "Short Answer"}]'
-                            [class.!border-error]="questionsForm?.invalid && questionsForm?.touched"
                         ></textarea>
                         @if (questionsForm?.invalid && questionsForm?.touched) {
                             <p class="mt-1 text-sm text-error">
                                 @if (questionsForm?.errors?.['required']) {
                                     Data is required
+                                }
+                                @if (questionsForm?.errors?.['invalidJson']) {
+                                    Invalid JSON format
                                 }
                             </p>
                         }

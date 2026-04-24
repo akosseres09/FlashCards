@@ -9,10 +9,21 @@ import { switchMap } from 'rxjs';
 import { QuestionsModalComponent } from '../questions-modal/questions-modal.component';
 import { QuestionService } from '../../../services/question/question.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ButtonModule } from 'primeng/button';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @Component({
     selector: 'app-view',
-    imports: [CommonModule, LucideAngularModule, RouterLink, QuestionsModalComponent],
+    imports: [
+        CommonModule,
+        LucideAngularModule,
+        RouterLink,
+        QuestionsModalComponent,
+        ButtonModule,
+        ProgressBarModule,
+        ProgressSpinnerModule,
+    ],
     templateUrl: './view.component.html',
     styleUrl: './view.component.scss',
     host: {
@@ -36,13 +47,15 @@ export class ViewComponent implements OnInit {
     isModalOpen = signal<boolean>(false);
 
     modalMode: 'create' | 'edit' | 'delete' | 'json' = 'create';
-    ngOnInit() {
+    async ngOnInit() {
         const projectId = this.projectId();
         if (!projectId) {
             console.error('Project ID is required');
             this.isLoading.set(false);
             return;
         }
+
+        await this.projectService.update(projectId, { lastStudied: new Date() });
         this.loadProject();
     }
 
