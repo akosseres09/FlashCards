@@ -1,13 +1,14 @@
-import { Component, HostListener, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { Project } from '../../../models/Project';
 import { Question, ViewQuestion } from '../../../models/Question';
 import { ProjectService } from '../../../services/project/project.service';
-import { filter, Subscription, switchMap } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { QuestionsModalComponent } from '../questions-modal/questions-modal.component';
 import { QuestionService } from '../../../services/question/question.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-view',
@@ -18,68 +19,71 @@ import { QuestionService } from '../../../services/question/question.service';
         class: 'flex-1 flex flex-col',
     },
 })
-export class ViewComponent implements OnInit, OnDestroy {
-    private route = inject(ActivatedRoute);
-    private projectService = inject(ProjectService);
-    private questionService = inject(QuestionService);
-    private subscription: Subscription | null = null;
+export class ViewComponent implements OnInit {
+    private readonly projectService = inject(ProjectService);
+    private readonly questionService = inject(QuestionService);
+    private readonly destroyRef = inject(DestroyRef);
 
-    questionData: ViewQuestion | null = null;
-    projectId: string = '';
-    project: Project | null = null;
-    questions: Question[] = [];
-    currentIndex: number = 0;
-    isFlipped: boolean = false;
-    isLoading: boolean = true;
+    projectId = input.required<string>();
 
-    isModalOpen: boolean = false;
+    questionData = signal<ViewQuestion | null>(null);
+    project = signal<Project | null>(null);
+    questions = signal<Question[]>([]);
+    currentIndex = signal<number>(0);
+    isFlipped = signal<boolean>(false);
+    isLoading = signal<boolean>(true);
+
+    isModalOpen = signal<boolean>(false);
 
     modalMode: 'create' | 'edit' | 'delete' | 'json' = 'create';
     ngOnInit() {
-        this.projectId = this.route.snapshot.paramMap.get('id') || '';
-        if (this.projectId) {
-            this.loadProject();
+        const projectId = this.projectId();
+        if (!projectId) {
+            console.error('Project ID is required');
+            this.isLoading.set(false);
+            return;
         }
+        this.loadProject();
     }
 
     loadProject() {
-        this.subscription = this.projectService
-            .getOne(this.projectId)
+        this.projectService
+            .getOne(this.projectId())
             .pipe(
-                filter((project): project is Project => !!project),
                 switchMap((project) => {
-                    this.project = project;
-                    this.isLoading = false;
+                    this.project.set(project);
+                    this.isLoading.set(false);
                     return this.questionService.getByProject(project.id);
-                })
+                }),
+                takeUntilDestroyed(this.destroyRef),
             )
             .subscribe({
                 next: (questions) => {
-                    this.questions = questions;
-                    this.currentIndex = 0;
+                    this.questions.set(questions);
+                    this.currentIndex.set(0);
                 },
                 error: (err) => {
                     console.error(err);
-                    this.isLoading = false;
+                    this.isLoading.set(false);
                 },
             });
     }
 
     flipCard() {
-        this.isFlipped = !this.isFlipped;
+        this.isFlipped.set(!this.isFlipped());
     }
 
     nextCard() {
-        if (this.currentIndex < this.questions.length - 1) {
-            this.currentIndex++;
-            this.isFlipped = false;
+        if (this.currentIndex() < this.questions().length - 1) {
+            this.currentIndex.set(this.currentIndex() + 1);
+            this.isFlipped.set(false);
         }
     }
 
     previousCard() {
-        if (this.currentIndex > 0) {
-            this.currentIndex--;
-            this.isFlipped = false;
+        if (this.currentIndex() > 0) {
+            this.currentIndex.set(this.currentIndex() - 1);
+            this.isFlipped.set(false);
         }
     }
 
@@ -90,7 +94,7 @@ export class ViewComponent implements OnInit, OnDestroy {
             target.tagName === 'INPUT' ||
             target.tagName === 'TEXTAREA' ||
             target.tagName === 'SELECT' ||
-            this.isModalOpen
+            this.isModalOpen()
         ) {
             return;
         }
@@ -113,7 +117,7 @@ export class ViewComponent implements OnInit, OnDestroy {
     }
 
     get currentQuestion(): Question | null {
-        return this.questions[this.currentIndex] || null;
+        return this.questions()[this.currentIndex()] || null;
     }
 
     get currentQuestionId(): string | null {
@@ -121,20 +125,16 @@ export class ViewComponent implements OnInit, OnDestroy {
     }
 
     onModalClose() {
-        this.isModalOpen = false;
+        this.isModalOpen.set(false);
     }
 
     openModal(
         mode: 'create' | 'edit' | 'delete' | 'json',
-        questionData: ViewQuestion | null = null
+        questionData: ViewQuestion | null = null,
     ) {
         this.modalMode = mode;
-        this.isModalOpen = true;
+        this.isModalOpen.set(true);
 
-        this.questionData = questionData;
-    }
-
-    ngOnDestroy() {
-        this.subscription?.unsubscribe();
+        this.questionData.set(questionData);
     }
 }

@@ -29,7 +29,7 @@ export const routes: Routes = [
                 path: 'verify-email',
                 loadComponent: () =>
                     import('./auth/verify-email/verify-email.component').then(
-                        (m) => m.VerifyEmailComponent
+                        (m) => m.VerifyEmailComponent,
                     ),
                 canActivate: [unverifiedGuard],
             },
@@ -61,7 +61,7 @@ export const routes: Routes = [
                     import('./main/projects/projects.component').then((m) => m.ProjectsComponent),
             },
             {
-                path: 'projects/:id',
+                path: 'projects/:projectId',
                 loadComponent: () =>
                     import('./main/projects/view/view.component').then((m) => m.ViewComponent),
             },

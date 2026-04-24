@@ -5,12 +5,11 @@ import {
     provideBrowserGlobalErrorListeners,
     provideZoneChangeDetection,
 } from '@angular/core';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import { initializeApp, getApp, provideFirebaseApp } from '@angular/fire/app';
 import { provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
 import { getFirestore, connectFirestoreEmulator } from '@angular/fire/firestore';
 
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withRouterConfig } from '@angular/router';
 import { providePrimeNG } from 'primeng/config';
 
 import { routes } from './app.routes';
@@ -70,8 +69,11 @@ export const appConfig: ApplicationConfig = {
         provideAuth(() => getAuth()),
         provideBrowserGlobalErrorListeners(),
         provideZoneChangeDetection({ eventCoalescing: true }),
-        provideAnimations(),
-        provideRouter(routes),
+        provideRouter(
+            routes,
+            withComponentInputBinding(),
+            withRouterConfig({ paramsInheritanceStrategy: 'always' }),
+        ),
         providePrimeNG({
             theme: {
                 preset: AppTheme,
