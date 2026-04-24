@@ -7,6 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { DrawerModule } from 'primeng/drawer';
 import { PopoverModule } from 'primeng/popover';
+import { LogoComponent } from '../logo/logo.component';
 
 @Component({
     selector: 'app-navbar',
@@ -19,6 +20,7 @@ import { PopoverModule } from 'primeng/popover';
         AvatarModule,
         DrawerModule,
         PopoverModule,
+        LogoComponent,
     ],
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.scss',

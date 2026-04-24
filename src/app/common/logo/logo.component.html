@@ -1,12 +1,18 @@
 <div
-    class="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl shadow-xl shadow-primary/30 mb-5"
+    class="inline-flex items-center justify-center bg-primary shadow-xl shadow-primary/30"
+    [style.width.px]="width()"
+    [style.height.px]="height()"
+    [class.mb-5]="showBottomMargin()"
+    [ngClass]="roundnessClasses[roundness()]"
 >
     <svg
         xmlns="http://www.w3.org/2000/svg"
-        class="h-9 w-9 text-white"
+        class="text-white"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
+        [style.width.px]="width() * 0.6"
+        [style.height.px]="height() * 0.6"
     >
         <path
             stroke-linecap="round"
