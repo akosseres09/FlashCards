@@ -1,4 +1,4 @@
-import { Component, inject, input, model, output, signal } from '@angular/core';
+import { Component, inject, input, linkedSignal, model, output, signal } from '@angular/core';
 import { ModalComponent } from '../../../common/modal/modal.component';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { QuestionService } from '../../../services/question/question.service';
@@ -26,21 +26,24 @@ export class QuestionsModalComponent {
     questionData = input<ViewQuestion | null>(null);
     visible = model<boolean>(true);
 
-    protected questions: Question[] = [];
     private fb = inject(FormBuilder);
     private questionService = inject(QuestionService);
     private toastService = inject(ToastService);
-    protected questionForm = this.fb.group({
-        question: ['', Validators.required],
-        answer: ['', Validators.required],
-        type: ['Multiple Choice', Validators.required],
-        options: this.fb.array([this.fb.control('')]),
+
+    protected questions = signal<Question[]>([]);
+    protected questionForm = linkedSignal(() => {
+        return this.fb.group({
+            question: [this.questionData()?.question, Validators.required],
+            answer: [this.questionData()?.answer, Validators.required],
+            type: [this.questionData()?.type || 'Multiple Choice', Validators.required],
+            options: this.fb.array([this.fb.control('')]),
+        });
     });
     protected jsonForm = this.fb.group({
         questions: ['', Validators.required],
     });
     isSaving = signal<boolean>(false);
-    protected selectedType: Question['type'] = 'Multiple Choice';
+    protected selectedType = signal<Question['type']>('Multiple Choice');
     protected selectionOptions = [...QUESTION_TYPES];
 
     addOption() {
@@ -54,7 +57,7 @@ export class QuestionsModalComponent {
     }
 
     get optionsArray() {
-        return this.questionForm.get('options') as any;
+        return this.questionForm().get('options') as any;
     }
 
     get showOptions() {
@@ -75,8 +78,8 @@ export class QuestionsModalComponent {
 
     async onCreate() {
         const projectId = this.projectId();
-        if (!this.questionForm.valid || !projectId) {
-            this.questionForm.markAllAsTouched();
+        if (!this.questionForm().valid || !projectId) {
+            this.questionForm().markAllAsTouched();
             return;
         }
 
@@ -109,8 +112,8 @@ export class QuestionsModalComponent {
     async onEdit() {
         const projectId = this.projectId();
         const questionId = this.questionId();
-        if (!this.questionForm.valid || !projectId || !questionId) {
-            this.questionForm.markAllAsTouched();
+        if (!this.questionForm().valid || !projectId || !questionId) {
+            this.questionForm().markAllAsTouched();
             return;
         }
 
@@ -197,10 +200,10 @@ export class QuestionsModalComponent {
 
     onClose() {
         this.jsonForm.reset();
-        this.questionForm.reset();
+        this.questionForm().reset();
         this.optionsArray.clear();
         this.optionsArray.push(this.fb.control(''));
-        this.selectedType = 'Multiple Choice';
+        this.selectedType.set('Multiple Choice');
         this.modalClosed.emit();
     }
 
@@ -240,19 +243,19 @@ export class QuestionsModalComponent {
     }
 
     get question() {
-        return this.questionForm.get('question');
+        return this.questionForm().get('question');
     }
 
     get answer() {
-        return this.questionForm.get('answer');
+        return this.questionForm().get('answer');
     }
 
     get type() {
-        return this.questionForm.get('type');
+        return this.questionForm().get('type');
     }
 
     get options() {
-        return this.questionForm.get('options');
+        return this.questionForm().get('options');
     }
 
     get submitButtonText() {

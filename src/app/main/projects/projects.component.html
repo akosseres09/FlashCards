@@ -1,6 +1,6 @@
 <div class="bg-surface py-12 px-4 flex-1">
     <div class="max-w-7xl mx-auto">
-        @if (devMode) {
+        @if (devMode()) {
             <p-splitbutton
                 class="mb-4!"
                 severity="warn"
@@ -14,7 +14,7 @@
             <p class="text-text-muted text-lg">Manage and study your flashcard collections</p>
         </div>
 
-        @if (isLoading) {
+        @if (isLoading()) {
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @for (i of [1, 2, 3, 4, 5, 6]; track i) {
                     <div
@@ -31,42 +31,41 @@
                     </div>
                 }
             </div>
-        } @else if (projects.length === 0) {
-            <div class="flex flex-col items-center justify-center py-20">
+        } @else if (projects().length === 0) {
+            <div class="flex flex-col items-center justify-center py-10">
                 <div
                     class="w-24 h-24 bg-surface-raised rounded-2xl flex items-center justify-center mb-6"
                 >
-                    <lucide-icon name="folder-open" class="w-12 h-12 text-text-muted"></lucide-icon>
+                    <i class="pi pi-folder-open text-5xl text-text-muted"></i>
                 </div>
                 <h2 class="text-2xl font-bold text-text-base mb-2">No Projects Yet</h2>
                 <p class="text-text-muted text-center max-w-md mb-8">
                     Create your first flashcard project to start learning. Organize your study
                     materials into projects for better focus.
                 </p>
-                <button
-                    (click)="openModal()"
-                    class="cursor-pointer flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-hover text-primary-foreground font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
-                >
-                    <lucide-icon name="plus" class="w-5 h-5"></lucide-icon>
-                    <span>Create Your First Project</span>
-                </button>
+                <p-button
+                    (onClick)="openModal()"
+                    label="Create Your First Project"
+                    icon="pi pi-plus"
+                    styleClass="transform hover:scale-[1.02] active:scale-[0.98]"
+                />
             </div>
         } @else {
             <div class="mb-6 flex justify-between items-center">
                 <p class="text-text-muted">
-                    {{ projects.length }} {{ projects.length === 1 ? 'project' : 'projects' }}
+                    {{ projects().length }} {{ projects().length === 1 ? 'project' : 'projects' }}
                 </p>
-                <button
-                    (click)="openModal()"
-                    class="flex cursor-pointer items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover text-primary-foreground font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
-                >
-                    <lucide-icon name="plus" class="w-4 h-4"></lucide-icon>
-                    <span>New Project</span>
-                </button>
+                <p-button
+                    (onClick)="openModal()"
+                    label="New Project"
+                    icon="pi pi-plus"
+                    size="small"
+                    styleClass="px-3 py-2 transform hover:scale-[1.02] active:scale-[0.98]"
+                />
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @for (project of projects; track project.id) {
+                @for (project of projects(); track project.id) {
                     <div
                         class="bg-surface-raised rounded-xl p-6 border border-surface-border hover:border-primary/50 transition-all duration-200 hover:shadow-xl group"
                     >
@@ -85,26 +84,27 @@
 
                         <div class="flex gap-4 mb-4 text-sm">
                             <div class="flex items-center gap-1 text-text-muted">
-                                <lucide-icon name="file-text" class="w-4 h-4"></lucide-icon>
+                                <i class="pi pi-file"></i>
                                 <span>{{ project.cardCount }} cards</span>
                             </div>
                             @if (project.lastStudied) {
                                 <div class="flex items-center gap-1 text-text-muted">
-                                    <lucide-icon name="clock" class="w-4 h-4"></lucide-icon>
+                                    <i class="pi pi-clock"></i>
                                     <span>Recent</span>
                                 </div>
                             }
                         </div>
 
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 flex-col xs:flex-row">
+                            <p-button
+                                class="flex-1"
+                                [routerLink]="'/projects/' + project.id"
+                                label="Study"
+                                icon="pi pi-play"
+                                styleClass="w-full"
+                            />
                             <button
-                                routerLink="/projects/{{ project.id }}"
-                                class="flex-1 cursor-pointer flex items-center justify-center gap-2 py-2 px-4 bg-primary hover:bg-primary-hover text-primary-foreground font-medium rounded-lg transition-all duration-200"
-                            >
-                                <lucide-icon name="play" class="w-4 h-4"></lucide-icon>
-                                <span>Study</span>
-                            </button>
-                            <button
+                                pButton
                                 (click)="
                                     openModal('edit', {
                                         id: project.id,
@@ -112,12 +112,15 @@
                                         description: project.description,
                                     })
                                 "
-                                class="flex cursor-pointer items-center justify-center p-2 bg-surface-overlay hover:bg-surface-border text-text-subtle rounded-lg transition-all duration-200"
+                                severity="warn"
+                                [text]="true"
+                                styleClass="rounded-lg"
                             >
-                                <lucide-icon name="pencil" class="w-4 h-4"></lucide-icon>
+                                <i class="pi pi-pencil"></i>
+                                <span class="block xs:hidden">Edit</span>
                             </button>
                             <button
-                                class="flex cursor-pointer items-center justify-center p-2 bg-surface-overlay hover:bg-surface-border text-text-subtle hover:text-error rounded-lg transition-all duration-200"
+                                pButton
                                 (click)="
                                     openModal('delete', {
                                         id: project.id,
@@ -125,8 +128,12 @@
                                         description: project.description,
                                     })
                                 "
+                                severity="danger"
+                                [text]="true"
+                                styleClass="rounded-lg"
                             >
-                                <lucide-icon name="trash-2" class="w-4 h-4"></lucide-icon>
+                                <i class="pi pi-trash"></i>
+                                <span class="block xs:hidden">Delete</span>
                             </button>
                         </div>
                     </div>
@@ -135,13 +142,14 @@
         }
     </div>
 
-    @if (isModalOpen && user) {
+    @let currentUser = user();
+    @if (isModalOpen() && currentUser) {
         <app-projects-modal
-            [mode]="modalMode"
-            [projectId]="editingProjectId"
-            [projectName]="projectName"
-            [projectDescription]="projectDescription"
-            [userId]="user.uid"
+            [mode]="modalMode()"
+            [projectId]="editingProjectId()"
+            [projectName]="projectName()"
+            [projectDescription]="projectDescription()"
+            [userId]="currentUser.uid"
             (modalClosed)="closeModal()"
         ></app-projects-modal>
     }

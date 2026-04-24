@@ -1,14 +1,4 @@
-import {
-    Component,
-    EventEmitter,
-    inject,
-    input,
-    Input,
-    model,
-    output,
-    Output,
-    signal,
-} from '@angular/core';
+import { Component, inject, input, linkedSignal, model, output, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProjectService } from '../../../services/project/project.service';
 import { Project } from '../../../models/Project';
@@ -37,18 +27,16 @@ export class ProjectsModalComponent {
     private projectService = inject(ProjectService);
     private toastService = inject(ToastService);
 
-    createProjectForm: FormGroup;
-    isSaving = signal<boolean>(false);
-
-    constructor() {
-        this.createProjectForm = this.fb.group({
+    createProjectForm = linkedSignal<FormGroup>(() =>
+        this.fb.group({
             name: [this.projectName(), [Validators.required, Validators.minLength(3)]],
             description: [
                 this.projectDescription(),
                 [Validators.required, Validators.minLength(10)],
             ],
-        });
-    }
+        }),
+    );
+    isSaving = signal<boolean>(false);
 
     close() {
         this.visible.set(false);
@@ -56,7 +44,7 @@ export class ProjectsModalComponent {
 
     onClose() {
         this.modalClosed.emit();
-        this.createProjectForm.reset();
+        this.createProjectForm().reset();
     }
 
     async onSubmit() {
@@ -72,16 +60,16 @@ export class ProjectsModalComponent {
     async onUpdate() {
         const projectId = this.projectId();
 
-        if (this.createProjectForm.invalid || !projectId) {
-            this.createProjectForm.markAllAsTouched();
+        if (this.createProjectForm().invalid || !projectId) {
+            this.createProjectForm().markAllAsTouched();
             return;
         }
 
         this.isSaving.set(true);
 
         const updatedProject: Partial<Project> = {
-            name: this.createProjectForm.value.name,
-            description: this.createProjectForm.value.description,
+            name: this.createProjectForm().value.name,
+            description: this.createProjectForm().value.description,
         };
 
         try {
@@ -98,16 +86,16 @@ export class ProjectsModalComponent {
 
     async onCreate() {
         const userId = this.userId();
-        if (this.createProjectForm.invalid || !userId) {
-            this.createProjectForm.markAllAsTouched();
+        if (this.createProjectForm().invalid || !userId) {
+            this.createProjectForm().markAllAsTouched();
             return;
         }
         this.isSaving.set(true);
 
         const newProject: ProjectData = {
             createdBy: userId,
-            name: this.createProjectForm.value.name,
-            description: this.createProjectForm.value.description,
+            name: this.createProjectForm().value.name,
+            description: this.createProjectForm().value.description,
             cardCount: 0,
             lastStudied: null,
             createdAt: new Date(),
@@ -159,11 +147,11 @@ export class ProjectsModalComponent {
     }
 
     get name() {
-        return this.createProjectForm.get('name');
+        return this.createProjectForm().get('name');
     }
 
     get description() {
-        return this.createProjectForm.get('description');
+        return this.createProjectForm().get('description');
     }
 
     get editMode() {

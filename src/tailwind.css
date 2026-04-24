@@ -64,4 +64,6 @@
     --radius-xl: 1rem; /* 16px – modals, panels */
     --radius-2xl: 1.5rem; /* 24px – hero sections */
     --radius-full: 9999px; /* pills, avatars */
+
+    --breakpoint-xs: 30rem /* 480px – mobile */;
 }

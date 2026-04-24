@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, isDevMode, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, isDevMode, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { LucideAngularModule } from 'lucide-angular';
 import { Project } from '../../models/Project';
 import { ProjectService } from '../../services/project/project.service';
 import { filter, switchMap } from 'rxjs';
@@ -9,19 +8,20 @@ import { ProjectsModalComponent } from './projects-modal/projects-modal.componen
 import { User } from '@angular/fire/auth';
 import { AuthService } from '../../services/auth/auth.service';
 import { ToastService } from '../../services/toast/toast.service';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SplitButtonModule } from 'primeng/splitbutton';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
     selector: 'app-projects',
     imports: [
         CommonModule,
-        LucideAngularModule,
         ReactiveFormsModule,
         ProjectsModalComponent,
         RouterLink,
         SplitButtonModule,
+        ButtonModule,
     ],
     templateUrl: './projects.component.html',
     styleUrl: './projects.component.scss',
@@ -33,20 +33,19 @@ export class ProjectsComponent implements OnInit {
     private readonly projectService = inject(ProjectService);
     private readonly authService = inject(AuthService);
     private readonly toastService = inject(ToastService);
-    private readonly router = inject(Router);
     private readonly destroyRef = inject(DestroyRef);
 
-    isLoading: boolean = true;
-    isModalOpen: boolean = false;
-    isSaving: boolean = false;
-    devMode: boolean = isDevMode();
+    isLoading = signal<boolean>(false);
+    isModalOpen = signal<boolean>(false);
+    isSaving = signal<boolean>(false);
+    devMode = signal<boolean>(isDevMode());
 
-    projects: Project[] = [];
-    modalMode: 'edit' | 'create' | 'delete' = 'create';
-    editingProjectId: string | null = null;
-    projectName: string | null = null;
-    projectDescription: string | null = null;
-    user: User | null = null;
+    projects = signal<Project[]>([]);
+    modalMode = signal<'edit' | 'create' | 'delete'>('create');
+    editingProjectId = signal<string | null>(null);
+    projectName = signal<string | null>(null);
+    projectDescription = signal<string | null>(null);
+    user = signal<User | null>(null);
 
     toastItems = [
         {
@@ -68,25 +67,25 @@ export class ProjectsComponent implements OnInit {
     ];
 
     ngOnInit() {
-        this.isLoading = true;
+        this.isLoading.set(true);
         this.authService.user$
             .pipe(
                 filter((user): user is User => !!user),
                 switchMap((user) => {
-                    this.user = user;
+                    this.user.set(user);
                     return this.projectService.getOwnProjects(user.uid);
                 }),
                 takeUntilDestroyed(this.destroyRef),
             )
             .subscribe({
                 next: (projects) => {
-                    this.projects = projects;
-                    this.isLoading = false;
+                    this.projects.set(projects);
+                    this.isLoading.set(false);
                 },
                 error: (err) => {
                     console.error(err);
                     this.toastService.show('Failed to load projects', 'error');
-                    this.isLoading = false;
+                    this.isLoading.set(false);
                 },
             });
     }
@@ -99,15 +98,15 @@ export class ProjectsComponent implements OnInit {
             description: null,
         },
     ) {
-        this.isModalOpen = true;
-        this.modalMode = mode;
-        this.projectName = data.name;
-        this.editingProjectId = data.id;
-        this.projectDescription = data.description;
+        this.isModalOpen.set(true);
+        this.modalMode.set(mode);
+        this.projectName.set(data.name);
+        this.editingProjectId.set(data.id);
+        this.projectDescription.set(data.description);
     }
 
     closeModal() {
-        this.isModalOpen = false;
+        this.isModalOpen.set(false);
     }
 
     onProjectDeleted(id: string) {
@@ -115,6 +114,7 @@ export class ProjectsComponent implements OnInit {
             .delete(id)
             .then(() => {
                 this.toastService.show('Project deleted successfully');
+                this.projects.update((projects) => projects.filter((project) => project.id !== id));
             })
             .catch((err) => {
                 console.error(err);
