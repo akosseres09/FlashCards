@@ -1,203 +1,212 @@
 <footer class="bg-surface border-t border-surface-border">
     <div class="max-w-7xl mx-auto px-4 py-12">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <!-- Brand -->
             <div class="col-span-1">
-                <div class="flex items-center gap-2 mb-4">
-                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5 text-primary-foreground"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                            />
-                        </svg>
-                    </div>
+                <a routerLink="/" class="flex items-center gap-2 mb-4 no-underline">
+                    <flashcard-logo
+                        [width]="32"
+                        [height]="32"
+                        [showBottomMargin]="false"
+                        roundness="md"
+                    ></flashcard-logo>
                     <span class="text-xl font-bold text-text-base">Flashcards</span>
-                </div>
+                </a>
                 <p class="text-text-muted text-sm mb-4">
                     Master any subject with our intelligent flashcard learning platform.
                 </p>
-                <div class="flex gap-3">
-                    <a
-                        href="#"
-                        class="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-raised text-text-muted hover:bg-surface-overlay hover:text-primary transition-all duration-200"
+                <div class="flex gap-1">
+                    <p-button
+                        [text]="true"
+                        severity="secondary"
+                        size="small"
+                        styleClass="!text-text-muted"
                         aria-label="Twitter"
                     >
-                        <lucide-icon name="twitter" class="w-4 h-4" fill="currentColor">
-                        </lucide-icon>
-                    </a>
-                    <a
-                        href="#"
-                        class="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-raised text-text-muted hover:bg-surface-overlay hover:text-primary transition-all duration-200"
+                        <i class="pi pi-twitter"></i>
+                    </p-button>
+                    <p-button
+                        [text]="true"
+                        severity="secondary"
+                        size="small"
+                        styleClass="!text-text-muted"
                         aria-label="GitHub"
                     >
-                        <lucide-icon
-                            name="github"
-                            class="w-4 h-4"
-                            fill="currentColor"
-                        ></lucide-icon>
-                    </a>
-                    <a
-                        href="#"
-                        class="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-raised text-text-muted hover:bg-surface-overlay hover:text-primary transition-all duration-200"
+                        <i class="pi pi-github"></i>
+                    </p-button>
+                    <p-button
+                        [text]="true"
+                        severity="secondary"
+                        size="small"
+                        styleClass="!text-text-muted"
                         aria-label="LinkedIn"
                     >
-                        <lucide-icon
-                            name="linkedin"
-                            class="w-4 h-4"
-                            fill="currentColor"
-                        ></lucide-icon>
-                    </a>
+                        <i class="pi pi-linkedin"></i>
+                    </p-button>
                 </div>
             </div>
 
+            <!-- Product -->
             <div>
-                <h3 class="text-text-base font-semibold mb-4">Product</h3>
-                <ul class="space-y-3">
+                <h3 class="text-text-base font-semibold mb-2">Product</h3>
+                <ul class="list-none p-0 m-0 space-y-1">
                     <li>
-                        <a
+                        <p-button
                             routerLink="/features"
-                            class="text-text-muted hover:text-primary transition-colors duration-200 text-sm"
-                        >
-                            Features
-                        </a>
+                            [text]="true"
+                            severity="secondary"
+                            size="small"
+                            label="Features"
+                            styleClass="!text-text-muted !px-0"
+                        />
                     </li>
                     <li>
-                        <a
+                        <p-button
                             routerLink="/pricing"
-                            class="text-text-muted hover:text-primary transition-colors duration-200 text-sm"
-                        >
-                            Pricing
-                        </a>
+                            [text]="true"
+                            severity="secondary"
+                            size="small"
+                            label="Pricing"
+                            styleClass="!text-text-muted !px-0"
+                        />
                     </li>
                     <li>
-                        <a
+                        <p-button
                             routerLink="/projects"
-                            class="text-text-muted hover:text-primary transition-colors duration-200 text-sm"
-                        >
-                            Projects
-                        </a>
+                            [text]="true"
+                            severity="secondary"
+                            size="small"
+                            label="Projects"
+                            styleClass="!text-text-muted !px-0"
+                        />
                     </li>
                     <li>
-                        <a
-                            href="#"
-                            class="text-text-muted hover:text-primary transition-colors duration-200 text-sm"
-                        >
-                            API
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <div>
-                <h3 class="text-text-base font-semibold mb-4">Company</h3>
-                <ul class="space-y-3">
-                    <li>
-                        <a
-                            href="#"
-                            class="text-text-muted hover:text-primary transition-colors duration-200 text-sm"
-                        >
-                            About Us
-                        </a>
-                    </li>
-                    <li>
-                        <a
-                            href="#"
-                            class="text-text-muted hover:text-primary transition-colors duration-200 text-sm"
-                        >
-                            Blog
-                        </a>
-                    </li>
-                    <li>
-                        <a
-                            href="#"
-                            class="text-text-muted hover:text-primary transition-colors duration-200 text-sm"
-                        >
-                            Careers
-                        </a>
-                    </li>
-                    <li>
-                        <a
-                            href="#"
-                            class="text-text-muted hover:text-primary transition-colors duration-200 text-sm"
-                        >
-                            Contact
-                        </a>
+                        <p-button
+                            [text]="true"
+                            severity="secondary"
+                            size="small"
+                            label="API"
+                            styleClass="!text-text-muted !px-0"
+                        />
                     </li>
                 </ul>
             </div>
 
+            <!-- Company -->
             <div>
-                <h3 class="text-text-base font-semibold mb-4">Support</h3>
-                <ul class="space-y-3">
+                <h3 class="text-text-base font-semibold mb-2">Company</h3>
+                <ul class="list-none p-0 m-0 space-y-1">
                     <li>
-                        <a
-                            href="#"
-                            class="text-text-muted hover:text-primary transition-colors duration-200 text-sm"
-                        >
-                            Help Center
-                        </a>
+                        <p-button
+                            [text]="true"
+                            severity="secondary"
+                            size="small"
+                            label="About Us"
+                            styleClass="!text-text-muted !px-0"
+                        />
                     </li>
                     <li>
-                        <a
-                            href="#"
-                            class="text-text-muted hover:text-primary transition-colors duration-200 text-sm"
-                        >
-                            Documentation
-                        </a>
+                        <p-button
+                            [text]="true"
+                            severity="secondary"
+                            size="small"
+                            label="Blog"
+                            styleClass="!text-text-muted !px-0"
+                        />
                     </li>
                     <li>
-                        <a
-                            href="#"
-                            class="text-text-muted hover:text-primary transition-colors duration-200 text-sm"
-                        >
-                            Community
-                        </a>
+                        <p-button
+                            [text]="true"
+                            severity="secondary"
+                            size="small"
+                            label="Careers"
+                            styleClass="!text-text-muted !px-0"
+                        />
                     </li>
                     <li>
-                        <a
-                            href="#"
-                            class="text-text-muted hover:text-primary transition-colors duration-200 text-sm"
-                        >
-                            Status
-                        </a>
+                        <p-button
+                            [text]="true"
+                            severity="secondary"
+                            size="small"
+                            label="Contact"
+                            styleClass="!text-text-muted !px-0"
+                        />
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Support -->
+            <div>
+                <h3 class="text-text-base font-semibold mb-2">Support</h3>
+                <ul class="list-none p-0 m-0 space-y-1">
+                    <li>
+                        <p-button
+                            [text]="true"
+                            severity="secondary"
+                            size="small"
+                            label="Help Center"
+                            styleClass="!text-text-muted !px-0"
+                        />
+                    </li>
+                    <li>
+                        <p-button
+                            [text]="true"
+                            severity="secondary"
+                            size="small"
+                            label="Documentation"
+                            styleClass="!text-text-muted !px-0"
+                        />
+                    </li>
+                    <li>
+                        <p-button
+                            [text]="true"
+                            severity="secondary"
+                            size="small"
+                            label="Community"
+                            styleClass="!text-text-muted !px-0"
+                        />
+                    </li>
+                    <li>
+                        <p-button
+                            [text]="true"
+                            severity="secondary"
+                            size="small"
+                            label="Status"
+                            styleClass="!text-text-muted !px-0"
+                        />
                     </li>
                 </ul>
             </div>
         </div>
 
-        <div
-            class="border-t border-surface-border mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
-        >
-            <p class="text-text-muted text-sm">
-                © {{ currentYear }} Flashcards. All rights reserved.
+        <p-divider styleClass="!border-surface-border" />
+
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-text-muted text-sm m-0">
+                &copy; {{ currentYear }} Flashcards. All rights reserved.
             </p>
-            <div class="flex gap-6">
-                <a
-                    href="#"
-                    class="text-text-muted hover:text-primary transition-colors duration-200 text-sm"
-                >
-                    Privacy Policy
-                </a>
-                <a
-                    href="#"
-                    class="text-text-muted hover:text-primary transition-colors duration-200 text-sm"
-                >
-                    Terms of Service
-                </a>
-                <a
-                    href="#"
-                    class="text-text-muted hover:text-primary transition-colors duration-200 text-sm"
-                >
-                    Cookie Policy
-                </a>
+            <div class="flex gap-1">
+                <p-button
+                    [text]="true"
+                    severity="secondary"
+                    size="small"
+                    label="Privacy Policy"
+                    styleClass="!text-text-muted"
+                />
+                <p-button
+                    [text]="true"
+                    severity="secondary"
+                    size="small"
+                    label="Terms of Service"
+                    styleClass="!text-text-muted"
+                />
+                <p-button
+                    [text]="true"
+                    severity="secondary"
+                    size="small"
+                    label="Cookie Policy"
+                    styleClass="!text-text-muted"
+                />
             </div>
         </div>
     </div>
