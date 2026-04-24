@@ -1,37 +1,63 @@
 {
+  "firestore": {
+    "database": "(default)",
+    "location": "europe-central2",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "public": "dist/FlashCards/browser",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "emulators": {
     "firestore": {
-        "database": "(default)",
-        "location": "europe-central2",
-        "rules": "firestore.rules",
-        "indexes": "firestore.indexes.json"
+      "host": "127.0.0.1",
+      "port": 8080
+    },
+    "auth": {
+      "host": "127.0.0.1",
+      "port": 9099
+    },
+    "ui": {
+      "enabled": true,
+      "host": "127.0.0.1",
+      "port": 3000
     },
     "hosting": {
-        "public": "dist/FlashCards/browser",
-        "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-        "rewrites": [
-            {
-                "source": "**",
-                "destination": "/index.html"
-            }
-        ]
+      "host": "127.0.0.1",
+      "port": 5000
     },
-    "emulators": {
-        "firestore": {
-            "host": "127.0.0.1",
-            "port": 8080
-        },
-        "auth": {
-            "host": "127.0.0.1",
-            "port": 9099
-        },
-        "ui": {
-            "enabled": true,
-            "host": "127.0.0.1",
-            "port": 3000
-        },
-        "hosting": {
-            "host": "127.0.0.1",
-            "port": 5000
-        }
+    "functions": {
+      "host": "127.0.0.1",
+      "port": 5001
     }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "disallowLegacyRuntimeConfig": true,
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint",
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ]
 }

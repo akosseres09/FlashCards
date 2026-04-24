@@ -9,6 +9,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { initializeApp, getApp, provideFirebaseApp } from '@angular/fire/app';
 import { provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
 import { getFirestore, connectFirestoreEmulator } from '@angular/fire/firestore';
+import { getFunctions, connectFunctionsEmulator, provideFunctions } from '@angular/fire/functions';
 
 import { provideRouter, withComponentInputBinding, withRouterConfig } from '@angular/router';
 import { providePrimeNG } from 'primeng/config';
@@ -62,12 +63,17 @@ export const appConfig: ApplicationConfig = {
     providers: [
         provideFirebaseApp(() => getApp(app.name)),
         provideAppInitializer(() => {
+            const firestore = getFirestore();
+            const auth = getAuth();
+            const functions = getFunctions();
             if (environment.useEmulators) {
-                connectFirestoreEmulator(getFirestore(), '127.0.0.1', 8080);
-                connectAuthEmulator(getAuth(), 'http://localhost:9099', { disableWarnings: true });
+                connectFirestoreEmulator(firestore, '127.0.0.1', 8080);
+                connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+                connectFunctionsEmulator(functions, '127.0.0.1', 5001);
             }
         }),
         provideAuth(() => getAuth()),
+        provideFunctions(() => getFunctions()),
         provideBrowserGlobalErrorListeners(),
         provideZoneChangeDetection({ eventCoalescing: true }),
         provideAnimations(),
