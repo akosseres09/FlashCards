@@ -1,0 +1,31 @@
+/* Enter Animation */
+.toast-enter {
+    animation: toast-in 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(-100%) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Leave Animation */
+.toast-leave {
+    animation: toast-out 250ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes toast-out {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-100%) scale(0.8);
+    }
+}

@@ -1,5 +1,14 @@
 <div class="bg-surface py-12 px-4 flex-1">
     <div class="max-w-7xl mx-auto">
+        @if (devMode) {
+            <p-splitbutton
+                class="mb-4!"
+                severity="warn"
+                size="small"
+                label="Trigger Toast"
+                [model]="toastItems"
+            />
+        }
         <div class="mb-8">
             <h1 class="text-4xl font-bold text-text-base mb-2">My Projects</h1>
             <p class="text-text-muted text-lg">Manage and study your flashcard collections</p>
