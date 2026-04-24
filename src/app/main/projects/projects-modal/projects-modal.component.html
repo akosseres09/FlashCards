@@ -1,4 +1,4 @@
-<app-modal (closeChange)="onClose()" [visible]="visible()">
+<app-modal (closeChange)="onClose()" [visible]="visible()" (visibleChange)="visible.set($event)">
     <h2 modal-header class="text-2xl font-bold text-text-base">
         {{ title }}
     </h2>
@@ -78,19 +78,19 @@
             type="button"
             label="Cancel"
             (onClick)="close()"
-            outlined="true"
+            [outlined]="true"
             severity="contrast"
             class="flex-1 justify-center"
             styleClass="w-full"
-            [disabled]="isSaving"
+            [disabled]="isSaving()"
         />
         <p-button
-            (onClick)="isSaving ? null : onSubmit()"
+            (onClick)="isSaving() ? null : onSubmit()"
             [severity]="deleteMode ? 'danger' : 'primary'"
             class="flex-1 justify-center"
             styleClass="w-full"
-            [disabled]="isSaving"
-            [loading]="isSaving"
+            [disabled]="isSaving()"
+            [loading]="isSaving()"
         >
             <span>{{ submitButtonText }}</span>
         </p-button>

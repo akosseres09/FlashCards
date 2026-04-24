@@ -1,4 +1,4 @@
-import { Component, EventEmitter, input, output, Output } from '@angular/core';
+import { Component, model, output } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -11,7 +11,7 @@ import { DialogModule } from 'primeng/dialog';
 })
 export class ModalComponent {
     closeChange = output<void>();
-    visible = input<boolean>(true);
+    visible = model<boolean>(true);
 
     onClose() {
         this.closeChange.emit();

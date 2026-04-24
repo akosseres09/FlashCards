@@ -7,6 +7,7 @@ import {
     model,
     output,
     Output,
+    signal,
 } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProjectService } from '../../../services/project/project.service';
@@ -37,7 +38,7 @@ export class ProjectsModalComponent {
     private toastService = inject(ToastService);
 
     createProjectForm: FormGroup;
-    isSaving: boolean = false;
+    isSaving = signal<boolean>(false);
 
     constructor() {
         this.createProjectForm = this.fb.group({
@@ -58,13 +59,13 @@ export class ProjectsModalComponent {
         this.createProjectForm.reset();
     }
 
-    onSubmit() {
+    async onSubmit() {
         if (this.editMode) {
-            this.onUpdate();
+            await this.onUpdate();
         } else if (this.createMode) {
-            this.onCreate();
+            await this.onCreate();
         } else if (this.deleteMode) {
-            this.onDelete();
+            await this.onDelete();
         }
     }
 
@@ -76,7 +77,7 @@ export class ProjectsModalComponent {
             return;
         }
 
-        this.isSaving = true;
+        this.isSaving.set(true);
 
         const updatedProject: Partial<Project> = {
             name: this.createProjectForm.value.name,
@@ -86,12 +87,12 @@ export class ProjectsModalComponent {
         try {
             await this.projectService.update(projectId, updatedProject);
             this.toastService.show('Project updated successfully');
-            this.onClose();
+            this.close();
         } catch (error) {
             console.error('Error updating project:', error);
             this.toastService.show('Error updating project', 'error');
         } finally {
-            this.isSaving = false;
+            this.isSaving.set(false);
         }
     }
 
@@ -101,7 +102,7 @@ export class ProjectsModalComponent {
             this.createProjectForm.markAllAsTouched();
             return;
         }
-        this.isSaving = true;
+        this.isSaving.set(true);
 
         const newProject: ProjectData = {
             createdBy: userId,
@@ -115,12 +116,12 @@ export class ProjectsModalComponent {
         try {
             await this.projectService.addOne(newProject);
             this.toastService.show('Project created successfully');
-            this.onClose();
+            this.close();
         } catch (error) {
             console.error('Error creating project:', error);
             this.toastService.show('Error creating project', 'error');
         } finally {
-            this.isSaving = false;
+            this.isSaving.set(false);
         }
     }
 
@@ -130,17 +131,17 @@ export class ProjectsModalComponent {
             return;
         }
 
-        this.isSaving = true;
+        this.isSaving.set(true);
 
         try {
             await this.projectService.delete(projectId);
             this.toastService.show('Project deleted successfully');
-            this.onClose();
+            this.close();
         } catch (error) {
             console.error('Error deleting project:', error);
             this.toastService.show('Error deleting project', 'error');
         } finally {
-            this.isSaving = false;
+            this.isSaving.set(false);
         }
     }
 
@@ -180,11 +181,11 @@ export class ProjectsModalComponent {
     get submitButtonIcon() {
         switch (this.mode()) {
             case 'create':
-                return this.isSaving ? 'loader-circle' : 'plus';
+                return this.isSaving() ? 'loader-circle' : 'plus';
             case 'edit':
-                return this.isSaving ? 'loader-circle' : 'pencil';
+                return this.isSaving() ? 'loader-circle' : 'pencil';
             case 'delete':
-                return this.isSaving ? 'loader-circle' : 'trash-2';
+                return this.isSaving() ? 'loader-circle' : 'trash-2';
             default:
                 return '';
         }
@@ -193,11 +194,11 @@ export class ProjectsModalComponent {
     get submitButtonText() {
         switch (this.mode()) {
             case 'create':
-                return this.isSaving ? 'Creating...' : 'Create';
+                return this.isSaving() ? 'Creating...' : 'Create';
             case 'edit':
-                return this.isSaving ? 'Saving...' : 'Save';
+                return this.isSaving() ? 'Saving...' : 'Save';
             case 'delete':
-                return this.isSaving ? 'Deleting...' : 'Delete';
+                return this.isSaving() ? 'Deleting...' : 'Delete';
             default:
                 return '';
         }
