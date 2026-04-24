@@ -1,26 +1,35 @@
-<div
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto"
-    (click)="onClose()"
+<p-dialog
+    [visible]="visible()"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="true"
+    [closeOnEscape]="true"
+    [showHeader]="false"
+    (onHide)="onClose()"
+    [style]="{ 'max-width': '32rem', width: 'calc(100vw - 2rem)' }"
+    contentStyleClass="!p-0"
 >
-    <div
-        [@modalAnimation]
-        class="bg-surface-raised rounded-2xl shadow-2xl border border-surface-border max-w-lg w-full max-h-[90vh] overflow-y-auto flex flex-col my-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-surface-overlay [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-surface-border"
-        (click)="$event.stopPropagation()"
-    >
+    <div class="flex flex-col max-h-[90vh]">
         <div class="flex items-center justify-between p-6 border-b border-surface-border shrink-0">
             <ng-content select="[modal-header]"></ng-content>
-            <button
-                (click)="onClose()"
-                class="cursor-pointer text-text-muted hover:text-text-subtle transition-colors p-1 rounded-lg hover:bg-surface-overlay"
+            <p-button
+                (onClick)="onClose()"
+                [text]="true"
+                severity="secondary"
+                styleClass="!text-text-muted"
+                aria-label="Close"
             >
-                <lucide-icon name="circle-x" class="w-6 h-6"></lucide-icon>
-            </button>
+                <lucide-icon name="circle-x" [size]="24"></lucide-icon>
+            </p-button>
         </div>
-        <div class="p-6 flex-1">
+        <div
+            class="p-6 flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-surface-overlay [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-surface-border"
+        >
             <ng-content select="[modal-body]"></ng-content>
         </div>
         <div class="shrink-0">
             <ng-content select="[modal-footer]"></ng-content>
         </div>
     </div>
-</div>
+</p-dialog>

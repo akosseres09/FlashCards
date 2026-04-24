@@ -44,8 +44,8 @@ export class ProjectService {
         });
     }
 
-    addOne(project: Project): Promise<void> {
-        const { id: _id, ...data } = project;
+    addOne(project: ProjectData): Promise<void> {
+        const { ...data } = project;
         return db.projects.add(data).then(() => undefined);
     }
 

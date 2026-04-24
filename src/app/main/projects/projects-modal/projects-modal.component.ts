@@ -2,10 +2,11 @@ import {
     Component,
     EventEmitter,
     inject,
+    input,
     Input,
-    OnChanges,
+    model,
+    output,
     Output,
-    SimpleChanges,
 } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProjectService } from '../../../services/project/project.service';
@@ -13,20 +14,23 @@ import { Project } from '../../../models/Project';
 import { LucideAngularModule } from 'lucide-angular';
 import { ToastService } from '../../../services/toast/toast.service';
 import { ModalComponent } from '../../../common/modal/modal.component';
+import { ButtonModule } from 'primeng/button';
+import { ProjectData } from '../../../models/schema/db';
 
 @Component({
     selector: 'app-projects-modal',
-    imports: [LucideAngularModule, ReactiveFormsModule, ModalComponent],
+    imports: [LucideAngularModule, ReactiveFormsModule, ModalComponent, ButtonModule],
     templateUrl: './projects-modal.component.html',
     styleUrl: './projects-modal.component.scss',
 })
-export class ProjectsModalComponent implements OnChanges {
-    @Output() modalClosed: EventEmitter<void> = new EventEmitter<void>();
-    @Input() projectId: string | null = null;
-    @Input() projectName: string | null = null;
-    @Input() projectDescription: string | null = null;
-    @Input() userId: string | null = null;
-    @Input() mode: 'edit' | 'create' | 'delete' = 'create';
+export class ProjectsModalComponent {
+    modalClosed = output<void>();
+    projectId = input<string | null>(null);
+    projectName = input<string | null>(null);
+    projectDescription = input<string | null>(null);
+    userId = input<string | null>(null);
+    mode = input<'edit' | 'create' | 'delete'>('create');
+    visible = model<boolean>(true);
 
     private fb = inject(FormBuilder);
     private projectService = inject(ProjectService);
@@ -37,33 +41,16 @@ export class ProjectsModalComponent implements OnChanges {
 
     constructor() {
         this.createProjectForm = this.fb.group({
-            name: [this.projectName, [Validators.required, Validators.minLength(3)]],
-            description: [this.projectDescription, [Validators.required, Validators.minLength(10)]],
+            name: [this.projectName(), [Validators.required, Validators.minLength(3)]],
+            description: [
+                this.projectDescription(),
+                [Validators.required, Validators.minLength(10)],
+            ],
         });
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (changes['projectId']) {
-            this.projectId = changes['projectId'].currentValue;
-        }
-
-        if (changes['mode']) {
-            this.mode = changes['mode'].currentValue;
-        }
-
-        if (changes['projectName']) {
-            this.projectName = changes['projectName'].currentValue;
-            this.createProjectForm.get('name')?.setValue(this.projectName);
-        }
-
-        if (changes['projectDescription']) {
-            this.projectDescription = changes['projectDescription'].currentValue;
-            this.createProjectForm.get('description')?.setValue(this.projectDescription);
-        }
-
-        if (changes['userId']) {
-            this.userId = changes['userId'].currentValue;
-        }
+    close() {
+        this.visible.set(false);
     }
 
     onClose() {
@@ -82,65 +69,71 @@ export class ProjectsModalComponent implements OnChanges {
     }
 
     async onUpdate() {
-        if (this.createProjectForm.valid && this.projectId) {
-            this.isSaving = true;
+        const projectId = this.projectId();
 
-            const updatedProject: Partial<Project> = {
-                name: this.createProjectForm.value.name,
-                description: this.createProjectForm.value.description,
-            };
+        if (this.createProjectForm.invalid || !projectId) {
+            this.createProjectForm.markAllAsTouched();
+            return;
+        }
 
-            try {
-                await this.projectService.update(this.projectId, updatedProject);
-                this.toastService.show('Project updated successfully');
-                this.onClose();
-            } catch (error) {
-                console.error('Error updating project:', error);
-                this.toastService.show('Error updating project', 'error');
-            } finally {
-                this.isSaving = false;
-            }
+        this.isSaving = true;
+
+        const updatedProject: Partial<Project> = {
+            name: this.createProjectForm.value.name,
+            description: this.createProjectForm.value.description,
+        };
+
+        try {
+            await this.projectService.update(projectId, updatedProject);
+            this.toastService.show('Project updated successfully');
+            this.onClose();
+        } catch (error) {
+            console.error('Error updating project:', error);
+            this.toastService.show('Error updating project', 'error');
+        } finally {
+            this.isSaving = false;
         }
     }
 
     async onCreate() {
-        if (this.createProjectForm.valid) {
-            this.isSaving = true;
+        const userId = this.userId();
+        if (this.createProjectForm.invalid || !userId) {
+            this.createProjectForm.markAllAsTouched();
+            return;
+        }
+        this.isSaving = true;
 
-            const newProject: Project = {
-                id: '',
-                createdBy: this.userId as string,
-                name: this.createProjectForm.value.name,
-                description: this.createProjectForm.value.description,
-                cardCount: 0,
-                lastStudied: null,
-                createdAt: new Date(),
-            };
+        const newProject: ProjectData = {
+            createdBy: userId,
+            name: this.createProjectForm.value.name,
+            description: this.createProjectForm.value.description,
+            cardCount: 0,
+            lastStudied: null,
+            createdAt: new Date(),
+        };
 
-            try {
-                await this.projectService.addOne(newProject);
-                this.toastService.show('Project created successfully');
-                this.onClose();
-            } catch (error) {
-                console.error('Error creating project:', error);
-                this.toastService.show('Error creating project', 'error');
-            } finally {
-                this.isSaving = false;
-            }
-        } else {
-            this.markFormGroupTouched(this.createProjectForm);
+        try {
+            await this.projectService.addOne(newProject);
+            this.toastService.show('Project created successfully');
+            this.onClose();
+        } catch (error) {
+            console.error('Error creating project:', error);
+            this.toastService.show('Error creating project', 'error');
+        } finally {
+            this.isSaving = false;
         }
     }
 
     async onDelete() {
-        if (!this.projectId) {
+        const projectId = this.projectId();
+        if (!projectId) {
             return;
         }
 
         this.isSaving = true;
 
         try {
-            await this.projectService.delete(this.projectId);
+            await this.projectService.delete(projectId);
             this.toastService.show('Project deleted successfully');
             this.onClose();
         } catch (error) {
@@ -151,15 +144,8 @@ export class ProjectsModalComponent implements OnChanges {
         }
     }
 
-    private markFormGroupTouched(formGroup: FormGroup) {
-        Object.keys(formGroup.controls).forEach((key) => {
-            const control = formGroup.get(key);
-            control?.markAsTouched();
-        });
-    }
-
     get title() {
-        switch (this.mode) {
+        switch (this.mode()) {
             case 'create':
                 return 'Create New Project';
             case 'edit':
@@ -180,19 +166,19 @@ export class ProjectsModalComponent implements OnChanges {
     }
 
     get editMode() {
-        return this.mode === 'edit';
+        return this.mode() === 'edit';
     }
 
     get createMode() {
-        return this.mode === 'create';
+        return this.mode() === 'create';
     }
 
     get deleteMode() {
-        return this.mode === 'delete';
+        return this.mode() === 'delete';
     }
 
     get submitButtonIcon() {
-        switch (this.mode) {
+        switch (this.mode()) {
             case 'create':
                 return this.isSaving ? 'loader-circle' : 'plus';
             case 'edit':
@@ -205,7 +191,7 @@ export class ProjectsModalComponent implements OnChanges {
     }
 
     get submitButtonText() {
-        switch (this.mode) {
+        switch (this.mode()) {
             case 'create':
                 return this.isSaving ? 'Creating...' : 'Create';
             case 'edit':

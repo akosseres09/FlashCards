@@ -1,4 +1,4 @@
-<app-modal (closeChange)="onClose()">
+<app-modal (closeChange)="onClose()" [visible]="visible()">
     <h2 modal-header class="text-2xl font-bold text-text-base">
         {{ title }}
     </h2>
@@ -66,7 +66,7 @@
             <div class="space-y-6">
                 <p class="text-text-subtle">
                     Are you sure you want to delete the project
-                    <span class="font-semibold text-text-base">{{ projectName }}</span
+                    <span class="font-semibold text-text-base">{{ projectName() }}</span
                     >? This action cannot be undone and all associated flashcards will be
                     permanently removed.
                 </p>
@@ -74,28 +74,25 @@
         }
     </div>
     <div modal-footer class="flex gap-3 p-6 border-t border-surface-border">
-        <button
+        <p-button
             type="button"
-            (click)="onClose()"
-            class="flex-1 cursor-pointer py-3 px-6 border border-surface-border rounded-lg text-text-subtle font-medium hover:bg-surface-overlay transition-all duration-200"
+            label="Cancel"
+            (onClick)="close()"
+            outlined="true"
+            severity="contrast"
+            class="flex-1 justify-center"
+            styleClass="w-full"
             [disabled]="isSaving"
-        >
-            Cancel
-        </button>
-        <button
-            (click)="isSaving ? null : onSubmit()"
-            type="submit"
-            class="flex-1 cursor-pointer flex items-center justify-center gap-2 py-3 px-6 bg-primary hover:bg-primary-hover text-primary-foreground font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        />
+        <p-button
+            (onClick)="isSaving ? null : onSubmit()"
+            [severity]="deleteMode ? 'danger' : 'primary'"
+            class="flex-1 justify-center"
+            styleClass="w-full"
             [disabled]="isSaving"
-            [class.bg-error]="deleteMode"
-            [class.hover:bg-error-hover]="deleteMode"
+            [loading]="isSaving"
         >
-            <lucide-icon
-                [class.animate-spin]="isSaving"
-                [name]="submitButtonIcon"
-                class="w-5 h-5"
-            ></lucide-icon>
             <span>{{ submitButtonText }}</span>
-        </button>
+        </p-button>
     </div>
 </app-modal>

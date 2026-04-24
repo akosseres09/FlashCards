@@ -121,13 +121,4 @@ export class ProjectsComponent implements OnInit {
                 this.toastService.show('Failed to delete project', 'error');
             });
     }
-
-    async navigateToStudy(projectId: string) {
-        try {
-            await this.projectService.update(projectId, { lastStudied: new Date() });
-            this.router.navigate(['/projects', projectId]);
-        } catch (error) {
-            console.error('Failed to update last studied date:', error);
-        }
-    }
 }

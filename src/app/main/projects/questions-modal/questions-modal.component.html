@@ -94,24 +94,27 @@
                                             [placeholder]="'Option ' + ($index + 1)"
                                         />
                                         @if (optionsArray.controls.length > 1) {
-                                            <button
+                                            <p-button
                                                 type="button"
-                                                (click)="removeOption($index)"
-                                                class="cursor-pointer px-3 py-3 bg-error hover:bg-error-hover text-primary-foreground rounded-lg transition-all duration-200"
+                                                (onClick)="removeOption($index)"
+                                                severity="danger"
+                                                [text]="true"
+                                                styleClass="!px-3"
                                             >
                                                 <lucide-icon name="x" class="w-4 h-4"></lucide-icon>
-                                            </button>
+                                            </p-button>
                                         }
                                     </div>
                                 }
-                                <button
+                                <p-button
                                     type="button"
-                                    (click)="addOption()"
-                                    class="cursor-pointer flex items-center gap-2 px-4 py-2 bg-surface-overlay hover:bg-surface-border text-text-base font-medium rounded-lg transition-all duration-200"
+                                    (onClick)="addOption()"
+                                    [outlined]="true"
+                                    severity="secondary"
                                 >
                                     <lucide-icon name="plus" class="w-4 h-4"></lucide-icon>
                                     <span>Add Option</span>
-                                </button>
+                                </p-button>
                             </div>
                         </div>
                     }
@@ -154,29 +157,27 @@
         }
     </div>
     <div modal-footer class="flex gap-3 p-6 border-t border-surface-border">
-        <button
+        <p-button
             type="button"
-            (click)="onClose()"
-            class="flex-1 cursor-pointer py-3 px-6 border border-surface-border rounded-lg text-text-subtle font-medium hover:bg-surface-overlay transition-all duration-200"
+            label="Cancel"
+            (onClick)="onClose()"
+            [outlined]="true"
+            severity="secondary"
+            styleClass="flex-1 justify-center"
             [disabled]="isSaving"
-        >
-            Cancel
-        </button>
-        <button
-            (click)="isSaving ? null : onSubmit()"
-            type="submit"
-            class="flex-1 cursor-pointer flex items-center justify-center gap-2 py-3 px-6 bg-primary hover:bg-primary-hover text-primary-foreground font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        />
+        <p-button
+            (onClick)="isSaving ? null : onSubmit()"
+            [severity]="deleteMode ? 'danger' : 'primary'"
+            styleClass="flex-1 justify-center"
             [disabled]="isSaving"
-            [class.bg-error]="deleteMode"
-            [class.hover:bg-error-hover]="deleteMode"
         >
             <lucide-icon
-                [class.animate-spin]="isSaving"
-                ]
                 [name]="submitButtonIcon"
                 class="w-5 h-5"
+                [class.animate-spin]="isSaving"
             ></lucide-icon>
             <span>{{ submitButtonText }}</span>
-        </button>
+        </p-button>
     </div>
 </app-modal>

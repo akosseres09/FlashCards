@@ -12,6 +12,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { QuestionService } from '../../../services/question/question.service';
 import { ToastService } from '../../../services/toast/toast.service';
 import { LucideAngularModule } from 'lucide-angular';
+import { ButtonModule } from 'primeng/button';
 import {
     Question,
     QUESTION_TYPES,
@@ -21,7 +22,7 @@ import {
 
 @Component({
     selector: 'app-questions-modal',
-    imports: [ModalComponent, ReactiveFormsModule, LucideAngularModule],
+    imports: [ModalComponent, ReactiveFormsModule, LucideAngularModule, ButtonModule],
     templateUrl: './questions-modal.component.html',
     styleUrl: './questions-modal.component.scss',
 })
@@ -146,7 +147,7 @@ export class QuestionsModalComponent implements OnChanges {
             this.questionService.updateOne(
                 this.questionId as string,
                 this.projectId as string,
-                updatedQuestion
+                updatedQuestion,
             );
             this.toastService.show('Question updated successfully.');
         } catch (error: any) {
