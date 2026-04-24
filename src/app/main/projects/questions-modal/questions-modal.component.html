@@ -176,7 +176,11 @@
             [severity]="deleteMode ? 'danger' : 'primary'"
             class="flex-1 justify-center"
             styleClass="w-full"
-            [disabled]="isSaving()"
+            [disabled]="
+                isSaving() ||
+                ((createMode || editMode) && questionForm().invalid) ||
+                (jsonMode && jsonForm.invalid)
+            "
             [loading]="isSaving()"
         >
             <span>{{ submitButtonText }}</span>

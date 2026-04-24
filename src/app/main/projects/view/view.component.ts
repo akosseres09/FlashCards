@@ -46,7 +46,7 @@ export class ViewComponent implements OnInit {
 
     isModalOpen = signal<boolean>(false);
 
-    modalMode: 'create' | 'edit' | 'delete' | 'json' = 'create';
+    modalMode = signal<'create' | 'edit' | 'delete' | 'json'>('create');
     async ngOnInit() {
         const projectId = this.projectId();
         if (!projectId) {
@@ -145,7 +145,7 @@ export class ViewComponent implements OnInit {
         mode: 'create' | 'edit' | 'delete' | 'json',
         questionData: ViewQuestion | null = null,
     ) {
-        this.modalMode = mode;
+        this.modalMode.set(mode);
         this.isModalOpen.set(true);
 
         this.questionData.set(questionData);

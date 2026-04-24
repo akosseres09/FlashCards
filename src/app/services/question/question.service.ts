@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Functions, httpsCallable } from '@angular/fire/functions';
 import { db, QuestionData, Schema } from '../../models/schema/db';
 import { Question, QuestionWithoutId } from '../../models/Question';
-import { ProjectQuestionService } from '../project-question/project-question.service';
 import { toData } from '../../utils/converter';
 
 type ProjectId = Schema['projects']['Id'];
@@ -13,7 +13,7 @@ type QuestionId = Parameters<QuestionCollection['get']>[0];
     providedIn: 'root',
 })
 export class QuestionService {
-    private projQuestService = inject(ProjectQuestionService);
+    private functions = inject(Functions);
 
     getOne(projectId: string, id: string): Observable<Question> {
         const projId = projectId as ProjectId;
@@ -45,22 +45,15 @@ export class QuestionService {
     async addOne(question: QuestionWithoutId, projectId: string): Promise<void> {
         const projId = projectId as ProjectId;
         const { id: _id, ...data } = question as QuestionWithoutId & { id?: string };
-        await Promise.all([
-            db.projects(projId).questions.add(data as QuestionData),
-            this.projQuestService.incrementCardCount(projectId, 1),
-        ]);
+        await db.projects(projId).questions.add(data as QuestionData);
     }
 
     async addMany(questions: Array<Partial<Question>>, projectId: string): Promise<void> {
-        const projId = projectId as ProjectId;
-        const adds = questions.map((q) => {
+        const payload = questions.map((q) => {
             const { id: _id, ...data } = q;
-            return db.projects(projId).questions.add(data as QuestionData);
+            return data;
         });
-        await Promise.all([
-            Promise.all(adds),
-            this.projQuestService.incrementCardCount(projectId, questions.length),
-        ]);
+        await httpsCallable(this.functions, 'bulkAddQuestions')({ projectId, questions: payload });
     }
 
     updateOne(id: string, projectId: string, question: Partial<Question>): Promise<void> {
@@ -73,15 +66,12 @@ export class QuestionService {
             .then(() => undefined);
     }
 
-    deleteOne(id: string, projectId: string): Promise<[void, void]> {
+    deleteOne(id: string, projectId: string): Promise<void> {
         const projId = projectId as ProjectId;
         const qId = id as QuestionId;
-        return Promise.all([
-            db
-                .projects(projId)
-                .questions.remove(qId)
-                .then(() => undefined),
-            this.projQuestService.incrementCardCount(projectId, -1),
-        ]);
+        return db
+            .projects(projId)
+            .questions.remove(qId)
+            .then(() => undefined);
     }
 }

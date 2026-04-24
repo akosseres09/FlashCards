@@ -112,11 +112,11 @@ export class QuestionsModalComponent {
         try {
             await this.questionService.addOne(newQuestion, projectId);
             this.toastService.show('Question created successfully.');
-            this.close();
         } catch (error: any) {
             const message = error.message || 'Error creating question.';
             this.toastService.show(message, 'error');
         } finally {
+            this.close();
             this.isSaving.set(false);
         }
     }
@@ -144,11 +144,11 @@ export class QuestionsModalComponent {
         try {
             await this.questionService.updateOne(questionId, projectId, updatedQuestion);
             this.toastService.show('Question updated successfully.');
-            this.close();
         } catch (error: any) {
             const message = error.message || 'Error updating question.';
             this.toastService.show(message, 'error');
         } finally {
+            this.close();
             this.isSaving.set(false);
         }
     }
@@ -169,6 +169,7 @@ export class QuestionsModalComponent {
             const message = error.message || 'Error deleting question.';
             this.toastService.show(message, 'error');
         } finally {
+            this.close();
             this.isSaving.set(false);
         }
     }
@@ -196,11 +197,11 @@ export class QuestionsModalComponent {
 
             await this.questionService.addMany(questions, projectId);
             this.toastService.show('Questions imported successfully.');
-            this.close();
         } catch (error: any) {
             const message = error.message || 'No questions imported! Invalid JSON format.';
             this.toastService.show(message, 'error');
         } finally {
+            this.close();
             this.jsonForm.reset();
             this.isSaving.set(false);
         }

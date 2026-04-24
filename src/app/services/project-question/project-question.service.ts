@@ -13,11 +13,4 @@ export class ProjectQuestionService {
         if (!docs.length) return;
         await Promise.all(docs.map((d) => d.remove()));
     }
-
-    incrementCardCount(projectId: string, incrementBy: number): Promise<void> {
-        const typedId = projectId as ProjectId;
-        return db.projects
-            .update(typedId, ($) => ({ cardCount: $.increment(incrementBy) }))
-            .then(() => undefined);
-    }
 }

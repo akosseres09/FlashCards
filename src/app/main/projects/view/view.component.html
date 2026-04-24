@@ -22,7 +22,8 @@
                         (onClick)="openModal('json')"
                         label="Import Questions"
                         icon="pi pi-upload"
-                        severity="secondary"
+                        severity="primary"
+                        [outlined]="true"
                         styleClass="[&_.p-button-label]:hidden [&_.p-button-label]:sm:inline"
                     />
                 </div>
@@ -40,7 +41,7 @@
                     <p class="text-text-muted text-lg">Loading flashcards...</p>
                 </div>
             </div>
-        } @else if (questions.length === 0) {
+        } @else if (questions().length === 0) {
             <div class="flex-1 flex items-center justify-center">
                 <div class="text-center">
                     <div
@@ -227,7 +228,7 @@
 @if (isModalOpen() && projectId()) {
     <app-questions-modal
         (modalClosed)="onModalClose()"
-        [mode]="modalMode"
+        [mode]="modalMode()"
         [projectId]="projectId()"
         [questionId]="currentQuestionId"
         [questionData]="questionData()"
