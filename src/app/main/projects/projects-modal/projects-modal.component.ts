@@ -9,6 +9,7 @@ import { ButtonModule } from 'primeng/button';
 import { ProjectData } from '../../../models/schema/db';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
+import { AuthService } from '../../../services/auth/auth.service';
 
 @Component({
     selector: 'app-projects-modal',
@@ -32,9 +33,10 @@ export class ProjectsModalComponent {
     mode = input<'edit' | 'create' | 'delete'>('create');
     visible = model<boolean>(true);
 
-    private fb = inject(FormBuilder);
-    private projectService = inject(ProjectService);
-    private toastService = inject(ToastService);
+    private readonly fb = inject(FormBuilder);
+    private readonly projectService = inject(ProjectService);
+    private readonly toastService = inject(ToastService);
+    private readonly authService = inject(AuthService);
 
     createProjectForm = linkedSignal<FormGroup>(() =>
         this.fb.group({
@@ -68,8 +70,9 @@ export class ProjectsModalComponent {
 
     async onUpdate() {
         const projectId = this.projectId();
+        const userId = this.userId();
 
-        if (this.createProjectForm().invalid || !projectId) {
+        if (this.createProjectForm().invalid || !projectId || !userId) {
             this.createProjectForm().markAllAsTouched();
             return;
         }
@@ -79,6 +82,12 @@ export class ProjectsModalComponent {
         const updatedProject: Partial<Project> = {
             name: this.createProjectForm().value.name,
             description: this.createProjectForm().value.description,
+            updatedBy: userId,
+            updatedAt: new Date(),
+            updatedByName:
+                this.authService.getUser()?.displayName ||
+                this.authService.getUser()?.email ||
+                'Unknown',
         };
 
         try {
@@ -103,6 +112,10 @@ export class ProjectsModalComponent {
 
         const newProject: ProjectData = {
             createdBy: userId,
+            createdByName:
+                this.authService.getUser()?.displayName ||
+                this.authService.getUser()?.email ||
+                'Unknown',
             name: this.createProjectForm().value.name,
             description: this.createProjectForm().value.description,
             cardCount: 0,

@@ -109,17 +109,4 @@ export class ProjectsComponent implements OnInit {
     closeModal() {
         this.isModalOpen.set(false);
     }
-
-    onProjectDeleted(id: string) {
-        this.projectService
-            .delete(id)
-            .then(() => {
-                this.toastService.show('Project deleted successfully');
-                this.projects.update((projects) => projects.filter((project) => project.id !== id));
-            })
-            .catch((err) => {
-                console.error(err);
-                this.toastService.show('Failed to delete project', 'error');
-            });
-    }
 }
