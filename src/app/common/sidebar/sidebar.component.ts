@@ -1,12 +1,6 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
-import {
-    ActivatedRoute,
-    NavigationEnd,
-    Router,
-    RouterLink,
-    RouterLinkActive,
-} from '@angular/router';
-import { filter, map } from 'rxjs';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { filter } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
@@ -28,7 +22,6 @@ interface NavItem {
 export class SidebarComponent {
     readonly sidebarService = inject(SidebarService);
     private readonly router = inject(Router);
-    private readonly activeRoute = inject(ActivatedRoute);
 
     readonly projectId = input.required<string>();
     readonly context = signal<'projects' | 'view' | null>(null);
@@ -41,7 +34,7 @@ export class SidebarComponent {
             )
             .subscribe((event) => {
                 const url = event.urlAfterRedirects;
-                if (url.match(/^\/projects$/)) {
+                if (url.match(/^\/projects(\/shared)?$/)) {
                     this.context.set('projects');
                 } else {
                     this.context.set('view');
@@ -65,7 +58,7 @@ export class SidebarComponent {
                     {
                         label: 'Shared with Me',
                         icon: 'pi pi-share-alt',
-                        route: ['/projects'],
+                        route: ['/projects/shared'],
                         exact: true,
                         noActive: true,
                     },
@@ -76,18 +69,18 @@ export class SidebarComponent {
                     {
                         label: 'Cards',
                         icon: 'pi pi-clone',
-                        route: ['/projects', pid],
+                        route: ['/project', pid],
                         exact: true,
                     },
                     {
                         label: 'Members',
                         icon: 'pi pi-users',
-                        route: ['/projects', pid, 'members'],
+                        route: ['/project', pid, 'members'],
                     },
                     {
                         label: 'Invite',
                         icon: 'pi pi-user-plus',
-                        route: ['/projects', pid, 'invite'],
+                        route: ['/project', pid, 'invite'],
                     },
                 ];
             default:

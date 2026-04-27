@@ -1,17 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, inject, isDevMode, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Project } from '../../models/Project';
-import { ProjectService } from '../../services/project/project.service';
-import { filter, switchMap } from 'rxjs';
-import { ProjectsModalComponent } from './projects-modal/projects-modal.component';
+import { Project } from '../../../models/Project';
+import { ProjectService } from '../../../services/project/project.service';
+import { ProjectsModalComponent } from '../projects-modal/projects-modal.component';
+import { ProjectListComponent } from '../project-list/project-list.component';
 import { User } from '@angular/fire/auth';
-import { AuthService } from '../../services/auth/auth.service';
-import { ToastService } from '../../services/toast/toast.service';
-import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../services/auth/auth.service';
+import { ToastService } from '../../../services/toast/toast.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { ButtonModule } from 'primeng/button';
+import { filter, switchMap } from 'rxjs';
 
 @Component({
     selector: 'app-projects',
@@ -19,7 +19,7 @@ import { ButtonModule } from 'primeng/button';
         CommonModule,
         ReactiveFormsModule,
         ProjectsModalComponent,
-        RouterLink,
+        ProjectListComponent,
         SplitButtonModule,
         ButtonModule,
     ],
@@ -41,6 +41,7 @@ export class ProjectsComponent implements OnInit {
     devMode = signal<boolean>(isDevMode());
 
     projects = signal<Project[]>([]);
+
     modalMode = signal<'edit' | 'create' | 'delete'>('create');
     editingProjectId = signal<string | null>(null);
     projectName = signal<string | null>(null);
@@ -78,8 +79,8 @@ export class ProjectsComponent implements OnInit {
                 takeUntilDestroyed(this.destroyRef),
             )
             .subscribe({
-                next: (projects) => {
-                    this.projects.set(projects);
+                next: (ownProjects) => {
+                    this.projects.set(ownProjects);
                     this.isLoading.set(false);
                 },
                 error: (err) => {

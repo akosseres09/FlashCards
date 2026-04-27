@@ -5,27 +5,29 @@
                 <div class="flex items-center gap-3">
                     <a
                         routerLink="/projects"
-                        class="text-text-muted text-lg hover:text-primary transition-colors flex items-center gap-2"
+                        class="text-text-muted text-lg hover:text-primary transition-colors flex items-center gap-2 md:hidden"
                     >
                         <lucide-icon name="chevron-left"></lucide-icon>
                         <span>Back to Projects</span>
                     </a>
                 </div>
                 <div class="flex gap-3 items-center">
-                    <p-button
-                        (onClick)="openModal('create')"
-                        label="Add Question"
-                        icon="pi pi-plus"
-                        styleClass="transform hover:scale-[1.02] [&_.p-button-label]:hidden [&_.p-button-label]:sm:inline"
-                    />
-                    <p-button
-                        (onClick)="openModal('json')"
-                        label="Import Questions"
-                        icon="pi pi-upload"
-                        severity="primary"
-                        [outlined]="true"
-                        styleClass="[&_.p-button-label]:hidden [&_.p-button-label]:sm:inline"
-                    />
+                    @if (canEdit()) {
+                        <p-button
+                            (onClick)="openModal('create')"
+                            label="Add Question"
+                            icon="pi pi-plus"
+                            styleClass="transform hover:scale-[1.02] [&_.p-button-label]:hidden [&_.p-button-label]:sm:inline"
+                        />
+                        <p-button
+                            (onClick)="openModal('json')"
+                            label="Import Questions"
+                            icon="pi pi-upload"
+                            severity="primary"
+                            [outlined]="true"
+                            styleClass="[&_.p-button-label]:hidden [&_.p-button-label]:sm:inline"
+                        />
+                    }
                 </div>
             </div>
             @if (project()) {
@@ -157,6 +159,7 @@
                                 icon="pi pi-pencil"
                                 severity="secondary"
                                 styleClass="w-[100px]"
+                                [class.!hidden]="!canEdit()"
                             />
                             <p-button
                                 (onClick)="openModal('delete')"
@@ -164,6 +167,7 @@
                                 icon="pi pi-trash"
                                 severity="danger"
                                 styleClass="w-[100px]"
+                                [class.!hidden]="!canEdit()"
                             />
                         </div>
                     </div>

@@ -1,0 +1,26 @@
+<div class="bg-surface py-12 px-4 flex-1">
+    <div class="max-w-7xl mx-auto">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-text-base mb-2">Shared with Me</h1>
+            <p class="text-text-muted text-lg">Projects other people have invited you to</p>
+        </div>
+
+        @if (!isLoading() && sharedProjects().length > 0) {
+            <div class="mb-6">
+                <p class="text-text-muted">
+                    {{ sharedProjects().length }}
+                    {{ sharedProjects().length === 1 ? 'project' : 'projects' }}
+                </p>
+            </div>
+        }
+
+        <app-project-list
+            [projects]="sharedProjects()"
+            [isLoading]="isLoading()"
+            [roleMap]="roleMap()"
+            emptyIcon="pi pi-share-alt"
+            emptyTitle="No Shared Projects"
+            emptyText="When someone invites you to their project, it will appear here."
+        />
+    </div>
+</div>

@@ -1,0 +1,117 @@
+@if (isLoading()) {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+            <div
+                class="bg-surface-raised rounded-xl p-6 border border-surface-border animate-pulse"
+            >
+                <div class="h-6 bg-surface-overlay rounded w-3/4 mb-3"></div>
+                <div class="h-4 bg-surface-overlay rounded w-full mb-2"></div>
+                <div class="h-4 bg-surface-overlay rounded w-5/6 mb-4"></div>
+                <div class="flex gap-4 mb-4">
+                    <div class="h-4 bg-surface-overlay rounded w-20"></div>
+                    <div class="h-4 bg-surface-overlay rounded w-24"></div>
+                </div>
+                <div class="h-10 bg-surface-overlay rounded"></div>
+            </div>
+        }
+    </div>
+} @else if (projects().length === 0) {
+    <div class="flex flex-col items-center justify-center py-10">
+        <div class="w-24 h-24 bg-surface-raised rounded-2xl flex items-center justify-center mb-6">
+            <i [class]="emptyIcon() + ' text-5xl text-text-muted'"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-text-base mb-2">{{ emptyTitle() }}</h2>
+        @if (emptyText()) {
+            <p class="text-text-muted text-center max-w-md mb-8">{{ emptyText() }}</p>
+        }
+        @if (emptyActionLabel()) {
+            <p-button
+                (onClick)="emptyActionClick.emit()"
+                [label]="emptyActionLabel()!"
+                icon="pi pi-plus"
+                styleClass="transform hover:scale-[1.02] active:scale-[0.98]"
+            />
+        }
+    </div>
+} @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (project of projects(); track project.id) {
+            <div
+                class="bg-surface-raised rounded-xl p-6 border border-surface-border hover:border-primary/50 transition-all duration-200 hover:shadow-xl group"
+            >
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex-1 min-w-0">
+                        <h3
+                            class="text-xl font-semibold text-text-base mb-2 group-hover:text-primary transition-colors"
+                        >
+                            {{ project.name }}
+                        </h3>
+                        <p class="text-text-muted text-sm line-clamp-2">
+                            {{ project.description }}
+                        </p>
+                    </div>
+                    @let role = roleMap()[project.id];
+                    @if (role) {
+                        <span
+                            class="ml-3 shrink-0 text-xs font-semibold px-2 py-1 rounded-full capitalize"
+                            [class]="
+                                role === 'admin'
+                                    ? 'bg-success/10 text-success'
+                                    : role === 'editor'
+                                      ? 'bg-warning/10 text-warning'
+                                      : 'bg-primary/10 text-primary'
+                            "
+                        >
+                            {{ role }}
+                        </span>
+                    }
+                </div>
+
+                <div class="flex gap-4 mb-4 text-sm">
+                    <div class="flex items-center gap-1 text-text-muted">
+                        <i class="pi pi-file"></i>
+                        <span>{{ project.cardCount }} cards</span>
+                    </div>
+                    @if (project.lastStudied) {
+                        <div class="flex items-center gap-1 text-text-muted">
+                            <i class="pi pi-clock"></i>
+                            <span>Recent</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="flex gap-2 flex-col xs:flex-row">
+                    <p-button
+                        class="flex-1"
+                        [routerLink]="'/project/' + project.id"
+                        label="Study"
+                        icon="pi pi-play"
+                        styleClass="w-full"
+                    />
+                    @if (showActions()) {
+                        <button
+                            pButton
+                            (click)="editClick.emit(project)"
+                            severity="warn"
+                            [text]="true"
+                            styleClass="rounded-lg"
+                        >
+                            <i class="pi pi-pencil"></i>
+                            <span class="block xs:hidden">Edit</span>
+                        </button>
+                        <button
+                            pButton
+                            (click)="deleteClick.emit(project)"
+                            severity="danger"
+                            [text]="true"
+                            styleClass="rounded-lg"
+                        >
+                            <i class="pi pi-trash"></i>
+                            <span class="block xs:hidden">Delete</span>
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
