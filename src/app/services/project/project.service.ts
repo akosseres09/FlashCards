@@ -62,4 +62,35 @@ export class ProjectService {
             this.projQuestService.deleteByProject(id),
         ]);
     }
+
+    /**
+     * Real-time stream of projects the user has been added to as a member
+     * (i.e. shared projects — does NOT include own projects).
+     */
+    getSharedProjects(userId: string): Observable<Project[]> {
+        return new Observable<Project[]>((subscriber) => {
+            const off = db.projectMembers
+                .query(($) => $.field('userId').eq(userId))
+                .on(async (memberDocs) => {
+                    if (memberDocs.length === 0) {
+                        subscriber.next([]);
+                        return;
+                    }
+                    try {
+                        const projects = await Promise.all(
+                            memberDocs.map((m) =>
+                                db.projects.get(m.data.projectId as Schema['projects']['Id']),
+                            ),
+                        );
+                        subscriber.next(
+                            projects.filter(Boolean).map((p) => toData<ProjectData>(p!)),
+                        );
+                    } catch (err) {
+                        subscriber.error(err);
+                    }
+                })
+                .catch((err) => subscriber.error(err));
+            return () => off();
+        });
+    }
 }
