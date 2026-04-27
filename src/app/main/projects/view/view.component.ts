@@ -1,4 +1,13 @@
-import { Component, DestroyRef, HostListener, inject, input, OnInit, signal } from '@angular/core';
+import {
+    Component,
+    computed,
+    DestroyRef,
+    HostListener,
+    inject,
+    input,
+    OnInit,
+    signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
@@ -12,6 +21,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { AuthService } from '../../../services/auth/auth.service';
+import { ProjectMemberService } from '../../../services/project-member/project-member.service';
+import { ProjectRole } from '../../../models/ProjectMember';
 
 @Component({
     selector: 'app-view',
@@ -33,6 +45,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 export class ViewComponent implements OnInit {
     private readonly projectService = inject(ProjectService);
     private readonly questionService = inject(QuestionService);
+    private readonly authService = inject(AuthService);
+    private readonly memberService = inject(ProjectMemberService);
     private readonly destroyRef = inject(DestroyRef);
 
     projectId = input.required<string>();
@@ -47,6 +61,18 @@ export class ViewComponent implements OnInit {
     isModalOpen = signal<boolean>(false);
 
     modalMode = signal<'create' | 'edit' | 'delete' | 'json'>('create');
+
+    /** 'owner' | ProjectRole | null (null = not a member / still loading) */
+    userRole = signal<ProjectRole | 'owner' | null>(null);
+
+    canEdit = computed(() => ['owner', 'admin', 'editor'].includes(this.userRole() ?? ''));
+    canManage = computed(() => ['owner', 'admin'].includes(this.userRole() ?? ''));
+
+    get currentUser() {
+        return this.authService.getUser();
+    }
+
+    private roleInitialized = false;
     async ngOnInit() {
         const projectId = this.projectId();
         if (!projectId) {
@@ -66,6 +92,12 @@ export class ViewComponent implements OnInit {
                 switchMap((project) => {
                     this.project.set(project);
                     this.isLoading.set(false);
+
+                    if (!this.roleInitialized) {
+                        this.roleInitialized = true;
+                        this.resolveUserRole(project);
+                    }
+
                     return this.questionService.getByProject(project.id);
                 }),
                 takeUntilDestroyed(this.destroyRef),
@@ -80,6 +112,21 @@ export class ViewComponent implements OnInit {
                     this.isLoading.set(false);
                 },
             });
+    }
+
+    private resolveUserRole(project: Project): void {
+        const user = this.authService.getUser();
+        if (!user) return;
+
+        if (project.createdBy === user.uid) {
+            this.userRole.set('owner');
+            return;
+        }
+
+        this.memberService
+            .getMembership(project.id, user.uid)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((member) => this.userRole.set(member?.role ?? null));
     }
 
     flipCard() {
