@@ -1,5 +1,5 @@
-<header class="bg-surface-raised px-6 py-3 shadow-lg z-10">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
+<header class="bg-surface-raised px-4 py-3 shadow-lg z-10">
+    <div class="flex items-center justify-between">
         <!-- Brand -->
         <a routerLink="/" class="flex items-center gap-3 no-underline">
             <flashcard-logo
@@ -27,6 +27,26 @@
                 }
             }
             @if (user()) {
+                <!-- Invitation bell -->
+                <div class="relative">
+                    <p-button
+                        (onClick)="isInboxOpen.set(true)"
+                        [text]="true"
+                        severity="secondary"
+                        styleClass="!px-2 !py-1.5 rounded-md"
+                        aria-label="Invitations"
+                    >
+                        <i class="pi pi-bell" style="color: currentColor"></i>
+                        @if (pendingInviteCount() > 0) {
+                            <p-badge
+                                [value]="pendingInviteCount().toString()"
+                                severity="danger"
+                                styleClass="!absolute !top-0 !right-0 !min-w-[18px] !h-[18px] !text-[10px]"
+                            />
+                        }
+                    </p-button>
+                </div>
+
                 <!-- User avatar button -->
                 <p-button
                     (onClick)="userMenu.toggle($event)"
@@ -170,4 +190,14 @@
             </button>
         }
     </div>
+</p-drawer>
+
+<!-- Invitation inbox drawer -->
+<p-drawer
+    [(visible)]="isInboxOpen"
+    position="right"
+    header="Invitations"
+    [style]="{ width: '22rem' }"
+>
+    <app-invitation-inbox />
 </p-drawer>
