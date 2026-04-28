@@ -1,6 +1,6 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { filter } from 'rxjs';
+import { filter, fromEvent } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
@@ -40,11 +40,18 @@ export class SidebarComponent {
                     this.context.set('view');
                 }
             });
+
+        fromEvent(window, 'resize')
+            .pipe(takeUntilDestroyed())
+            .subscribe(() => {
+                if (window.innerWidth >= 768) {
+                    this.sidebarService.close();
+                }
+            });
     }
 
     readonly items = computed<NavItem[]>(() => {
         const pid = this.projectId();
-        console.log(pid, this.context());
 
         switch (this.context()) {
             case 'projects':

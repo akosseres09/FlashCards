@@ -24,6 +24,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AuthService } from '../../../services/auth/auth.service';
 import { ProjectMemberService } from '../../../services/project-member/project-member.service';
 import { ProjectRole } from '../../../models/ProjectMember';
+import { Menu } from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
 
 @Component({
     selector: 'app-view',
@@ -35,6 +37,7 @@ import { ProjectRole } from '../../../models/ProjectMember';
         ButtonModule,
         ProgressBarModule,
         ProgressSpinnerModule,
+        Menu,
     ],
     templateUrl: './view.component.html',
     styleUrl: './view.component.scss',
@@ -67,6 +70,24 @@ export class ViewComponent implements OnInit {
 
     canEdit = computed(() => ['owner', 'admin', 'editor'].includes(this.userRole() ?? ''));
     canManage = computed(() => ['owner', 'admin'].includes(this.userRole() ?? ''));
+    menuItems = computed<MenuItem[]>(() => {
+        const items: MenuItem[] = [];
+
+        if (this.canEdit()) {
+            items.push({
+                label: 'Add Question',
+                icon: 'plus',
+                command: () => this.openModal('create'),
+            });
+            items.push({
+                label: 'Import from JSON',
+                icon: 'file-json',
+                command: () => this.openModal('json'),
+            });
+        }
+
+        return items;
+    });
 
     get currentUser() {
         return this.authService.getUser();

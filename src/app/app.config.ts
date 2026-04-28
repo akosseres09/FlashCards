@@ -56,6 +56,7 @@ import {
     TriangleAlert,
     Menu,
 } from 'lucide-angular';
+import { ConfirmationService } from 'primeng/api';
 
 const app = initializeApp(environment.firebaseConfig);
 
@@ -134,5 +135,6 @@ export const appConfig: ApplicationConfig = {
                 TriangleAlert,
             }),
         ),
+        ConfirmationService,
     ],
 };

@@ -15,4 +15,18 @@ export class SidebarService {
             localStorage.setItem(STORAGE_KEY, String(next));
         }
     }
+
+    open(): void {
+        this.collapsed.set(false);
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem(STORAGE_KEY, 'false');
+        }
+    }
+
+    close(): void {
+        this.collapsed.set(true);
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem(STORAGE_KEY, 'true');
+        }
+    }
 }

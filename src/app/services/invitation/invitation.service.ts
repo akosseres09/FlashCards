@@ -1,13 +1,16 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { db, ProjectInvitationData, Schema } from '../../models/schema/db';
 import { ProjectInvitation, InvitationStatus } from '../../models/ProjectInvitation';
 import { toData } from '../../utils/converter';
+import { Functions, httpsCallable } from '@angular/fire/functions';
 
 @Injectable({
     providedIn: 'root',
 })
 export class InvitationService {
+    private functions = inject(Functions);
+
     /** Real-time stream of pending invitations sent to a given email address. */
     getByEmail(email: string): Observable<ProjectInvitation[]> {
         return new Observable<ProjectInvitation[]>((subscriber) => {
@@ -53,8 +56,8 @@ export class InvitationService {
         });
     }
 
-    create(invitation: ProjectInvitationData): Promise<void> {
-        return db.invitations.add(invitation).then(() => undefined);
+    async create(invitation: ProjectInvitationData): Promise<void> {
+        await httpsCallable(this.functions, 'invite')(invitation);
     }
 
     updateStatus(id: string, status: InvitationStatus): Promise<void> {

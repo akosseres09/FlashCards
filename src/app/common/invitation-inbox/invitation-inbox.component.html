@@ -1,0 +1,53 @@
+@if (invitations().length === 0) {
+    <div class="flex flex-col items-center justify-center py-8 text-center">
+        <i class="pi pi-inbox text-3xl text-text-muted mb-3"></i>
+        <p class="text-text-muted text-sm">No pending invitations</p>
+    </div>
+} @else {
+    <ul class="flex flex-col divide-y divide-surface-border">
+        @for (invite of invitations(); track invite.id) {
+            <li class="flex flex-col gap-3">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="min-w-0">
+                        <p class="font-semibold text-text-base truncate">
+                            {{ invite.projectName }}
+                        </p>
+                        <p class="text-xs text-text-muted mt-0.5">
+                            Invited by <span class="font-medium">{{ invite.invitedByName }}</span>
+                        </p>
+                    </div>
+                    <p-tag
+                        [value]="invite.role | titlecase"
+                        [severity]="roleSeverity(invite.role)"
+                        styleClass="shrink-0"
+                    />
+                </div>
+
+                <div class="flex gap-2">
+                    <p-button
+                        label="Accept"
+                        icon="pi pi-check"
+                        size="small"
+                        (onClick)="accept(invite)"
+                        [loading]="processingId() === invite.id"
+                        [disabled]="processingId() !== null && processingId() !== invite.id"
+                        styleClass="w-full"
+                        class="flex-1"
+                    />
+                    <p-button
+                        label="Decline"
+                        icon="pi pi-times"
+                        size="small"
+                        severity="danger"
+                        [text]="true"
+                        (onClick)="decline(invite)"
+                        [loading]="processingId() === invite.id"
+                        [disabled]="processingId() !== null && processingId() !== invite.id"
+                        styleClass="w-full"
+                        class="flex-1"
+                    />
+                </div>
+            </li>
+        }
+    </ul>
+}

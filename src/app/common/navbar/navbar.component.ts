@@ -9,20 +9,12 @@ import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
 import { DrawerModule } from 'primeng/drawer';
 import { PopoverModule } from 'primeng/popover';
+import { MenuItem, PrimeIcons } from 'primeng/api';
 import { LogoComponent } from '../logo/logo.component';
 import { InvitationInboxComponent } from '../invitation-inbox/invitation-inbox.component';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { PrimeIcons } from 'primeng/api';
-import { switchMap, of } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { switchMap, of, fromEvent } from 'rxjs';
 
-export type MenuItem = {
-    label: string;
-    icon: string;
-    route: string | string[];
-    show: boolean;
-    showBreak?: boolean;
-};
 @Component({
     selector: 'app-navbar',
     imports: [
@@ -40,17 +32,20 @@ export type MenuItem = {
     ],
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.scss',
+    host: {
+        class: 'block h-[70px]',
+    },
 })
 export class NavbarComponent {
-    authService = inject(AuthService);
+    private readonly authService = inject(AuthService);
     private readonly invitationService = inject(InvitationService);
     private readonly destroyRef = inject(DestroyRef);
-    router = inject(Router);
+    private readonly router = inject(Router);
+
     userSignal = toSignal(this.authService.user$);
     user = computed(() => this.userSignal());
-    isMobileMenuOpen = false;
+    isMobileMenuOpen = signal(false);
     isInboxOpen = signal(false);
-
     pendingInviteCount = signal(0);
 
     constructor() {
@@ -64,6 +59,14 @@ export class NavbarComponent {
                 takeUntilDestroyed(this.destroyRef),
             )
             .subscribe((invites) => this.pendingInviteCount.set(invites.length));
+
+        fromEvent(window, 'resize')
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(() => {
+                if (window.innerWidth >= 768) {
+                    this.isMobileMenuOpen.set(false);
+                }
+            });
     }
 
     menuItems = computed<MenuItem[]>(() => {
@@ -72,31 +75,75 @@ export class NavbarComponent {
             {
                 label: 'Login',
                 icon: PrimeIcons.SIGN_IN,
-                route: '/auth/login',
-                show: !user,
+                routerLink: '/auth/login',
+                visible: !user,
             },
             {
                 label: 'Sign Up',
                 icon: PrimeIcons.USER_PLUS,
-                route: '/auth/signup',
-                show: !user,
-                showBreak: true,
+                routerLink: '/auth/signup',
+                visible: !user,
             },
             {
                 label: 'Projects',
                 icon: PrimeIcons.FOLDER,
-                route: '/projects',
-                show: !!user,
+                routerLink: '/projects',
+                visible: !!user,
+            },
+        ];
+    });
+
+    mobileMenuItems = computed<MenuItem[]>(() => {
+        const user = this.user();
+        return [
+            {
+                label: 'Login',
+                icon: PrimeIcons.SIGN_IN,
+                routerLink: '/auth/login',
+                visible: !user,
+                command: () => this.closeMobileMenu(),
+            },
+            {
+                label: 'Sign Up',
+                icon: PrimeIcons.USER_PLUS,
+                routerLink: '/auth/signup',
+                visible: !user,
+                command: () => this.closeMobileMenu(),
+            },
+            {
+                label: 'Projects',
+                icon: PrimeIcons.FOLDER,
+                routerLink: '/projects',
+                visible: !!user,
+                command: () => this.closeMobileMenu(),
+            },
+            {
+                label: 'Settings',
+                icon: PrimeIcons.COG,
+                routerLink: '/settings',
+                visible: !!user,
+                command: () => this.closeMobileMenu(),
+            },
+            { separator: true, visible: !!user },
+            {
+                label: 'Logout',
+                icon: PrimeIcons.SIGN_OUT,
+                visible: !!user,
+                command: () => this.logout(),
             },
         ];
     });
 
     toggleMobileMenu() {
-        this.isMobileMenuOpen = !this.isMobileMenuOpen;
+        this.isMobileMenuOpen.set(!this.isMobileMenuOpen());
     }
 
     closeMobileMenu() {
-        this.isMobileMenuOpen = false;
+        this.isMobileMenuOpen.set(false);
+    }
+
+    runCommand(item: MenuItem, event: Event) {
+        item.command?.({ originalEvent: event, item });
     }
 
     logout() {

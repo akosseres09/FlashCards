@@ -15,6 +15,8 @@ import { ProjectService } from '../../../services/project/project.service';
 import { ProjectMemberService } from '../../../services/project-member/project-member.service';
 import { InvitationService } from '../../../services/invitation/invitation.service';
 import { ToastService } from '../../../services/toast/toast.service';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialog } from 'primeng/confirmdialog';
 
 const ROLE_OPTIONS: { label: string; value: ProjectRole }[] = [
     { label: 'Viewer', value: 'viewer' },
@@ -32,6 +34,7 @@ const ROLE_OPTIONS: { label: string; value: ProjectRole }[] = [
         ButtonModule,
         SelectModule,
         TagModule,
+        ConfirmDialog,
     ],
     templateUrl: './members.component.html',
     styleUrl: './members.component.scss',
@@ -46,6 +49,7 @@ export class MembersComponent implements OnInit {
     private readonly invitationService = inject(InvitationService);
     private readonly toastService = inject(ToastService);
     private readonly destroyRef = inject(DestroyRef);
+    private readonly confirmationService = inject(ConfirmationService);
 
     projectId = input.required<string>();
 
@@ -112,14 +116,32 @@ export class MembersComponent implements OnInit {
         }
     }
 
-    async removeMember(member: ProjectMember) {
-        try {
-            await this.memberService.delete(member.id);
-            this.toastService.show(`${member.email} removed from project`, 'success');
-        } catch (err) {
-            console.error(err);
-            this.toastService.show('Failed to remove member', 'error');
-        }
+    openRemoveMemberDialog(member: ProjectMember) {
+        this.confirmationService.confirm({
+            message: `Are you sure you want to remove ${member.email} from the project?`,
+            closable: true,
+            header: 'Confirm Remove',
+            acceptButtonProps: { label: 'Remove', severity: 'danger' },
+            rejectButtonProps: { label: 'Cancel', severity: 'secondary', outlined: true },
+            icon: 'pi pi-exclamation-triangle',
+            accept: async () => {
+                await this.removeMember(member);
+            },
+        });
+    }
+
+    openRevokeDialog(invitation: ProjectInvitation) {
+        this.confirmationService.confirm({
+            message: `Are you sure you want to revoke this invitation?`,
+            closable: true,
+            header: 'Confirm Revoke',
+            acceptButtonProps: { label: 'Revoke', severity: 'danger' },
+            rejectButtonProps: { label: 'Cancel', severity: 'secondary', outlined: true },
+            icon: 'pi pi-exclamation-triangle',
+            accept: async () => {
+                await this.revokeInvite(invitation);
+            },
+        });
     }
 
     async revokeInvite(invite: ProjectInvitation) {
@@ -129,6 +151,16 @@ export class MembersComponent implements OnInit {
         } catch (err) {
             console.error(err);
             this.toastService.show('Failed to revoke invitation', 'error');
+        }
+    }
+
+    async removeMember(member: ProjectMember) {
+        try {
+            await this.memberService.delete(member.id);
+            this.toastService.show(`${member.email} removed from project`, 'success');
+        } catch (err) {
+            console.error(err);
+            this.toastService.show('Failed to remove member', 'error');
         }
     }
 }

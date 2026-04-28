@@ -71,8 +71,9 @@ export class InviteComponent implements OnInit {
         if (this.form.invalid) return;
 
         const project = this.project();
+        const projectId = this.projectId();
         const user = this.currentUser;
-        if (!project || !user) return;
+        if (!project || !user || project.id !== projectId) return;
 
         this.isSaving.set(true);
         const { email, role } = this.form.getRawValue();

@@ -1,5 +1,5 @@
-<header class="bg-surface-raised px-4 py-3 shadow-lg z-10">
-    <div class="flex items-center justify-between">
+<header class="flex items-center bg-surface-raised px-4 py-3 shadow-lg z-10 h-full">
+    <div class="flex flex-1 justify-between self-center">
         <!-- Brand -->
         <a routerLink="/" class="flex items-center gap-3 no-underline">
             <flashcard-logo
@@ -13,16 +13,16 @@
 
         <!-- Desktop nav -->
         <nav class="hidden md:flex items-center gap-2">
-            @for (menuItem of menuItems(); track $index) {
-                @if (menuItem.show) {
+            @for (item of menuItems(); track $index) {
+                @if (item.visible) {
                     <a
-                        [routerLink]="menuItem.route"
+                        [routerLink]="item.routerLink"
                         routerLinkActive="!text-primary !bg-primary/10"
                         [routerLinkActiveOptions]="{ exact: true }"
                         class="flex items-center gap-2 px-4 py-2 rounded-md font-semibold text-text-subtle hover:text-primary hover:bg-surface-overlay transition-all duration-200 no-underline"
                     >
-                        <i class="{{ menuItem.icon }}" style="color: currentColor"></i>
-                        {{ menuItem.label }}
+                        <i class="pi {{ item.icon }}" style="color: currentColor"></i>
+                        {{ item.label }}
                     </a>
                 }
             }
@@ -32,8 +32,9 @@
                     <p-button
                         (onClick)="isInboxOpen.set(true)"
                         [text]="true"
-                        severity="secondary"
-                        styleClass="!px-2 !py-1.5 rounded-md"
+                        severity="primary"
+                        styleClass="!px-4 !py-2 rounded-md"
+                        class="block h-full"
                         aria-label="Invitations"
                     >
                         <i class="pi pi-bell" style="color: currentColor"></i>
@@ -41,7 +42,7 @@
                             <p-badge
                                 [value]="pendingInviteCount().toString()"
                                 severity="danger"
-                                styleClass="!absolute !top-0 !right-0 !min-w-[18px] !h-[18px] !text-[10px]"
+                                class="absolute! top-0! right-0! min-w-[18px]! h-[18px]! text-[10px]"
                             />
                         }
                     </p-button>
@@ -51,8 +52,8 @@
                 <p-button
                     (onClick)="userMenu.toggle($event)"
                     [text]="true"
-                    severity="secondary"
-                    styleClass="!px-2 !py-1.5 rounded-md flex items-center gap-2"
+                    severity="primary"
+                    styleClass="!px-2 !py-1.5 rounded-md flex items-center gap-2 h-full"
                     aria-label="User menu"
                 >
                     @let image = user()?.photoURL;
@@ -116,7 +117,11 @@
 </header>
 
 <!-- Mobile Drawer -->
-<p-drawer [(visible)]="isMobileMenuOpen" position="right" [style]="{ width: '17rem' }">
+<p-drawer
+    [(visible)]="isMobileMenuOpen"
+    position="right"
+    [style]="{ maxWidth: '18rem', width: '100%' }"
+>
     <ng-template pTemplate="header">
         <div class="flex items-center gap-3">
             <flashcard-logo
@@ -129,7 +134,7 @@
         </div>
     </ng-template>
 
-    <div class="flex flex-col gap-1 py-2">
+    <div class="flex flex-col gap-2">
         @if (user()) {
             <!-- User info -->
             <div
@@ -138,56 +143,41 @@
                 @let image = user()?.photoURL;
                 @let email = user()?.email;
                 @if (image) {
-                    <p-avatar [image]="image" shape="circle" size="large" />
+                    <p-avatar [image]="image" size="large" />
                 } @else {
-                    <p-avatar
-                        [label]="(email?.charAt(0) ?? 'U').toUpperCase()"
-                        shape="circle"
-                        size="large"
-                    />
+                    <p-avatar [label]="(email?.charAt(0) ?? 'U').toUpperCase()" size="large" />
                 }
                 <div class="min-w-0">
                     <p class="text-sm text-text-muted">Signed in as</p>
-                    <p class="font-semibold text-text-base truncate">{{ email }}</p>
+                    <p [title]="email" class="font-semibold text-text-base truncate">{{ email }}</p>
                 </div>
             </div>
         }
 
-        @for (menuItem of menuItems(); track $index) {
-            @if (menuItem.show) {
-                <a
-                    [routerLink]="menuItem.route"
-                    (click)="closeMobileMenu()"
-                    class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-text-subtle font-medium hover:bg-surface-overlay transition-colors no-underline"
-                >
-                    <i class="pi" [ngClass]="menuItem.icon" style="color: currentColor"></i>
-                    {{ menuItem.label }}
-                </a>
-            }
-            @if (menuItem.showBreak) {
+        @for (item of mobileMenuItems(); track $index) {
+            @if (item.separator) {
                 <hr class="border-surface-border my-1" />
+            } @else if (item.visible) {
+                @if (item.routerLink) {
+                    <a
+                        [routerLink]="item.routerLink"
+                        routerLinkActive="!bg-primary/10 !text-primary"
+                        (click)="item.command ? runCommand(item, $event) : null"
+                        class="flex items-center gap-3 px-4 py-2 rounded-md text-text-subtle font-medium hover:bg-surface-overlay transition-colors no-underline"
+                    >
+                        <i class="pi {{ item.icon }}" style="color: currentColor"></i>
+                        {{ item.label }}
+                    </a>
+                } @else {
+                    <button
+                        (click)="item.command ? runCommand(item, $event) : null"
+                        class="flex items-center gap-3 px-4 py-2 rounded-md text-text-subtle font-medium hover:bg-error/5 hover:text-error transition-colors w-full cursor-pointer"
+                    >
+                        <i class="pi {{ item.icon }}" style="color: currentColor"></i>
+                        {{ item.label }}
+                    </button>
+                }
             }
-        }
-        @if (user()) {
-            <a
-                routerLink="/settings"
-                routerLinkActive="!bg-primary/10 !text-primary"
-                (click)="closeMobileMenu()"
-                class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-text-subtle font-medium hover:bg-surface-overlay transition-colors no-underline"
-            >
-                <i class="pi pi-cog" style="color: currentColor"></i>
-                Settings
-            </a>
-
-            <hr class="border-surface-border my-1" />
-
-            <button
-                (click)="logout()"
-                class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-text-subtle font-medium hover:bg-error/5 hover:text-error transition-colors w-full cursor-pointer"
-            >
-                <i class="pi pi-sign-out" style="color: currentColor"></i>
-                Logout
-            </button>
         }
     </div>
 </p-drawer>
@@ -197,7 +187,7 @@
     [(visible)]="isInboxOpen"
     position="right"
     header="Invitations"
-    [style]="{ width: '22rem' }"
+    [style]="{ maxWidth: '22rem', width: '100%' }"
 >
     <app-invitation-inbox />
 </p-drawer>

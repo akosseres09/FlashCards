@@ -1,3 +1,4 @@
+<p-confirmDialog />
 <div class="bg-surface flex-1 flex flex-col">
     <div class="max-w-7xl mx-auto w-full px-4 py-8 flex-1 flex flex-col">
         <!-- Header -->
@@ -64,7 +65,7 @@
                                         icon="pi pi-user-minus"
                                         severity="danger"
                                         [text]="true"
-                                        (onClick)="removeMember(member)"
+                                        (onClick)="openRemoveMemberDialog(member)"
                                         pTooltip="Remove member"
                                         tooltipPosition="top"
                                     />
@@ -85,16 +86,14 @@
 
                 <!-- Pending invitations -->
                 @if (pendingInvites().length > 0) {
-                    <div class="bg-surface-raised rounded-2xl p-6 border border-surface-border">
-                        <h2
-                            class="text-sm font-semibold text-text-muted uppercase tracking-wide mb-4"
-                        >
+                    <div class="bg-surface-raised rounded-md p-6">
+                        <h2 class="font-semibold text-text-muted uppercase tracking-wide mb-4">
                             Pending Invitations
                         </h2>
                         <ul class="flex flex-col gap-2">
                             @for (invite of pendingInvites(); track invite.id) {
                                 <li
-                                    class="flex items-center justify-between gap-3 p-3 rounded-lg bg-surface-overlay border border-dashed border-surface-border"
+                                    class="flex items-center justify-between gap-3 p-3 rounded-md bg-surface-overlay"
                                 >
                                     <div class="min-w-0 flex-1">
                                         <p class="text-sm font-medium text-text-base truncate">
@@ -107,9 +106,9 @@
                                     @if (canManage()) {
                                         <p-button
                                             icon="pi pi-times"
-                                            severity="secondary"
+                                            severity="danger"
                                             [text]="true"
-                                            (onClick)="revokeInvite(invite)"
+                                            (onClick)="openRevokeDialog(invite)"
                                             pTooltip="Revoke invitation"
                                             tooltipPosition="top"
                                         />
