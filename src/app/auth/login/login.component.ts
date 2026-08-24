@@ -53,16 +53,15 @@ export class LoginComponent {
 
     async onSubmit() {
         if (this.loginForm.valid) {
-            this.isLoading.set(true);
             this.errorMessage.set('');
 
             const { email, password } = this.loginForm.value;
             if (!email || !password) {
                 this.errorMessage.set('Email and password are required');
-                this.isLoading.set(false);
                 return;
             }
 
+            this.isLoading.set(true);
             try {
                 await this.authService.login(email, password);
                 this.router.navigate(['/']);

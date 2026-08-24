@@ -1,4 +1,4 @@
-import { Component, importProvidersFrom, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
     AbstractControl,
     FormBuilder,
@@ -41,26 +41,23 @@ import { LogoComponent } from '../../common/logo/logo.component';
     styleUrl: './signup.component.scss',
 })
 export class SignupComponent {
-    private fb = inject(FormBuilder);
-    private authService = inject(AuthService);
-    private router = inject(Router);
-    private toastService = inject(ToastService);
+    private readonly fb = inject(FormBuilder);
+    private readonly authService = inject(AuthService);
+    private readonly router = inject(Router);
+    private readonly toastService = inject(ToastService);
 
-    signupForm: FormGroup;
-    errorMessage: string = '';
-    isLoading: boolean = false;
+    readonly signupForm = this.fb.group(
+        {
+            email: ['', [Validators.required, Validators.email]],
+            password: ['', [Validators.required, Validators.minLength(6)]],
+            confirmPassword: ['', [Validators.required]],
+            agree: [false, [Validators.requiredTrue]],
+        },
+        { validators: this.passwordMatchValidator },
+    );
 
-    constructor() {
-        this.signupForm = this.fb.group(
-            {
-                email: ['', [Validators.required, Validators.email]],
-                password: ['', [Validators.required, Validators.minLength(6)]],
-                confirmPassword: ['', [Validators.required]],
-                agree: [false, [Validators.requiredTrue]],
-            },
-            { validators: this.passwordMatchValidator },
-        );
-    }
+    readonly errorMessage = signal<string>('');
+    readonly isLoading = signal<boolean>(false);
 
     passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
         const password = control.get('password')?.value;
@@ -76,19 +73,23 @@ export class SignupComponent {
 
     async onSubmit() {
         if (this.signupForm.valid) {
-            this.isLoading = true;
-            this.errorMessage = '';
+            this.errorMessage.set('');
 
             const { email, password } = this.signupForm.value;
+            if (!email || !password) {
+                this.errorMessage.set('Email and password are required.');
+                return;
+            }
 
+            this.isLoading.set(true);
             try {
                 await this.authService.signup(email, password);
                 this.toastService.show('Signup successful! Please verify your email.');
                 this.router.navigate(['/auth/verify-email']);
-            } catch (error: any) {
-                this.errorMessage = 'An error occurred. Please try again.';
+            } catch {
+                this.errorMessage.set('An error occurred. Please try again.');
             } finally {
-                this.isLoading = false;
+                this.isLoading.set(false);
             }
         } else {
             this.markFormGroupTouched(this.signupForm);
@@ -103,18 +104,18 @@ export class SignupComponent {
     }
 
     get email() {
-        return this.signupForm.get('email');
+        return this.signupForm.get('email')!;
     }
 
     get password() {
-        return this.signupForm.get('password');
+        return this.signupForm.get('password')!;
     }
 
     get confirmPassword() {
-        return this.signupForm.get('confirmPassword');
+        return this.signupForm.get('confirmPassword')!;
     }
 
     get agree() {
-        return this.signupForm.get('agree');
+        return this.signupForm.get('agree')!;
     }
 }
