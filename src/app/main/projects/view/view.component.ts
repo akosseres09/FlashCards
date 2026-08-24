@@ -52,25 +52,25 @@ export class ViewComponent implements OnInit {
     private readonly memberService = inject(ProjectMemberService);
     private readonly destroyRef = inject(DestroyRef);
 
-    projectId = input.required<string>();
+    readonly projectId = input.required<string>();
 
-    questionData = signal<ViewQuestion | null>(null);
-    project = signal<Project | null>(null);
-    questions = signal<Question[]>([]);
-    currentIndex = signal<number>(0);
-    isFlipped = signal<boolean>(false);
-    isLoading = signal<boolean>(true);
+    readonly questionData = signal<ViewQuestion | null>(null);
+    readonly project = signal<Project | null>(null);
+    readonly questions = signal<Question[]>([]);
+    readonly currentIndex = signal<number>(0);
+    readonly isFlipped = signal<boolean>(false);
+    readonly isLoading = signal<boolean>(true);
 
-    isModalOpen = signal<boolean>(false);
+    readonly isModalOpen = signal<boolean>(false);
 
-    modalMode = signal<'create' | 'edit' | 'delete' | 'json'>('create');
+    readonly modalMode = signal<'create' | 'edit' | 'delete' | 'json'>('create');
 
     /** 'owner' | ProjectRole | null (null = not a member / still loading) */
-    userRole = signal<ProjectRole | 'owner' | null>(null);
+    readonly userRole = signal<ProjectRole | 'owner' | null>(null);
 
-    canEdit = computed(() => ['owner', 'admin', 'editor'].includes(this.userRole() ?? ''));
-    canManage = computed(() => ['owner', 'admin'].includes(this.userRole() ?? ''));
-    menuItems = computed<MenuItem[]>(() => {
+    readonly canEdit = computed(() => ['owner', 'admin', 'editor'].includes(this.userRole() ?? ''));
+    readonly canManage = computed(() => ['owner', 'admin'].includes(this.userRole() ?? ''));
+    readonly menuItems = computed<MenuItem[]>(() => {
         const items: MenuItem[] = [];
 
         if (this.canEdit()) {

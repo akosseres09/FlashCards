@@ -48,7 +48,7 @@ export class QuestionService {
         await db.projects(projId).questions.add(data as QuestionData);
     }
 
-    async addMany(questions: Array<Partial<Question>>, projectId: string): Promise<void> {
+    async addMany(questions: Partial<Question>[], projectId: string): Promise<void> {
         const payload = questions.map((q) => {
             const { id: _id, ...data } = q;
             return data;

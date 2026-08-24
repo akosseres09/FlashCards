@@ -5,7 +5,7 @@ export class CustomValidators {
         try {
             JSON.parse(control.value);
             return null;
-        } catch (e) {
+        } catch {
             return { invalidJson: 'Invalid JSON format' };
         }
     }

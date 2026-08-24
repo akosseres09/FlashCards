@@ -26,11 +26,11 @@ export class SharedProjectsComponent implements OnInit {
     private readonly toastService = inject(ToastService);
     private readonly destroyRef = inject(DestroyRef);
 
-    isLoading = signal<boolean>(true);
-    sharedProjects = signal<Project[]>([]);
-    myMemberships = signal<ProjectMember[]>([]);
+    readonly isLoading = signal<boolean>(true);
+    readonly sharedProjects = signal<Project[]>([]);
+    readonly myMemberships = signal<ProjectMember[]>([]);
 
-    roleMap = computed<Record<string, string>>(() =>
+    readonly roleMap = computed<Record<string, string>>(() =>
         Object.fromEntries(this.myMemberships().map((m) => [m.projectId, m.role])),
     );
 

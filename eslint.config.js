@@ -56,6 +56,7 @@ module.exports = tseslint.config(
             '@angular-eslint/no-output-native': 'error',
             '@angular-eslint/no-duplicates-in-metadata-arrays': 'error',
             '@angular-eslint/use-injectable-provided-in': 'error',
+            '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }],
         },
     },
     {

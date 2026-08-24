@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { db, ProjectInvitationData, Schema } from '../../models/schema/db';
+import { db, ProjectInvitationData } from '../../models/schema/db';
 import { ProjectInvitation, InvitationStatus } from '../../models/ProjectInvitation';
 import { toData } from '../../utils/converter';
 import { Functions, httpsCallable } from '@angular/fire/functions';

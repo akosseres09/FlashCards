@@ -79,6 +79,11 @@
                             [class.flipped]="isFlipped()"
                             [style.transform]="isFlipped() ? 'rotateY(180deg)' : 'rotateY(0)'"
                             (click)="flipCard()"
+                            (keydown.enter)="flipCard()"
+                            (keydown.space)="flipCard(); $event.preventDefault()"
+                            tabindex="0"
+                            role="button"
+                            [attr.aria-label]="isFlipped() ? 'Show question' : 'Show answer'"
                         >
                             <!-- Front Face -->
                             <div
@@ -99,17 +104,19 @@
                                         {{ currentQuestion.question }}
                                     </p>
 
-                                    <div
-                                        *ngIf="currentQuestion.options?.length"
-                                        class="w-full max-w-sm mx-auto text-left space-y-2 mt-4"
-                                    >
+                                    @if (currentQuestion.options?.length) {
                                         <div
-                                            *ngFor="let opt of currentQuestion.options"
-                                            class="bg-surface-overlay/30 p-2.5 rounded border border-surface-border/50 text-text-subtle text-sm"
+                                            class="w-full max-w-sm mx-auto text-left space-y-2 mt-4"
                                         >
-                                            • {{ opt }}
+                                            @for (opt of currentQuestion.options; track opt) {
+                                                <div
+                                                    class="bg-surface-overlay/30 p-2.5 rounded border border-surface-border/50 text-text-subtle text-sm"
+                                                >
+                                                    • {{ opt }}
+                                                </div>
+                                            }
                                         </div>
-                                    </div>
+                                    }
 
                                     <p class="text-text-muted text-xs md:text-sm mt-6 shrink-0">
                                         Click or press Space to reveal answer

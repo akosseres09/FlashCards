@@ -47,8 +47,6 @@ export class AuthService {
         return sendPasswordResetEmail(this.auth, email, actionCodeSettings);
     }
 
-    resetPassword(email: string) {}
-
     sendVerificationEmail() {
         const currentUser = this.auth.currentUser;
         if (currentUser) {
