@@ -12,8 +12,7 @@ import { ToastService } from '../../services/toast/toast.service';
 import { ProjectInvitation } from '../../models/ProjectInvitation';
 import { ProjectRole } from '../../models/ProjectMember';
 import { finalize } from 'rxjs';
-
-type RoleSeverity = 'info' | 'warn' | 'success';
+import { RoleSeverity } from '../../models/Role';
 
 @Component({
     selector: 'app-invitation-inbox',

@@ -22,7 +22,7 @@ export class MainComponent {
                 filter((event): event is NavigationEnd => event instanceof NavigationEnd),
                 takeUntilDestroyed(),
             )
-            .subscribe((event) => {
+            .subscribe(() => {
                 let current = this.activeRoute.root;
 
                 while (current.firstChild) {

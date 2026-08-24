@@ -1,6 +1,6 @@
 import { Component, DestroyRef, inject, input, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
@@ -43,13 +43,12 @@ export class InviteComponent implements OnInit {
     private readonly toastService = inject(ToastService);
     private readonly destroyRef = inject(DestroyRef);
     private readonly fb = inject(FormBuilder);
-    private readonly router = inject(Router);
 
-    projectId = input.required<string>();
+    readonly projectId = input.required<string>();
 
-    project = signal<Project | null>(null);
-    isSaving = signal(false);
-    roleOptions = ROLE_OPTIONS;
+    readonly project = signal<Project | null>(null);
+    readonly isSaving = signal(false);
+    readonly roleOptions = ROLE_OPTIONS;
 
     form = this.fb.group({
         email: ['', [Validators.required, Validators.email]],

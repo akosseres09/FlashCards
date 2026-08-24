@@ -17,6 +17,7 @@ import { InvitationService } from '../../../services/invitation/invitation.servi
 import { ToastService } from '../../../services/toast/toast.service';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
+import { RoleSeverity } from '../../../models/Role';
 
 const ROLE_OPTIONS: { label: string; value: ProjectRole }[] = [
     { label: 'Viewer', value: 'viewer' },
@@ -51,16 +52,16 @@ export class MembersComponent implements OnInit {
     private readonly destroyRef = inject(DestroyRef);
     private readonly confirmationService = inject(ConfirmationService);
 
-    projectId = input.required<string>();
+    readonly projectId = input.required<string>();
 
-    project = signal<Project | null>(null);
-    members = signal<ProjectMember[]>([]);
-    pendingInvites = signal<ProjectInvitation[]>([]);
-    userRole = signal<ProjectRole | 'owner' | null>(null);
+    readonly project = signal<Project | null>(null);
+    readonly members = signal<ProjectMember[]>([]);
+    readonly pendingInvites = signal<ProjectInvitation[]>([]);
+    readonly userRole = signal<ProjectRole | 'owner' | null>(null);
 
-    canManage = computed(() => ['owner', 'admin'].includes(this.userRole() ?? ''));
+    readonly canManage = computed(() => ['owner', 'admin'].includes(this.userRole() ?? ''));
 
-    roleOptions = ROLE_OPTIONS;
+    readonly roleOptions = ROLE_OPTIONS;
 
     private roleInitialized = false;
 
@@ -102,7 +103,7 @@ export class MembersComponent implements OnInit {
             .subscribe((member) => this.userRole.set(member?.role ?? null));
     }
 
-    roleSeverity(role: ProjectRole): 'info' | 'warn' | 'success' {
+    roleSeverity(role: ProjectRole): RoleSeverity {
         return role === 'admin' ? 'success' : role === 'editor' ? 'warn' : 'info';
     }
 
