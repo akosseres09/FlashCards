@@ -3,7 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { map, take } from 'rxjs/operators';
 
-export const unverifiedGuard: CanActivateFn = (route, state) => {
+export const unverifiedGuard: CanActivateFn = () => {
     const authService = inject(AuthService);
     const router = inject(Router);
 
@@ -21,6 +21,6 @@ export const unverifiedGuard: CanActivateFn = (route, state) => {
             }
 
             return true;
-        })
+        }),
     );
 };

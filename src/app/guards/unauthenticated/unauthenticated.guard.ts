@@ -3,7 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { map, take } from 'rxjs';
 
-export const unauthenticatedGuard: CanActivateFn = (route, state) => {
+export const unauthenticatedGuard: CanActivateFn = () => {
     const authService = inject(AuthService);
     const router = inject(Router);
 
@@ -16,6 +16,6 @@ export const unauthenticatedGuard: CanActivateFn = (route, state) => {
 
             router.navigate(['/projects']);
             return false;
-        })
+        }),
     );
 };
