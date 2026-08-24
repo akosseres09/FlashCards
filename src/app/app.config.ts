@@ -1,19 +1,21 @@
 import {
     ApplicationConfig,
     importProvidersFrom,
+    provideAppInitializer,
     provideBrowserGlobalErrorListeners,
     provideZoneChangeDetection,
 } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { provideAuth, getAuth } from '@angular/fire/auth';
-import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { initializeApp, getApp, provideFirebaseApp } from '@angular/fire/app';
+import { provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
+import { getFirestore, connectFirestoreEmulator } from '@angular/fire/firestore';
+import { getFunctions, connectFunctionsEmulator, provideFunctions } from '@angular/fire/functions';
 
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withRouterConfig } from '@angular/router';
+import { providePrimeNG } from 'primeng/config';
 
 import { routes } from './app.routes';
-import { connectAuthEmulator } from '@angular/fire/auth';
-import { connectFirestoreEmulator } from '@angular/fire/firestore';
+import { AppTheme } from './primeng-theme';
 import { environment } from '../environments/environment';
 import {
     LucideAngularModule,
@@ -54,28 +56,45 @@ import {
     TriangleAlert,
     Menu,
 } from 'lucide-angular';
+import { ConfirmationService } from 'primeng/api';
+
+const app = initializeApp(environment.firebaseConfig);
 
 export const appConfig: ApplicationConfig = {
     providers: [
-        provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
-        provideFirestore(() => {
+        provideFirebaseApp(() => getApp(app.name)),
+        provideAppInitializer(() => {
             const firestore = getFirestore();
+            const auth = getAuth();
+            const functions = getFunctions();
             if (environment.useEmulators) {
                 connectFirestoreEmulator(firestore, '127.0.0.1', 8080);
-            }
-            return firestore;
-        }),
-        provideAuth(() => {
-            const auth = getAuth();
-            if (environment.useEmulators) {
                 connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+                connectFunctionsEmulator(functions, '127.0.0.1', 5001);
             }
-            return auth;
         }),
+        provideAuth(() => getAuth()),
+        provideFunctions(() => getFunctions()),
         provideBrowserGlobalErrorListeners(),
         provideZoneChangeDetection({ eventCoalescing: true }),
         provideAnimations(),
-        provideRouter(routes),
+        provideRouter(
+            routes,
+            withComponentInputBinding(),
+            withRouterConfig({ paramsInheritanceStrategy: 'always' }),
+        ),
+        providePrimeNG({
+            theme: {
+                preset: AppTheme,
+                options: {
+                    darkModeSelector: '.dark',
+                    cssLayer: {
+                        name: 'primeng',
+                        order: 'base, primeng, utilities',
+                    },
+                },
+            },
+        }),
         importProvidersFrom(
             LucideAngularModule.pick({
                 AtSign,
@@ -114,7 +133,8 @@ export const appConfig: ApplicationConfig = {
                 RotateCw,
                 Info,
                 TriangleAlert,
-            })
+            }),
         ),
+        ConfirmationService,
     ],
 };

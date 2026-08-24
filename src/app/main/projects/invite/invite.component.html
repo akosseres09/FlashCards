@@ -1,0 +1,71 @@
+<div class="bg-surface flex-1 flex flex-col">
+    <div class="max-w-7xl mx-auto w-full px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <a
+                [routerLink]="['/projects', projectId()]"
+                class="text-text-muted text-lg hover:text-primary transition-colors flex items-center gap-2 mb-4 w-fit md:hidden"
+            >
+                <lucide-icon name="chevron-left"></lucide-icon>
+                <span>Back to Project</span>
+            </a>
+            <h1 class="text-3xl font-bold text-text-base">Invite Member</h1>
+        </div>
+
+        <div class="bg-surface-raised rounded-md p-6">
+            <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex flex-1 flex-col gap-1.5">
+                        <label for="invite-email" class="font-medium text-text-subtle">
+                            Email address
+                        </label>
+                        <input
+                            id="invite-email"
+                            pInputText
+                            type="email"
+                            formControlName="email"
+                            placeholder="colleague@example.com"
+                            autocomplete="off"
+                            class="w-full"
+                        />
+                        @if (form.get('email')?.invalid && form.get('email')?.touched) {
+                            <p class="text-sm text-error">Enter a valid email address.</p>
+                        }
+                    </div>
+
+                    <div class="flex flex-1 flex-col gap-1.5">
+                        <label for="invite-role" class="font-medium text-text-subtle"> Role </label>
+                        <p-select
+                            id="invite-role"
+                            formControlName="role"
+                            [options]="roleOptions"
+                            optionLabel="label"
+                            optionValue="value"
+                            styleClass="w-full"
+                        >
+                            <ng-template pTemplate="selectedItem" let-item>
+                                <span>{{ item?.label }}</span>
+                            </ng-template>
+                            <ng-template pTemplate="item" let-item>
+                                <div>
+                                    <p class="font-medium text-text-base">{{ item.label }}</p>
+                                    <p class="text-xs text-text-muted">{{ item.description }}</p>
+                                </div>
+                            </ng-template>
+                        </p-select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <p-button
+                        type="submit"
+                        label="Send Invite"
+                        icon="pi pi-send"
+                        [loading]="isSaving()"
+                        [disabled]="form.invalid"
+                    />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,219 +1,193 @@
-<header class="bg-slate-800 border-b border-slate-700 p-4 shadow-lg z-10">
-    <div class="max-w-7xl mx-auto flex flex-row justify-between items-center gap-4">
-        <div class="flex items-center gap-4">
-            <div class="w-6 h-6 rounded-lg flex items-center justify-center">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-6 w-6 text-blue-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                    />
-                </svg>
-            </div>
-            <div>
-                <h1 class="text-xl md:text-3xl font-bold text-white leading-tight">Flashcards</h1>
-            </div>
-        </div>
-        <div>
-            <button
-                (click)="toggleMobileMenu()"
-                class="md:hidden text-slate-300 hover:text-blue-400 transition-colors duration-200 p-2"
-            >
-                <lucide-icon name="menu" [size]="28"></lucide-icon>
-            </button>
+<header class="flex items-center bg-surface-raised px-4 py-3 shadow-lg z-10 h-full">
+    <div class="flex flex-1 justify-between self-center">
+        <!-- Brand -->
+        <a routerLink="/" class="flex items-center gap-3 no-underline">
+            <flashcard-logo
+                [width]="36"
+                [height]="36"
+                [showBottomMargin]="false"
+                roundness="md"
+            ></flashcard-logo>
+            <span class="text-xl font-bold text-text-base tracking-tight">Flashcards</span>
+        </a>
 
-            <nav class="hidden md:block">
-                <ul class="flex gap-5 cursor-pointer text-lg font-semibold">
-                    @if (user$ | async; as user) {
-                    <li>
-                        <a
-                            routerLink="/projects"
-                            routerLinkActive="text-blue-400"
-                            class="text-slate-300 hover:text-blue-400 transition-colors duration-200"
-                            >Projects</a
-                        >
-                    </li>
-                    <li class="relative">
-                        <button
-                            (click)="toggleDropdown()"
-                            class="cursor-pointer text-slate-400 hover:text-slate-300 transition-colors duration-200 flex items-center gap-2"
-                        >
-                            @if(user.photoURL) {
-                            <img
-                                [src]="user.photoURL"
-                                alt="User Avatar"
-                                class="w-8 h-8 rounded-full object-cover"
+        <!-- Desktop nav -->
+        <nav class="hidden md:flex items-center gap-2">
+            @for (item of menuItems(); track $index) {
+                @if (item.visible) {
+                    <a
+                        [routerLink]="item.routerLink"
+                        routerLinkActive="!text-primary !bg-primary/10"
+                        [routerLinkActiveOptions]="{ exact: true }"
+                        class="flex items-center gap-2 px-4 py-2 rounded-md font-semibold text-text-subtle hover:text-primary hover:bg-surface-overlay transition-all duration-200 no-underline"
+                    >
+                        <i class="pi {{ item.icon }}" style="color: currentColor"></i>
+                        {{ item.label }}
+                    </a>
+                }
+            }
+            @if (user()) {
+                <!-- Invitation bell -->
+                <div class="relative">
+                    <p-button
+                        (onClick)="isInboxOpen.set(true)"
+                        [text]="true"
+                        severity="primary"
+                        styleClass="!px-4 !py-2 rounded-md"
+                        class="block h-full"
+                        aria-label="Invitations"
+                    >
+                        <i class="pi pi-bell" style="color: currentColor"></i>
+                        @if (pendingInviteCount() > 0) {
+                            <p-badge
+                                [value]="pendingInviteCount().toString()"
+                                severity="danger"
+                                class="absolute! top-0! right-0! min-w-[18px]! h-[18px]! text-[10px]"
                             />
-                            } @else {
-                            <span>{{ user.email }}</span>
-
-                            } @if(isDropdownOpen) {
-                            <lucide-icon
-                                name="chevron-up"
-                                [size]="20"
-                                [absoluteStrokeWidth]="true"
-                            ></lucide-icon>
-                            } @else {
-                            <lucide-icon
-                                name="chevron-down"
-                                [size]="20"
-                                [absoluteStrokeWidth]="true"
-                            ></lucide-icon>
-                            }
-                        </button>
-                        @if (isDropdownOpen) {
-                        <div
-                            class="absolute right-0 mt-2 w-48 bg-slate-800 rounded-lg shadow-xl border border-slate-700 py-2 z-50"
-                        >
-                            <a
-                                routerLink="/settings"
-                                (click)="closeDropdown()"
-                                class="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-blue-400 transition-colors duration-200"
-                            >
-                                <lucide-icon
-                                    name="settings"
-                                    [size]="20"
-                                    [absoluteStrokeWidth]="true"
-                                ></lucide-icon>
-                                <span>Settings</span>
-                            </a>
-                            <div class="border-t border-slate-700 my-1"></div>
-                            <span
-                                (click)="logout()"
-                                class="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-red-400 transition-colors duration-200 cursor-pointer"
-                            >
-                                <lucide-icon
-                                    name="log-out"
-                                    [size]="20"
-                                    [absoluteStrokeWidth]="true"
-                                ></lucide-icon>
-                                <span>Logout</span>
-                            </span>
-                        </div>
                         }
-                    </li>
+                    </p-button>
+                </div>
 
+                <!-- User avatar button -->
+                <p-button
+                    (onClick)="userMenu.toggle($event)"
+                    [text]="true"
+                    severity="primary"
+                    styleClass="!px-2 !py-1.5 rounded-md flex items-center gap-2 h-full"
+                    aria-label="User menu"
+                >
+                    @let image = user()?.photoURL;
+                    @let email = user()?.email;
+                    @if (image) {
+                        <p-avatar [image]="image" shape="circle" size="normal" />
                     } @else {
-                    <li>
-                        <a
-                            routerLink="/auth/login"
-                            routerLinkActive="text-blue-400"
-                            class="text-slate-300 hover:text-blue-400 transition-colors duration-200"
-                            >Login</a
-                        >
-                    </li>
-                    <li>
-                        <a
-                            routerLink="/auth/signup"
-                            routerLinkActive="text-blue-400"
-                            class="text-slate-300 hover:text-blue-400 transition-colors duration-200"
-                            >Signup</a
-                        >
-                    </li>
+                        <p-avatar
+                            [label]="(email?.charAt(0) ?? 'U').toUpperCase()"
+                            shape="circle"
+                            size="normal"
+                        />
                     }
-                </ul>
-            </nav>
+                    <i class="pi pi-chevron-down" style="color: currentColor"></i>
+                </p-button>
 
-            @if(isMobileMenuOpen) {
-            <div
-                [@backdropFade]
-                class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-                (click)="closeMobileMenu()"
-            ></div>
-            <div
-                [@slideInLeft]
-                class="fixed top-0 right-0 h-full w-72 bg-slate-800 shadow-2xl z-50 md:hidden transform transition-transform duration-300 ease-in-out"
-            >
-                <div class="flex flex-col h-full">
-                    <div class="flex items-center justify-between p-4 border-b border-slate-700">
-                        <h2 class="text-xl font-bold text-white">Menu</h2>
-                        <button
-                            (click)="closeMobileMenu()"
-                            class="text-slate-400 hover:text-slate-300 transition-colors p-1"
-                        >
-                            <lucide-icon name="x" [size]="24"></lucide-icon>
-                        </button>
-                    </div>
-                    <nav class="flex-1 overflow-y-auto p-4">
-                        @if (user$ | async; as user) {
-                        <div class="space-y-2">
-                            <div class="flex items-center gap-3 p-3 bg-slate-700 rounded-lg mb-4">
-                                @if(user.photoURL) {
-                                <img
-                                    [src]="user.photoURL"
-                                    alt="User Avatar"
-                                    class="w-10 h-10 rounded-full object-cover"
-                                />
-                                }
-                                <div class="flex-1 overflow-hidden">
-                                    <p class="text-sm text-slate-400">Signed in as</p>
-                                    <p class="text-white text-sm truncate">{{ user.email }}</p>
-                                </div>
-                            </div>
-
-                            <a
-                                routerLink="/projects"
-                                routerLinkActive="bg-blue-600 text-white"
-                                (click)="closeMobileMenu()"
-                                class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-700 rounded-lg transition-colors duration-200"
-                            >
-                                <lucide-icon name="folder-open" [size]="20"></lucide-icon>
-                                <span class="font-medium">Projects</span>
-                            </a>
-
+                <p-popover #userMenu styleClass="!p-0 !overflow-hidden">
+                    <div class="flex flex-col min-w-48">
+                        <div class="px-3 py-2 border-b border-surface-border">
+                            <p class="text-sm text-text-muted mb-0.5">Signed in as</p>
+                            <p class="font-semibold text-text-base truncate">
+                                {{ email }}
+                            </p>
+                        </div>
+                        <div class="p-1">
                             <a
                                 routerLink="/settings"
-                                (click)="closeMobileMenu()"
-                                class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-700 rounded-lg transition-colors duration-200"
+                                (click)="userMenu.hide()"
+                                class="flex items-center gap-3 px-3 py-2 font-medium text-text-subtle hover:text-primary hover:bg-surface-overlay rounded-md transition-colors no-underline"
                             >
-                                <lucide-icon name="settings" [size]="20"></lucide-icon>
-                                <span class="font-medium">Settings</span>
+                                <i class="pi pi-cog" style="color: currentColor"></i>
+                                Settings
                             </a>
-
-                            <div class="border-t border-slate-700 my-3"></div>
-
+                            <hr class="border-surface-border my-1" />
                             <button
-                                (click)="logout()"
-                                class="w-full flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-red-400 rounded-lg transition-colors duration-200"
+                                (click)="logout(); userMenu.hide()"
+                                class="flex items-center gap-3 px-3 py-2 font-medium text-text-subtle hover:text-error hover:bg-error/5 rounded-md transition-colors w-full text-left cursor-pointer"
                             >
-                                <lucide-icon name="log-out" [size]="20"></lucide-icon>
-                                <span class="font-medium">Logout</span>
+                                <i class="pi pi-sign-out" style="color: currentColor"></i>
+                                Logout
                             </button>
                         </div>
-                        } @else {
-                        <div class="space-y-2">
-                            <a
-                                routerLink="/auth/login"
-                                routerLinkActive="bg-blue-600 text-white"
-                                (click)="closeMobileMenu()"
-                                class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-700 rounded-lg transition-colors duration-200"
-                            >
-                                <lucide-icon name="log-in" [size]="20"></lucide-icon>
-                                <span class="font-medium">Login</span>
-                            </a>
-
-                            <a
-                                routerLink="/auth/signup"
-                                routerLinkActive="bg-blue-600 text-white"
-                                (click)="closeMobileMenu()"
-                                class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-700 rounded-lg transition-colors duration-200"
-                            >
-                                <lucide-icon name="user-plus" [size]="20"></lucide-icon>
-                                <span class="font-medium">Sign Up</span>
-                            </a>
-                        </div>
-                        }
-                    </nav>
-                </div>
-            </div>
+                    </div>
+                </p-popover>
             }
+        </nav>
+
+        <!-- Mobile hamburger (wrapped in div so responsive hiding works on host) -->
+        <div class="md:hidden">
+            <p-button
+                (onClick)="toggleMobileMenu()"
+                [text]="true"
+                severity="secondary"
+                styleClass="!p-2"
+                aria-label="Open navigation menu"
+            >
+                <i class="pi pi-bars" style="color: currentColor"></i>
+            </p-button>
         </div>
     </div>
 </header>
+
+<!-- Mobile Drawer -->
+<p-drawer
+    [(visible)]="isMobileMenuOpen"
+    position="right"
+    [style]="{ maxWidth: '18rem', width: '100%' }"
+>
+    <ng-template pTemplate="header">
+        <div class="flex items-center gap-3">
+            <flashcard-logo
+                [width]="28"
+                [height]="28"
+                [showBottomMargin]="false"
+                roundness="md"
+            ></flashcard-logo>
+            <span class="font-bold text-text-base tracking-tight">Flashcards</span>
+        </div>
+    </ng-template>
+
+    <div class="flex flex-col gap-2">
+        @if (user()) {
+            <!-- User info -->
+            <div
+                class="flex items-center gap-3 p-3 mb-2 bg-surface-overlay rounded-md border border-surface-border"
+            >
+                @let image = user()?.photoURL;
+                @let email = user()?.email;
+                @if (image) {
+                    <p-avatar [image]="image" size="large" />
+                } @else {
+                    <p-avatar [label]="(email?.charAt(0) ?? 'U').toUpperCase()" size="large" />
+                }
+                <div class="min-w-0">
+                    <p class="text-sm text-text-muted">Signed in as</p>
+                    <p [title]="email" class="font-semibold text-text-base truncate">{{ email }}</p>
+                </div>
+            </div>
+        }
+
+        @for (item of mobileMenuItems(); track $index) {
+            @if (item.separator) {
+                <hr class="border-surface-border my-1" />
+            } @else if (item.visible) {
+                @if (item.routerLink) {
+                    <a
+                        [routerLink]="item.routerLink"
+                        routerLinkActive="!bg-primary/10 !text-primary"
+                        (click)="item.command ? runCommand(item, $event) : null"
+                        class="flex items-center gap-3 px-4 py-2 rounded-md text-text-subtle font-medium hover:bg-surface-overlay transition-colors no-underline"
+                    >
+                        <i class="pi {{ item.icon }}" style="color: currentColor"></i>
+                        {{ item.label }}
+                    </a>
+                } @else {
+                    <button
+                        (click)="item.command ? runCommand(item, $event) : null"
+                        class="flex items-center gap-3 px-4 py-2 rounded-md text-text-subtle font-medium hover:bg-error/5 hover:text-error transition-colors w-full cursor-pointer"
+                    >
+                        <i class="pi {{ item.icon }}" style="color: currentColor"></i>
+                        {{ item.label }}
+                    </button>
+                }
+            }
+        }
+    </div>
+</p-drawer>
+
+<!-- Invitation inbox drawer -->
+<p-drawer
+    [(visible)]="isInboxOpen"
+    position="right"
+    header="Invitations"
+    [style]="{ maxWidth: '22rem', width: '100%' }"
+>
+    <app-invitation-inbox />
+</p-drawer>

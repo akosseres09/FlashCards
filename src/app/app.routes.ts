@@ -29,7 +29,7 @@ export const routes: Routes = [
                 path: 'verify-email',
                 loadComponent: () =>
                     import('./auth/verify-email/verify-email.component').then(
-                        (m) => m.VerifyEmailComponent
+                        (m) => m.VerifyEmailComponent,
                     ),
                 canActivate: [unverifiedGuard],
             },
@@ -58,12 +58,35 @@ export const routes: Routes = [
             {
                 path: 'projects',
                 loadComponent: () =>
-                    import('./main/projects/projects.component').then((m) => m.ProjectsComponent),
+                    import('./main/projects/own-projects/projects.component').then(
+                        (m) => m.ProjectsComponent,
+                    ),
             },
             {
-                path: 'projects/:id',
+                path: 'projects/shared',
+                loadComponent: () =>
+                    import('./main/projects/shared-projects/shared-projects.component').then(
+                        (m) => m.SharedProjectsComponent,
+                    ),
+            },
+            {
+                path: 'project/:projectId',
                 loadComponent: () =>
                     import('./main/projects/view/view.component').then((m) => m.ViewComponent),
+            },
+            {
+                path: 'project/:projectId/members',
+                loadComponent: () =>
+                    import('./main/projects/members/members.component').then(
+                        (m) => m.MembersComponent,
+                    ),
+            },
+            {
+                path: 'project/:projectId/invite',
+                loadComponent: () =>
+                    import('./main/projects/invite/invite.component').then(
+                        (m) => m.InviteComponent,
+                    ),
             },
         ],
     },

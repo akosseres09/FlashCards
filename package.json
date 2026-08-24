@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "emulators": "firebase emulators:start --import=./emulator-data --export-on-exit=./emulator-data",
+    "start:dev": "concurrently \"ng serve\" \"npm run build:watch --prefix functions\""
   },
   "prettier": {
     "printWidth": 100,
@@ -30,12 +32,16 @@
     "@angular/forms": "^20.3.0",
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.0",
+    "@primeuix/themes": "^2.0.3",
     "@tailwindcss/postcss": "^4.1.17",
     "lucide-angular": "^0.561.0",
     "postcss": "^8.5.6",
+    "primeicons": "^7.0.0",
+    "primeng": "^20.4.0",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.1.17",
     "tslib": "^2.3.0",
+    "typesaurus": "^10.7.0",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
@@ -43,6 +49,7 @@
     "@angular/cli": "^20.3.13",
     "@angular/compiler-cli": "^20.3.0",
     "@types/jasmine": "~5.1.0",
+    "concurrently": "^9.2.1",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

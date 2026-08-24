@@ -1,165 +1,162 @@
-import {
-    Component,
-    EventEmitter,
-    inject,
-    Input,
-    OnChanges,
-    Output,
-    SimpleChanges,
-} from '@angular/core';
+import { Component, inject, input, linkedSignal, model, output, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProjectService } from '../../../services/project/project.service';
 import { Project } from '../../../models/Project';
 import { LucideAngularModule } from 'lucide-angular';
 import { ToastService } from '../../../services/toast/toast.service';
 import { ModalComponent } from '../../../common/modal/modal.component';
+import { ButtonModule } from 'primeng/button';
+import { ProjectData } from '../../../models/schema/db';
+import { InputText } from 'primeng/inputtext';
+import { Textarea } from 'primeng/textarea';
+import { AuthService } from '../../../services/auth/auth.service';
 
 @Component({
     selector: 'app-projects-modal',
-    imports: [LucideAngularModule, ReactiveFormsModule, ModalComponent],
+    imports: [
+        LucideAngularModule,
+        ReactiveFormsModule,
+        ModalComponent,
+        ButtonModule,
+        InputText,
+        Textarea,
+    ],
     templateUrl: './projects-modal.component.html',
     styleUrl: './projects-modal.component.scss',
 })
-export class ProjectsModalComponent implements OnChanges {
-    @Output() modalClosed: EventEmitter<void> = new EventEmitter<void>();
-    @Input() projectId: string | null = null;
-    @Input() projectName: string | null = null;
-    @Input() projectDescription: string | null = null;
-    @Input() userId: string | null = null;
-    @Input() mode: 'edit' | 'create' | 'delete' = 'create';
+export class ProjectsModalComponent {
+    modalClosed = output<void>();
+    projectId = input<string | null>(null);
+    projectName = input<string | null>(null);
+    projectDescription = input<string | null>(null);
+    userId = input<string | null>(null);
+    mode = input<'edit' | 'create' | 'delete'>('create');
+    visible = model<boolean>(true);
 
-    private fb = inject(FormBuilder);
-    private projectService = inject(ProjectService);
-    private toastService = inject(ToastService);
+    private readonly fb = inject(FormBuilder);
+    private readonly projectService = inject(ProjectService);
+    private readonly toastService = inject(ToastService);
+    private readonly authService = inject(AuthService);
 
-    createProjectForm: FormGroup;
-    isSaving: boolean = false;
+    createProjectForm = linkedSignal<FormGroup>(() =>
+        this.fb.group({
+            name: [this.projectName(), [Validators.required, Validators.minLength(3)]],
+            description: [
+                this.projectDescription(),
+                [Validators.required, Validators.minLength(10)],
+            ],
+        }),
+    );
+    isSaving = signal<boolean>(false);
 
-    constructor() {
-        this.createProjectForm = this.fb.group({
-            name: [this.projectName, [Validators.required, Validators.minLength(3)]],
-            description: [this.projectDescription, [Validators.required, Validators.minLength(10)]],
-        });
-    }
-
-    ngOnChanges(changes: SimpleChanges): void {
-        if (changes['projectId']) {
-            this.projectId = changes['projectId'].currentValue;
-        }
-
-        if (changes['mode']) {
-            this.mode = changes['mode'].currentValue;
-        }
-
-        if (changes['projectName']) {
-            this.projectName = changes['projectName'].currentValue;
-            this.createProjectForm.get('name')?.setValue(this.projectName);
-        }
-
-        if (changes['projectDescription']) {
-            this.projectDescription = changes['projectDescription'].currentValue;
-            this.createProjectForm.get('description')?.setValue(this.projectDescription);
-        }
-
-        if (changes['userId']) {
-            this.userId = changes['userId'].currentValue;
-        }
+    close() {
+        this.visible.set(false);
     }
 
     onClose() {
         this.modalClosed.emit();
-        this.createProjectForm.reset();
+        this.createProjectForm().reset();
     }
 
-    onSubmit() {
+    async onSubmit() {
         if (this.editMode) {
-            this.onUpdate();
+            await this.onUpdate();
         } else if (this.createMode) {
-            this.onCreate();
+            await this.onCreate();
         } else if (this.deleteMode) {
-            this.onDelete();
+            await this.onDelete();
         }
     }
 
     async onUpdate() {
-        if (this.createProjectForm.valid && this.projectId) {
-            this.isSaving = true;
+        const projectId = this.projectId();
+        const userId = this.userId();
 
-            const updatedProject: Partial<Project> = {
-                name: this.createProjectForm.value.name,
-                description: this.createProjectForm.value.description,
-            };
+        if (this.createProjectForm().invalid || !projectId || !userId) {
+            this.createProjectForm().markAllAsTouched();
+            return;
+        }
 
-            try {
-                await this.projectService.update(this.projectId, updatedProject);
-                this.toastService.show('Project updated successfully');
-                this.onClose();
-            } catch (error) {
-                console.error('Error updating project:', error);
-                this.toastService.show('Error updating project', 'error');
-            } finally {
-                this.isSaving = false;
-            }
+        this.isSaving.set(true);
+
+        const updatedProject: Partial<Project> = {
+            name: this.createProjectForm().value.name,
+            description: this.createProjectForm().value.description,
+            updatedBy: userId,
+            updatedAt: new Date(),
+            updatedByName:
+                this.authService.getUser()?.displayName ||
+                this.authService.getUser()?.email ||
+                'Unknown',
+        };
+
+        try {
+            await this.projectService.update(projectId, updatedProject);
+            this.toastService.show('Project updated successfully');
+            this.close();
+        } catch (error) {
+            console.error('Error updating project:', error);
+            this.toastService.show('Error updating project', 'error');
+        } finally {
+            this.isSaving.set(false);
         }
     }
 
     async onCreate() {
-        if (this.createProjectForm.valid) {
-            this.isSaving = true;
+        const userId = this.userId();
+        if (this.createProjectForm().invalid || !userId) {
+            this.createProjectForm().markAllAsTouched();
+            return;
+        }
+        this.isSaving.set(true);
 
-            const newProject: Project = {
-                id: '',
-                createdBy: this.userId as string,
-                name: this.createProjectForm.value.name,
-                description: this.createProjectForm.value.description,
-                cardCount: 0,
-                lastStudied: null,
-                createdAt: new Date(),
-            };
+        const newProject: ProjectData = {
+            createdBy: userId,
+            createdByName:
+                this.authService.getUser()?.displayName ||
+                this.authService.getUser()?.email ||
+                'Unknown',
+            name: this.createProjectForm().value.name,
+            description: this.createProjectForm().value.description,
+            cardCount: 0,
+            lastStudied: null,
+            createdAt: new Date(),
+        };
 
-            try {
-                await this.projectService.addOne(newProject);
-                this.toastService.show('Project created successfully');
-                this.onClose();
-            } catch (error) {
-                console.error('Error creating project:', error);
-                this.toastService.show('Error creating project', 'error');
-            } finally {
-                this.isSaving = false;
-            }
-        } else {
-            this.markFormGroupTouched(this.createProjectForm);
+        try {
+            await this.projectService.addOne(newProject);
+            this.toastService.show('Project created successfully');
+            this.close();
+        } catch (error) {
+            console.error('Error creating project:', error);
+            this.toastService.show('Error creating project', 'error');
+        } finally {
+            this.isSaving.set(false);
         }
     }
 
     async onDelete() {
-        if (!this.projectId) {
+        const projectId = this.projectId();
+        if (!projectId) {
             return;
         }
 
-        this.isSaving = true;
+        this.isSaving.set(true);
 
         try {
-            await this.projectService.delete(this.projectId);
+            await this.projectService.delete(projectId);
             this.toastService.show('Project deleted successfully');
-            this.onClose();
+            this.close();
         } catch (error) {
             console.error('Error deleting project:', error);
             this.toastService.show('Error deleting project', 'error');
         } finally {
-            this.isSaving = false;
+            this.isSaving.set(false);
         }
     }
 
-    private markFormGroupTouched(formGroup: FormGroup) {
-        Object.keys(formGroup.controls).forEach((key) => {
-            const control = formGroup.get(key);
-            control?.markAsTouched();
-        });
-    }
-
     get title() {
-        switch (this.mode) {
+        switch (this.mode()) {
             case 'create':
                 return 'Create New Project';
             case 'edit':
@@ -172,46 +169,46 @@ export class ProjectsModalComponent implements OnChanges {
     }
 
     get name() {
-        return this.createProjectForm.get('name');
+        return this.createProjectForm().get('name');
     }
 
     get description() {
-        return this.createProjectForm.get('description');
+        return this.createProjectForm().get('description');
     }
 
     get editMode() {
-        return this.mode === 'edit';
+        return this.mode() === 'edit';
     }
 
     get createMode() {
-        return this.mode === 'create';
+        return this.mode() === 'create';
     }
 
     get deleteMode() {
-        return this.mode === 'delete';
+        return this.mode() === 'delete';
     }
 
     get submitButtonIcon() {
-        switch (this.mode) {
+        switch (this.mode()) {
             case 'create':
-                return this.isSaving ? 'loader-circle' : 'plus';
+                return this.isSaving() ? 'loader-circle' : 'plus';
             case 'edit':
-                return this.isSaving ? 'loader-circle' : 'pencil';
+                return this.isSaving() ? 'loader-circle' : 'pencil';
             case 'delete':
-                return this.isSaving ? 'loader-circle' : 'trash-2';
+                return this.isSaving() ? 'loader-circle' : 'trash-2';
             default:
                 return '';
         }
     }
 
     get submitButtonText() {
-        switch (this.mode) {
+        switch (this.mode()) {
             case 'create':
-                return this.isSaving ? 'Creating...' : 'Create';
+                return this.isSaving() ? 'Creating...' : 'Create';
             case 'edit':
-                return this.isSaving ? 'Saving...' : 'Save';
+                return this.isSaving() ? 'Saving...' : 'Save';
             case 'delete':
-                return this.isSaving ? 'Deleting...' : 'Delete';
+                return this.isSaving() ? 'Deleting...' : 'Delete';
             default:
                 return '';
         }

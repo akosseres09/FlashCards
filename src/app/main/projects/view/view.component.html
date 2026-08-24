@@ -1,223 +1,230 @@
-<div class="bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 flex-1 flex flex-col">
+<div class="bg-surface flex-1 flex flex-col">
     <div class="max-w-7xl mx-auto w-full px-4 py-8 flex-1 flex flex-col">
         <div class="mb-6">
-            <div class="flex flex-col md:flex-row md:items-center gap-5 md:justify-between mb-4">
+            <div class="flex flex-row items-center gap-5 justify-between mb-4">
                 <div class="flex items-center gap-3">
                     <a
                         routerLink="/projects"
-                        class="text-slate-400 text-lg hover:text-blue-400 transition-colors flex items-center gap-2"
+                        class="text-text-muted text-lg hover:text-primary transition-colors flex items-center gap-2"
                     >
                         <lucide-icon name="chevron-left"></lucide-icon>
                         <span>Back to Projects</span>
                     </a>
                 </div>
                 <div class="flex gap-3 items-center">
-                    <button
-                        (click)="openModal('create')"
-                        class="cursor-pointer flex items-center gap-2 px-8 py-4 sm:px-4 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
-                    >
-                        <lucide-icon name="plus" class="w-4 h-4"></lucide-icon>
-                        <span class="hidden sm:block">Add Question</span>
-                    </button>
-                    <button
-                        (click)="openModal('json')"
-                        class="cursor-pointer flex items-center gap-2 px-8 py-4 sm:px-4 sm:py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-all duration-200"
-                    >
-                        <lucide-icon name="upload" class="w-4 h-4"></lucide-icon>
-                        <span class="hidden sm:block">Import Questions</span>
-                    </button>
+                    <p-menu #menu [model]="menuItems()" popup="true"></p-menu>
+                    <p-button
+                        (onClick)="menu.toggle($event)"
+                        icon="pi pi-ellipsis-v"
+                        severity="primary"
+                    ></p-button>
                 </div>
             </div>
-            @if (project) {
-            <h1 class="text-4xl font-bold text-white mb-2">{{ project.name }}</h1>
-            <p class="text-slate-400 text-lg">{{ project.description }}</p>
+            @if (project()) {
+                <h1 class="text-4xl font-bold text-text-base mb-2">{{ project()?.name }}</h1>
+                <p class="text-text-muted text-lg">{{ project()?.description }}</p>
             }
         </div>
 
-        @if (isLoading) {
-        <div class="flex-1 flex items-center justify-center">
-            <div class="text-center">
-                <lucide-icon
-                    name="loader-circle"
-                    class="w-12 h-12 text-blue-400 animate-spin mx-auto mb-4"
-                ></lucide-icon>
-                <p class="text-slate-400 text-lg">Loading flashcards...</p>
-            </div>
-        </div>
-        } @else if (questions.length === 0) {
-        <div class="flex-1 flex items-center justify-center">
-            <div class="text-center">
-                <div
-                    class="w-24 h-24 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6"
-                >
-                    <lucide-icon name="file-text" class="w-12 h-12 text-slate-600"></lucide-icon>
-                </div>
-                <h2 class="text-2xl font-bold text-white mb-2">No Questions Yet</h2>
-                <p class="text-slate-400 mb-6">Start by adding your first flashcard question</p>
-                <button
-                    (click)="openModal('create')"
-                    class="cursor-pointer inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
-                >
-                    <lucide-icon name="plus" class="w-5 h-5"></lucide-icon>
-                    <span>Add First Question</span>
-                </button>
-            </div>
-        </div>
-        } @else {
-        <div class="flex-1 flex flex-col items-center justify-center">
-            <div class="mb-6 text-center">
-                <p class="text-slate-400 text-sm">
-                    Card <span class="text-white font-semibold">{{ currentIndex + 1 }}</span> of
-                    <span class="text-white font-semibold">{{ questions.length }}</span>
-                </p>
-                <div
-                    class="w-48 sm:w-64 md:w-96 h-2 bg-slate-700 rounded-full mt-2 mx-auto overflow-hidden"
-                >
-                    <div
-                        class="h-full bg-blue-500 transition-all duration-300"
-                        [style.width.%]="((currentIndex + 1) / questions.length) * 100"
-                    ></div>
+        @if (isLoading()) {
+            <div class="flex-1 flex items-center justify-center">
+                <div class="text-center">
+                    <p-progressSpinner styleClass="w-12 h-12 mx-auto mb-4" strokeWidth="4" />
+                    <p class="text-text-muted text-lg">Loading flashcards...</p>
                 </div>
             </div>
-
-            @if (currentQuestion) {
-            <div class="w-full max-w-3xl perspective-[1000px] mb-8">
-                <div
-                    class="grid grid-cols-1 w-full transition-transform duration-700 transform-3d cursor-pointer"
-                    [class.flipped]="isFlipped"
-                    [style.transform]="isFlipped ? 'rotateY(180deg)' : 'rotateY(0)'"
-                    (click)="flipCard()"
-                >
-                    <!-- Front Face -->
+        } @else if (questions().length === 0) {
+            <div class="flex-1 flex items-center justify-center">
+                <div class="text-center">
                     <div
-                        class="col-start-1 row-start-1 w-full min-h-[400px] backface-hidden bg-slate-800 border-2 border-slate-700 rounded-2xl shadow-2xl overflow-hidden z-20"
+                        class="w-24 h-24 bg-surface-raised rounded-2xl flex items-center justify-center mx-auto mb-6"
                     >
-                        <div
-                            class="flex flex-col items-center justify-center min-h-[400px] p-6 md:p-12"
-                        >
-                            <div class="text-blue-400 mb-4 shrink-0">
-                                <lucide-icon
-                                    name="help-circle"
-                                    class="w-8 h-8 md:w-12 md:h-12"
-                                ></lucide-icon>
-                            </div>
-                            <p class="text-lg md:text-2xl text-white text-center font-medium">
-                                {{ currentQuestion.question }}
-                            </p>
+                        <lucide-icon
+                            name="file-text"
+                            class="w-12 h-12 text-text-muted"
+                        ></lucide-icon>
+                    </div>
+                    <h2 class="text-2xl font-bold text-text-base mb-2">No Questions Yet</h2>
+                    <p class="text-text-muted mb-6">
+                        Start by adding your first flashcard question
+                    </p>
+                    <p-button
+                        (onClick)="openModal('create')"
+                        label="Add First Question"
+                        icon="pi pi-plus"
+                        styleClass="transform transition-transform hover:scale-[1.02] duration-200"
+                    />
+                </div>
+            </div>
+        } @else {
+            <div class="flex-1 flex flex-col items-center justify-center">
+                <div class="mb-6 text-center">
+                    <p class="text-text-muted text-sm">
+                        Card
+                        <span class="text-text-base font-semibold">{{ currentIndex() + 1 }}</span>
+                        of
+                        <span class="text-text-base font-semibold">{{ questions().length }}</span>
+                    </p>
+                    <p-progressbar
+                        [value]="((currentIndex() + 1) / questions().length) * 100"
+                        [showValue]="false"
+                        class="w-48 sm:w-64 md:w-96 mt-2 mx-auto"
+                    />
+                </div>
 
+                @if (currentQuestion) {
+                    <div class="w-full max-w-3xl perspective-[1000px] mb-8">
+                        <div
+                            class="grid grid-cols-1 w-full transition-transform duration-700 transform-3d cursor-pointer"
+                            [class.flipped]="isFlipped()"
+                            [style.transform]="isFlipped() ? 'rotateY(180deg)' : 'rotateY(0)'"
+                            (click)="flipCard()"
+                        >
+                            <!-- Front Face -->
                             <div
-                                *ngIf="currentQuestion.options?.length"
-                                class="w-full max-w-sm mx-auto text-left space-y-2 mt-4"
+                                class="col-start-1 row-start-1 w-full min-h-[400px] backface-hidden bg-surface-raised border-2 border-surface-border rounded-2xl shadow-2xl overflow-hidden z-20"
                             >
                                 <div
-                                    *ngFor="let opt of currentQuestion.options"
-                                    class="bg-slate-700/30 p-2.5 rounded border border-slate-600/50 text-slate-300 text-sm"
+                                    class="flex flex-col items-center justify-center min-h-[400px] p-6 md:p-12"
                                 >
-                                    • {{ opt }}
+                                    <div class="text-primary mb-4 shrink-0">
+                                        <lucide-icon
+                                            name="help-circle"
+                                            class="w-8 h-8 md:w-12 md:h-12"
+                                        ></lucide-icon>
+                                    </div>
+                                    <p
+                                        class="text-lg md:text-2xl text-text-base text-center font-medium"
+                                    >
+                                        {{ currentQuestion.question }}
+                                    </p>
+
+                                    <div
+                                        *ngIf="currentQuestion.options?.length"
+                                        class="w-full max-w-sm mx-auto text-left space-y-2 mt-4"
+                                    >
+                                        <div
+                                            *ngFor="let opt of currentQuestion.options"
+                                            class="bg-surface-overlay/30 p-2.5 rounded border border-surface-border/50 text-text-subtle text-sm"
+                                        >
+                                            • {{ opt }}
+                                        </div>
+                                    </div>
+
+                                    <p class="text-text-muted text-xs md:text-sm mt-6 shrink-0">
+                                        Click or press Space to reveal answer
+                                    </p>
                                 </div>
                             </div>
 
-                            <p class="text-slate-500 text-xs md:text-sm mt-6 shrink-0">
-                                Click or press Space to reveal answer
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Back Face -->
-                    <div
-                        class="col-start-1 row-start-1 w-full min-h-[400px] backface-hidden transform-[rotateY(180deg)] bg-slate-800 border-2 border-blue-500 rounded-2xl shadow-2xl overflow-hidden"
-                    >
-                        <div
-                            class="flex flex-col items-center justify-center min-h-[400px] h-full p-6 md:p-12"
-                        >
-                            <div class="text-green-400 mb-4 shrink-0">
-                                <lucide-icon
-                                    name="check-circle"
-                                    class="w-8 h-8 md:w-12 md:h-12"
-                                ></lucide-icon>
+                            <!-- Back Face -->
+                            <div
+                                class="col-start-1 row-start-1 w-full min-h-[400px] backface-hidden transform-[rotateY(180deg)] bg-surface-raised border-2 border-primary rounded-2xl shadow-2xl overflow-hidden"
+                            >
+                                <div
+                                    class="flex flex-col items-center justify-center min-h-[400px] h-full p-6 md:p-12"
+                                >
+                                    <div class="text-success mb-4 shrink-0">
+                                        <lucide-icon
+                                            name="check-circle"
+                                            class="w-8 h-8 md:w-12 md:h-12"
+                                        ></lucide-icon>
+                                    </div>
+                                    <p
+                                        class="text-lg md:text-2xl text-text-base text-center font-medium"
+                                    >
+                                        {{ currentQuestion.answer }}
+                                    </p>
+                                    <p class="text-text-muted text-xs md:text-sm mt-6 shrink-0">
+                                        Click or press Space to see question
+                                    </p>
+                                </div>
                             </div>
-                            <p class="text-lg md:text-2xl text-white text-center font-medium">
-                                {{ currentQuestion.answer }}
-                            </p>
-                            <p class="text-slate-500 text-xs md:text-sm mt-6 shrink-0">
-                                Click or press Space to see question
-                            </p>
+                        </div>
+
+                        <div class="flex justify-center gap-3 mt-6">
+                            <p-button
+                                (onClick)="openModal('edit', currentQuestion)"
+                                label="Edit"
+                                icon="pi pi-pencil"
+                                severity="secondary"
+                                styleClass="w-[100px]"
+                                [class.!hidden]="!canEdit()"
+                            />
+                            <p-button
+                                (onClick)="openModal('delete')"
+                                label="Delete"
+                                icon="pi pi-trash"
+                                severity="danger"
+                                styleClass="w-[100px]"
+                                [class.!hidden]="!canEdit()"
+                            />
                         </div>
                     </div>
+                }
+
+                <div class="flex flex-row items-center gap-4">
+                    <p-button
+                        (onClick)="previousCard()"
+                        [disabled]="currentIndex() === 0"
+                        label="Previous"
+                        icon="pi pi-chevron-left"
+                        severity="secondary"
+                        styleClass="sm:w-[150px] [&_.p-button-label]:hidden [&_.p-button-label]:sm:inline"
+                    />
+
+                    <p-button
+                        (onClick)="flipCard()"
+                        label="Flip Card"
+                        icon="pi pi-refresh"
+                        styleClass="sm:w-[150px] [&_.p-button-label]:hidden [&_.p-button-label]:sm:inline"
+                    />
+
+                    <p-button
+                        (onClick)="nextCard()"
+                        [disabled]="currentIndex() === questions().length - 1"
+                        label="Next"
+                        icon="pi pi-chevron-right"
+                        iconPos="right"
+                        severity="secondary"
+                        styleClass="sm:w-[150px] [&_.p-button-label]:hidden [&_.p-button-label]:sm:inline"
+                    />
                 </div>
 
-                <div class="flex justify-center gap-3 mt-6">
-                    <button
-                        (click)="openModal('edit', currentQuestion)"
-                        class="w-[100px] cursor-pointer flex items-center justify-center gap-2 px-4 py-2 bg-slate-700 hover:bg-blue-700 text-white rounded-lg transition-all duration-200"
-                    >
-                        <lucide-icon name="pencil" class="w-4 h-4"></lucide-icon>
-                        <span>Edit</span>
-                    </button>
-                    <button
-                        (click)="openModal('delete')"
-                        class="w-[100px] cursor-pointer flex items-center justify-center gap-2 px-4 py-2 bg-slate-700 hover:bg-red-600 text-white hover:text-white rounded-lg transition-all duration-200"
-                    >
-                        <lucide-icon name="trash-2" class="w-4 h-4"></lucide-icon>
-                        <span>Delete</span>
-                    </button>
-                </div>
-            </div>
-            }
-
-            <div class="flex flex-row items-center gap-4">
-                <button
-                    (click)="previousCard()"
-                    [disabled]="currentIndex === 0"
-                    class="sm:w-[150px] cursor-pointer flex items-center justify-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <lucide-icon name="chevron-left" class="w-5 h-5"></lucide-icon>
-                    <span class="hidden sm:block">Previous</span>
-                </button>
-
-                <button
-                    (click)="flipCard()"
-                    class="sm:w-[150px] cursor-pointer flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200"
-                >
-                    <lucide-icon name="rotate-cw" class="w-5 h-5"></lucide-icon>
-                    <span class="hidden sm:block">Flip Card</span>
-                </button>
-
-                <button
-                    (click)="nextCard()"
-                    [disabled]="currentIndex === questions.length - 1"
-                    class="sm:w-[150px] cursor-pointer flex items-center justify-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <span class="hidden sm:block">Next</span>
-                    <lucide-icon name="chevron-right" class="w-5 h-5"></lucide-icon>
-                </button>
-            </div>
-
-            <div class="hidden md:flex mt-8 gap-6 text-sm text-slate-500">
-                <div class="flex items-center gap-2">
-                    <kbd class="px-2 py-1 bg-slate-800 border border-slate-700 rounded">←</kbd>
-                    <span>Previous</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <kbd class="px-2 py-1 bg-slate-800 border border-slate-700 rounded">Space</kbd>
-                    <span>Flip</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <kbd class="px-2 py-1 bg-slate-800 border border-slate-700 rounded">→</kbd>
-                    <span>Next</span>
+                <div class="hidden md:flex mt-8 gap-6 text-sm text-text-muted">
+                    <div class="flex items-center gap-2">
+                        <kbd
+                            class="px-2 py-1 bg-surface-raised border border-surface-border rounded"
+                            >←</kbd
+                        >
+                        <span>Previous</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <kbd
+                            class="px-2 py-1 bg-surface-raised border border-surface-border rounded"
+                            >Space</kbd
+                        >
+                        <span>Flip</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <kbd
+                            class="px-2 py-1 bg-surface-raised border border-surface-border rounded"
+                            >→</kbd
+                        >
+                        <span>Next</span>
+                    </div>
                 </div>
             </div>
-        </div>
         }
     </div>
 </div>
 
-@if (isModalOpen && projectId) {
-<app-questions-modal
-    (modalClosed)="onModalClose()"
-    [mode]="modalMode"
-    [projectId]="projectId"
-    [questionId]="currentQuestionId"
-    [questionData]="questionData"
-></app-questions-modal>
+@if (isModalOpen() && projectId()) {
+    <app-questions-modal
+        (modalClosed)="onModalClose()"
+        [mode]="modalMode()"
+        [projectId]="projectId()"
+        [questionId]="currentQuestionId"
+        [questionData]="questionData()"
+    ></app-questions-modal>
 }

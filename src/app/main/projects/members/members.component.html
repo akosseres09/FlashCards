@@ -1,0 +1,124 @@
+<p-confirmDialog />
+<div class="bg-surface flex-1 flex flex-col">
+    <div class="max-w-7xl mx-auto w-full px-4 py-8 flex-1 flex flex-col">
+        <!-- Header -->
+        <div class="mb-8">
+            <a
+                [routerLink]="['/projects', projectId()]"
+                class="text-text-muted text-lg hover:text-primary transition-colors flex items-center gap-2 mb-4 w-fit md:hidden"
+            >
+                <lucide-icon name="chevron-left"></lucide-icon>
+                <span>Back to Project</span>
+            </a>
+            <h1 class="text-3xl font-bold text-text-base">Members</h1>
+            @if (project()) {
+                <p class="text-text-muted mt-1">{{ project()!.name }}</p>
+            }
+        </div>
+
+        <div class="flex flex-col gap-6">
+            <!-- Members & Pending Invitations -->
+            <section class="flex flex-col gap-6">
+                <!-- Accepted members -->
+                <div class="bg-surface-raised rounded-md p-6">
+                    <h2 class="font-semibold text-text-muted uppercase tracking-wide mb-4">
+                        Members
+                    </h2>
+                    <ul class="flex flex-col gap-2">
+                        <!-- Owner row (static) -->
+                        @if (project()) {
+                            <li
+                                class="flex items-center justify-between gap-3 p-3 rounded-md bg-surface-overlay"
+                            >
+                                <div class="min-w-0">
+                                    <p class="text-sm font-medium text-text-base truncate">
+                                        {{ project()!.createdByName || project()!.createdBy }}
+                                    </p>
+                                    <p class="text-xs text-text-muted">Owner</p>
+                                </div>
+                                <p-tag value="Owner" severity="danger" />
+                            </li>
+                        }
+
+                        @for (member of members(); track member.id) {
+                            <li
+                                class="flex items-center justify-between gap-3 p-3 rounded-md bg-surface-overlay"
+                            >
+                                <div class="min-w-0 flex-1 flex flex-col">
+                                    <p class="text-sm font-medium text-text-base truncate">
+                                        {{ member.email }}
+                                    </p>
+                                    <p class="text-xs text-text-muted">
+                                        {{ member.role || 'No role' | titlecase }}
+                                    </p>
+                                </div>
+
+                                @if (canManage()) {
+                                    <p-select
+                                        [ngModel]="member.role"
+                                        (ngModelChange)="changeRole(member, $event)"
+                                        [options]="roleOptions"
+                                        optionLabel="label"
+                                        optionValue="value"
+                                    />
+                                    <p-button
+                                        icon="pi pi-user-minus"
+                                        severity="danger"
+                                        [text]="true"
+                                        (onClick)="openRemoveMemberDialog(member)"
+                                        pTooltip="Remove member"
+                                        tooltipPosition="top"
+                                    />
+                                } @else {
+                                    <p-tag
+                                        [value]="member.role | titlecase"
+                                        [severity]="roleSeverity(member.role)"
+                                    />
+                                }
+                            </li>
+                        }
+
+                        @if (members().length === 0) {
+                            <li class="text-sm text-text-muted py-2 px-3">No other members yet.</li>
+                        }
+                    </ul>
+                </div>
+
+                <!-- Pending invitations -->
+                @if (pendingInvites().length > 0) {
+                    <div class="bg-surface-raised rounded-md p-6">
+                        <h2 class="font-semibold text-text-muted uppercase tracking-wide mb-4">
+                            Pending Invitations
+                        </h2>
+                        <ul class="flex flex-col gap-2">
+                            @for (invite of pendingInvites(); track invite.id) {
+                                <li
+                                    class="flex items-center justify-between gap-3 p-3 rounded-md bg-surface-overlay"
+                                >
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-sm font-medium text-text-base truncate">
+                                            {{ invite.invitedEmail }}
+                                        </p>
+                                        <p class="text-xs text-text-muted">
+                                            Invited as {{ invite.role }}
+                                        </p>
+                                    </div>
+                                    @if (canManage()) {
+                                        <p-button
+                                            icon="pi pi-times"
+                                            severity="danger"
+                                            [text]="true"
+                                            (onClick)="openRevokeDialog(invite)"
+                                            pTooltip="Revoke invitation"
+                                            tooltipPosition="top"
+                                        />
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </section>
+        </div>
+    </div>
+</div>

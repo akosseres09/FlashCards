@@ -1,0 +1,70 @@
+<div class="bg-surface py-12 px-4 flex-1">
+    <div class="max-w-7xl mx-auto">
+        @if (devMode()) {
+            <p-splitbutton
+                class="mb-4!"
+                severity="warn"
+                size="small"
+                label="Trigger Toast"
+                [model]="toastItems"
+            />
+        }
+
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-text-base mb-2">My Projects</h1>
+            <p class="text-text-muted text-lg">Manage and study your flashcard collections</p>
+        </div>
+
+        @if (!isLoading() && projects().length > 0) {
+            <div class="mb-6 flex justify-between items-center">
+                <p class="text-text-muted">
+                    {{ projects().length }} {{ projects().length === 1 ? 'project' : 'projects' }}
+                </p>
+                <p-button
+                    (onClick)="openModal()"
+                    label="New Project"
+                    icon="pi pi-plus"
+                    size="small"
+                    styleClass="px-3 py-2 transform hover:scale-[1.02] active:scale-[0.98]"
+                />
+            </div>
+        }
+
+        <app-project-list
+            [projects]="projects()"
+            [isLoading]="isLoading()"
+            [showActions]="true"
+            emptyIcon="pi pi-folder-open"
+            emptyTitle="No Projects Yet"
+            emptyText="Create your first flashcard project to start learning. Organize your study materials into projects for better focus."
+            emptyActionLabel="Create Your First Project"
+            (emptyActionClick)="openModal()"
+            (editClick)="
+                openModal('edit', {
+                    id: $event.id,
+                    name: $event.name,
+                    description: $event.description,
+                })
+            "
+            (deleteClick)="
+                openModal('delete', {
+                    id: $event.id,
+                    name: $event.name,
+                    description: $event.description,
+                })
+            "
+        />
+    </div>
+
+    @let currentUser = user();
+    @if (isModalOpen() && currentUser) {
+        <app-projects-modal
+            [mode]="modalMode()"
+            [projectId]="editingProjectId()"
+            [projectName]="projectName()"
+            [projectDescription]="projectDescription()"
+            [userId]="currentUser.uid"
+            (modalClosed)="closeModal()"
+        ></app-projects-modal>
+    }
+</div>

@@ -1,52 +1,61 @@
-import {
-    Component,
-    EventEmitter,
-    inject,
-    Input,
-    OnChanges,
-    Output,
-    SimpleChanges,
-} from '@angular/core';
+import { Component, inject, input, linkedSignal, model, output, signal } from '@angular/core';
 import { ModalComponent } from '../../../common/modal/modal.component';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { QuestionService } from '../../../services/question/question.service';
 import { ToastService } from '../../../services/toast/toast.service';
 import { LucideAngularModule } from 'lucide-angular';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
+import { SelectModule } from 'primeng/select';
 import {
     Question,
     QUESTION_TYPES,
     QuestionWithoutId,
     ViewQuestion,
 } from '../../../models/Question';
+import { CustomValidators } from '../../../shared/validators/validators';
 
 @Component({
     selector: 'app-questions-modal',
-    imports: [ModalComponent, ReactiveFormsModule, LucideAngularModule],
+    imports: [
+        ModalComponent,
+        ReactiveFormsModule,
+        LucideAngularModule,
+        ButtonModule,
+        InputTextModule,
+        TextareaModule,
+        SelectModule,
+    ],
     templateUrl: './questions-modal.component.html',
     styleUrl: './questions-modal.component.scss',
 })
-export class QuestionsModalComponent implements OnChanges {
-    @Output() modalClosed: EventEmitter<void> = new EventEmitter<void>();
-    @Input() projectId: string | null = null;
-    @Input() questionId: string | null = null;
-    @Input() mode: 'edit' | 'create' | 'delete' | 'json' = 'create';
-    @Input() questionData: ViewQuestion | null = null;
+export class QuestionsModalComponent {
+    modalClosed = output<void>();
+    projectId = input<string | null>(null);
+    questionId = input<string | null>(null);
+    mode = input<'edit' | 'create' | 'delete' | 'json'>('create');
+    questionData = input<ViewQuestion | null>(null);
+    visible = model<boolean>(true);
 
-    protected questions: Question[] = [];
     private fb = inject(FormBuilder);
     private questionService = inject(QuestionService);
     private toastService = inject(ToastService);
-    protected questionForm = this.fb.group({
-        question: ['', Validators.required],
-        answer: ['', Validators.required],
-        type: ['Multiple Choice', Validators.required],
-        options: this.fb.array([this.fb.control('')]),
+
+    protected questions = signal<Question[]>([]);
+    protected questionForm = linkedSignal(() => {
+        return this.fb.group({
+            question: [this.questionData()?.question, Validators.required],
+            answer: [this.questionData()?.answer, Validators.required],
+            type: [this.questionData()?.type || 'Multiple Choice', Validators.required],
+            options: this.fb.array([this.fb.control('')]),
+        });
     });
     protected jsonForm = this.fb.group({
-        questions: ['', Validators.required],
+        questions: ['', [Validators.required, CustomValidators.json]],
     });
-    isSaving: boolean = false;
-    protected selectedType: Question['type'] = 'Multiple Choice';
+    isSaving = signal<boolean>(false);
+    protected selectedType = signal<Question['type']>('Multiple Choice');
     protected selectionOptions = [...QUESTION_TYPES];
 
     addOption() {
@@ -60,48 +69,33 @@ export class QuestionsModalComponent implements OnChanges {
     }
 
     get optionsArray() {
-        return this.questionForm.get('options') as any;
+        return this.questionForm().get('options') as any;
     }
 
     get showOptions() {
         return this.type?.value === 'Multiple Choice';
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (changes['questionId']) {
-            this.questionId = changes['questionId'].currentValue;
-        }
-
-        if (changes['mode']) {
-            this.mode = changes['mode'].currentValue;
-        }
-
-        if (changes['projectId']) {
-            this.projectId = changes['projectId'].currentValue;
-        }
-
-        if (changes['questionData']) {
-            this.questionData = changes['questionData'].currentValue;
-            if (this.questionData) {
-                this.question?.setValue(this.questionData.question || '');
-                this.answer?.setValue(this.questionData.answer || '');
-                this.type?.setValue(this.questionData.type || 'Multiple Choice');
-                this.selectedType = this.questionData.type || 'Multiple Choice';
-
-                if (this.questionData.options && this.questionData.options.length > 0) {
-                    this.optionsArray.clear();
-                    this.questionData.options.forEach((option: string) => {
-                        this.optionsArray.push(this.fb.control(option));
-                    });
-                }
-            }
+    async onSubmit() {
+        if (this.jsonMode) {
+            await this.onJson();
+        } else if (this.createMode) {
+            await this.onCreate();
+        } else if (this.editMode) {
+            await this.onEdit();
+        } else if (this.deleteMode) {
+            await this.onDelete();
         }
     }
 
     async onCreate() {
-        if (!this.questionForm.valid || !this.projectId) return;
+        const projectId = this.projectId();
+        if (!this.questionForm().valid || !projectId) {
+            this.questionForm().markAllAsTouched();
+            return;
+        }
 
-        this.isSaving = true;
+        this.isSaving.set(true);
         const optionsValue = this.showOptions
             ? (this.optionsArray.value as string[]).filter((opt: string) => opt.trim() !== '')
             : [];
@@ -111,26 +105,31 @@ export class QuestionsModalComponent implements OnChanges {
             answer: this.answer?.value as string,
             type: this.type?.value as Question['type'],
             options: optionsValue,
-            projectId: this.projectId,
+            projectId: projectId,
             createdAt: new Date(),
         };
 
         try {
-            await this.questionService.addOne(newQuestion, this.projectId);
+            await this.questionService.addOne(newQuestion, projectId);
             this.toastService.show('Question created successfully.');
         } catch (error: any) {
             const message = error.message || 'Error creating question.';
             this.toastService.show(message, 'error');
         } finally {
-            this.isSaving = false;
-            this.onClose();
+            this.close();
+            this.isSaving.set(false);
         }
     }
 
-    onEdit() {
-        if (!this.questionForm.valid) return;
+    async onEdit() {
+        const projectId = this.projectId();
+        const questionId = this.questionId();
+        if (!this.questionForm().valid || !projectId || !questionId) {
+            this.questionForm().markAllAsTouched();
+            return;
+        }
 
-        this.isSaving = true;
+        this.isSaving.set(true);
         const optionsValue = this.showOptions
             ? (this.optionsArray.value as string[]).filter((opt: string) => opt.trim() !== '')
             : [];
@@ -143,54 +142,47 @@ export class QuestionsModalComponent implements OnChanges {
         };
 
         try {
-            this.questionService.updateOne(
-                this.questionId as string,
-                this.projectId as string,
-                updatedQuestion
-            );
+            await this.questionService.updateOne(questionId, projectId, updatedQuestion);
             this.toastService.show('Question updated successfully.');
         } catch (error: any) {
             const message = error.message || 'Error updating question.';
             this.toastService.show(message, 'error');
         } finally {
-            this.isSaving = false;
-            this.onClose();
+            this.close();
+            this.isSaving.set(false);
         }
     }
 
     async onDelete() {
-        if (!this.questionId) {
-            this.onClose();
+        const projectId = this.projectId();
+        const questionId = this.questionId();
+        if (!questionId || !projectId) {
+            this.close();
             return;
         }
 
-        this.isSaving = true;
+        this.isSaving.set(true);
         try {
-            await this.questionService.deleteOne(this.questionId, this.projectId as string);
+            await this.questionService.deleteOne(questionId, projectId);
             this.toastService.show('Question deleted successfully.');
         } catch (error: any) {
             const message = error.message || 'Error deleting question.';
             this.toastService.show(message, 'error');
         } finally {
-            this.isSaving = false;
-            this.onClose();
-        }
-    }
-
-    onSubmit() {
-        if (this.jsonMode) {
-            this.onJson();
-        } else if (this.createMode) {
-            this.onCreate();
-        } else if (this.editMode) {
-            this.onEdit();
-        } else if (this.deleteMode) {
-            this.onDelete();
+            this.close();
+            this.isSaving.set(false);
         }
     }
 
     async onJson() {
-        this.isSaving = true;
+        const projectId = this.projectId();
+
+        if (!projectId) {
+            this.close();
+            return;
+        }
+
+        this.isSaving.set(true);
         const textValue = this.questionsForm?.value || '';
         try {
             const questions = JSON.parse(textValue) as Array<Partial<Question>>;
@@ -200,48 +192,52 @@ export class QuestionsModalComponent implements OnChanges {
 
             questions.forEach((question) => {
                 question.createdAt = new Date();
-                question.projectId = this.projectId as string;
+                question.projectId = projectId as string;
             });
 
-            await this.questionService.addMany(questions, this.projectId as string);
+            await this.questionService.addMany(questions, projectId);
             this.toastService.show('Questions imported successfully.');
         } catch (error: any) {
             const message = error.message || 'No questions imported! Invalid JSON format.';
             this.toastService.show(message, 'error');
         } finally {
+            this.close();
             this.jsonForm.reset();
-            this.isSaving = false;
-            this.onClose();
+            this.isSaving.set(false);
         }
+    }
+
+    close() {
+        this.visible.set(false);
     }
 
     onClose() {
         this.jsonForm.reset();
-        this.questionForm.reset();
+        this.questionForm().reset();
         this.optionsArray.clear();
         this.optionsArray.push(this.fb.control(''));
-        this.selectedType = 'Multiple Choice';
+        this.selectedType.set('Multiple Choice');
         this.modalClosed.emit();
     }
 
     get editMode() {
-        return this.mode === 'edit';
+        return this.mode() === 'edit';
     }
 
     get createMode() {
-        return this.mode === 'create';
+        return this.mode() === 'create';
     }
 
     get deleteMode() {
-        return this.mode === 'delete';
+        return this.mode() === 'delete';
     }
 
     get jsonMode() {
-        return this.mode === 'json';
+        return this.mode() === 'json';
     }
 
     get title() {
-        switch (this.mode) {
+        switch (this.mode()) {
             case 'create':
                 return 'Create Question';
             case 'edit':
@@ -260,46 +256,46 @@ export class QuestionsModalComponent implements OnChanges {
     }
 
     get question() {
-        return this.questionForm.get('question');
+        return this.questionForm().get('question');
     }
 
     get answer() {
-        return this.questionForm.get('answer');
+        return this.questionForm().get('answer');
     }
 
     get type() {
-        return this.questionForm.get('type');
+        return this.questionForm().get('type');
     }
 
     get options() {
-        return this.questionForm.get('options');
+        return this.questionForm().get('options');
     }
 
     get submitButtonText() {
-        switch (this.mode) {
+        switch (this.mode()) {
             case 'create':
-                return this.isSaving ? 'Creating...' : 'Create';
+                return this.isSaving() ? 'Creating...' : 'Create';
             case 'edit':
-                return this.isSaving ? 'Saving Changes...' : 'Save';
+                return this.isSaving() ? 'Saving Changes...' : 'Save';
             case 'delete':
-                return this.isSaving ? 'Deleting...' : 'Delete';
+                return this.isSaving() ? 'Deleting...' : 'Delete';
             case 'json':
-                return this.isSaving ? 'Importing...' : 'Import';
+                return this.isSaving() ? 'Importing...' : 'Import';
             default:
                 return '';
         }
     }
 
     get submitButtonIcon() {
-        switch (this.mode) {
+        switch (this.mode()) {
             case 'create':
-                return this.isSaving ? 'loader-circle' : 'plus';
+                return this.isSaving() ? 'loader-circle' : 'plus';
             case 'edit':
-                return this.isSaving ? 'loader-circle' : 'pencil';
+                return this.isSaving() ? 'loader-circle' : 'pencil';
             case 'delete':
-                return this.isSaving ? 'loader-circle' : 'trash-2';
+                return this.isSaving() ? 'loader-circle' : 'trash-2';
             case 'json':
-                return this.isSaving ? 'loader-circle' : 'upload';
+                return this.isSaving() ? 'loader-circle' : 'upload';
             default:
                 return '';
         }

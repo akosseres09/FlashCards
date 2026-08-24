@@ -1,0 +1,46 @@
+<nav
+    class="flex flex-col bg-surface-raised shrink-0 transition-[width] duration-150 ease-in-out overflow-hidden sticky top-0 h-full"
+    [class.w-52]="!sidebarService.collapsed()"
+    [class.w-16]="sidebarService.collapsed()"
+>
+    <!-- Nav items -->
+    <div class="flex-1 py-4 px-2 flex flex-col gap-1">
+        @for (item of items(); track item.label) {
+            <a
+                [routerLink]="item.route"
+                routerLinkActive="!text-primary !bg-surface-overlay"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="flex items-center gap-3 px-3 py-2.5 rounded-md font-medium text-text-subtle hover:text-primary hover:bg-surface-overlay transition-colors no-underline whitespace-nowrap"
+                [class.justify-center]="sidebarService.collapsed()"
+                [pTooltip]="sidebarService.collapsed() ? item.label : ''"
+                tooltipPosition="right"
+            >
+                <i [class]="item.icon + ' shrink-0 text-base'"></i>
+                @if (!sidebarService.collapsed()) {
+                    <span class="text-base">{{ item.label }}</span>
+                }
+            </a>
+        }
+    </div>
+
+    <!-- Toggle button -->
+    <div class="border-t border-surface-border p-2">
+        <button
+            (click)="sidebarService.toggle()"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-md font-medium text-text-muted hover:text-primary hover:bg-surface-overlay transition-colors w-full cursor-pointer"
+            [class.justify-center]="sidebarService.collapsed()"
+            [pTooltip]="sidebarService.collapsed() ? 'Expand' : ''"
+            tooltipPosition="right"
+        >
+            <i
+                [class]="
+                    (sidebarService.collapsed() ? 'pi pi-chevron-right' : 'pi pi-chevron-left') +
+                    ' shrink-0 text-base'
+                "
+            ></i>
+            @if (!sidebarService.collapsed()) {
+                <span class="text-base">Collapse</span>
+            }
+        </button>
+    </div>
+</nav>

@@ -1,77 +1,155 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
+import { InvitationService } from '../../services/invitation/invitation.service';
 import { LucideAngularModule } from 'lucide-angular';
-import { animate, style, transition, trigger } from '@angular/animations';
+import { ButtonModule } from 'primeng/button';
+import { AvatarModule } from 'primeng/avatar';
+import { BadgeModule } from 'primeng/badge';
+import { DrawerModule } from 'primeng/drawer';
+import { PopoverModule } from 'primeng/popover';
+import { MenuItem, PrimeIcons } from 'primeng/api';
+import { LogoComponent } from '../logo/logo.component';
+import { InvitationInboxComponent } from '../invitation-inbox/invitation-inbox.component';
+import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { switchMap, of, fromEvent } from 'rxjs';
 
 @Component({
     selector: 'app-navbar',
-    imports: [RouterLink, RouterLinkActive, CommonModule, LucideAngularModule],
+    imports: [
+        RouterLink,
+        RouterLinkActive,
+        CommonModule,
+        LucideAngularModule,
+        ButtonModule,
+        AvatarModule,
+        BadgeModule,
+        DrawerModule,
+        PopoverModule,
+        LogoComponent,
+        InvitationInboxComponent,
+    ],
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.scss',
-    animations: [
-        trigger('slideInLeft', [
-            transition(':enter', [
-                style({
-                    transform: 'translateX(100px)',
-                    opacity: 0,
-                }),
-                animate(
-                    '200ms ease-out',
-                    style({
-                        transform: 'translateX(0)',
-                        opacity: 1,
-                    })
-                ),
-            ]),
-            transition(':leave', [
-                animate(
-                    '200ms ease-in',
-                    style({
-                        transform: 'translateX(100px)',
-                        opacity: 0,
-                    })
-                ),
-            ]),
-        ]),
-        trigger('backdropFade', [
-            transition(':enter', [
-                style({ opacity: 0 }),
-                animate('200ms ease-out', style({ opacity: 1 })),
-            ]),
-            transition(':leave', [animate('200ms ease-in', style({ opacity: 0 }))]),
-        ]),
-    ],
+    host: {
+        class: 'block h-[70px]',
+    },
 })
 export class NavbarComponent {
-    authService = inject(AuthService);
-    router = inject(Router);
-    user$ = this.authService.user$;
-    isDropdownOpen = false;
-    isMobileMenuOpen = false;
+    private readonly authService = inject(AuthService);
+    private readonly invitationService = inject(InvitationService);
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly router = inject(Router);
 
-    toggleDropdown() {
-        this.isDropdownOpen = !this.isDropdownOpen;
+    userSignal = toSignal(this.authService.user$);
+    user = computed(() => this.userSignal());
+    isMobileMenuOpen = signal(false);
+    isInboxOpen = signal(false);
+    pendingInviteCount = signal(0);
+
+    constructor() {
+        // Subscribe to pending invitation count whenever the user changes
+        this.authService.user$
+            .pipe(
+                switchMap((user) => {
+                    if (!user?.email) return of([]);
+                    return this.invitationService.getByEmail(user.email);
+                }),
+                takeUntilDestroyed(this.destroyRef),
+            )
+            .subscribe((invites) => this.pendingInviteCount.set(invites.length));
+
+        fromEvent(window, 'resize')
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(() => {
+                if (window.innerWidth >= 768) {
+                    this.isMobileMenuOpen.set(false);
+                }
+            });
     }
 
-    closeDropdown() {
-        this.isDropdownOpen = false;
-    }
+    menuItems = computed<MenuItem[]>(() => {
+        const user = this.user();
+        return [
+            {
+                label: 'Login',
+                icon: PrimeIcons.SIGN_IN,
+                routerLink: '/auth/login',
+                visible: !user,
+            },
+            {
+                label: 'Sign Up',
+                icon: PrimeIcons.USER_PLUS,
+                routerLink: '/auth/signup',
+                visible: !user,
+            },
+            {
+                label: 'Projects',
+                icon: PrimeIcons.FOLDER,
+                routerLink: '/projects',
+                visible: !!user,
+            },
+        ];
+    });
+
+    mobileMenuItems = computed<MenuItem[]>(() => {
+        const user = this.user();
+        return [
+            {
+                label: 'Login',
+                icon: PrimeIcons.SIGN_IN,
+                routerLink: '/auth/login',
+                visible: !user,
+                command: () => this.closeMobileMenu(),
+            },
+            {
+                label: 'Sign Up',
+                icon: PrimeIcons.USER_PLUS,
+                routerLink: '/auth/signup',
+                visible: !user,
+                command: () => this.closeMobileMenu(),
+            },
+            {
+                label: 'Projects',
+                icon: PrimeIcons.FOLDER,
+                routerLink: '/projects',
+                visible: !!user,
+                command: () => this.closeMobileMenu(),
+            },
+            {
+                label: 'Settings',
+                icon: PrimeIcons.COG,
+                routerLink: '/settings',
+                visible: !!user,
+                command: () => this.closeMobileMenu(),
+            },
+            { separator: true, visible: !!user },
+            {
+                label: 'Logout',
+                icon: PrimeIcons.SIGN_OUT,
+                visible: !!user,
+                command: () => this.logout(),
+            },
+        ];
+    });
 
     toggleMobileMenu() {
-        this.isMobileMenuOpen = !this.isMobileMenuOpen;
+        this.isMobileMenuOpen.set(!this.isMobileMenuOpen());
     }
 
     closeMobileMenu() {
-        this.isMobileMenuOpen = false;
+        this.isMobileMenuOpen.set(false);
+    }
+
+    runCommand(item: MenuItem, event: Event) {
+        item.command?.({ originalEvent: event, item });
     }
 
     logout() {
         this.authService
             .logout()
             .then(() => {
-                this.closeDropdown();
                 this.closeMobileMenu();
                 this.router.navigate(['/auth/login']);
             })
