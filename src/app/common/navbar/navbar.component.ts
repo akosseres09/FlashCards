@@ -42,34 +42,13 @@ export class NavbarComponent {
     private readonly destroyRef = inject(DestroyRef);
     private readonly router = inject(Router);
 
-    userSignal = toSignal(this.authService.user$);
-    user = computed(() => this.userSignal());
-    isMobileMenuOpen = signal(false);
-    isInboxOpen = signal(false);
-    pendingInviteCount = signal(0);
+    readonly userSignal = toSignal(this.authService.user$);
+    readonly user = computed(() => this.userSignal());
+    readonly isMobileMenuOpen = signal(false);
+    readonly isInboxOpen = signal(false);
+    readonly pendingInviteCount = signal(0);
 
-    constructor() {
-        // Subscribe to pending invitation count whenever the user changes
-        this.authService.user$
-            .pipe(
-                switchMap((user) => {
-                    if (!user?.email) return of([]);
-                    return this.invitationService.getByEmail(user.email);
-                }),
-                takeUntilDestroyed(this.destroyRef),
-            )
-            .subscribe((invites) => this.pendingInviteCount.set(invites.length));
-
-        fromEvent(window, 'resize')
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(() => {
-                if (window.innerWidth >= 768) {
-                    this.isMobileMenuOpen.set(false);
-                }
-            });
-    }
-
-    menuItems = computed<MenuItem[]>(() => {
+    readonly menuItems = computed<MenuItem[]>(() => {
         const user = this.user();
         return [
             {
@@ -93,7 +72,7 @@ export class NavbarComponent {
         ];
     });
 
-    mobileMenuItems = computed<MenuItem[]>(() => {
+    readonly mobileMenuItems = computed<MenuItem[]>(() => {
         const user = this.user();
         return [
             {
@@ -133,6 +112,27 @@ export class NavbarComponent {
             },
         ];
     });
+
+    constructor() {
+        // Subscribe to pending invitation count whenever the user changes
+        this.authService.user$
+            .pipe(
+                switchMap((user) => {
+                    if (!user || !user.email) return of([]);
+                    return this.invitationService.getByEmail(user.email);
+                }),
+                takeUntilDestroyed(this.destroyRef),
+            )
+            .subscribe((invites) => this.pendingInviteCount.set(invites.length));
+
+        fromEvent(window, 'resize')
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(() => {
+                if (window.innerWidth >= 768) {
+                    this.isMobileMenuOpen.set(false);
+                }
+            });
+    }
 
     toggleMobileMenu() {
         this.isMobileMenuOpen.set(!this.isMobileMenuOpen());

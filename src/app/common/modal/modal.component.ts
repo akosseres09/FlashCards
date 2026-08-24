@@ -10,8 +10,8 @@ import { DialogModule } from 'primeng/dialog';
     styleUrl: './modal.component.scss',
 })
 export class ModalComponent {
-    closeChange = output<void>();
-    visible = model<boolean>(true);
+    readonly closeChange = output<void>();
+    readonly visible = model<boolean>(true);
 
     onClose() {
         this.closeChange.emit();
