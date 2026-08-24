@@ -6,9 +6,9 @@ import { ToastComponent } from './common/toast/toast.component';
     standalone: true,
     selector: 'app-root',
     imports: [RouterOutlet, ToastComponent],
-    templateUrl: './app.html',
-    styleUrl: './app.scss',
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss',
 })
-export class App {
+export class AppComponent {
     protected readonly title = signal('FlashCards');
 }

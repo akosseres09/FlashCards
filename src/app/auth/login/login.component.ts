@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
@@ -13,6 +13,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { AuthErrorCodes } from '@angular/fire/auth';
 import { LogoComponent } from '../../common/logo/logo.component';
+import { FirebaseError } from '@angular/fire/app';
 
 @Component({
     selector: 'app-login',
@@ -34,40 +35,43 @@ import { LogoComponent } from '../../common/logo/logo.component';
     styleUrl: './login.component.scss',
 })
 export class LoginComponent {
-    private fb = inject(FormBuilder);
-    private authService = inject(AuthService);
-    private router = inject(Router);
+    private readonly fb = inject(FormBuilder);
+    private readonly authService = inject(AuthService);
+    private readonly router = inject(Router);
 
-    loginForm: FormGroup;
-    errorMessage: string = '';
-    isLoading: boolean = false;
-    showPassword: boolean = false;
-
-    constructor() {
-        this.loginForm = this.fb.group({
-            email: ['', [Validators.required, Validators.email]],
-            password: ['', [Validators.required, Validators.minLength(6)]],
-        });
-    }
+    loginForm = this.fb.group({
+        email: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, Validators.minLength(6)]],
+    });
+    readonly errorMessage = signal<string>('');
+    readonly isLoading = signal<boolean>(false);
+    readonly showPassword = signal<boolean>(false);
 
     togglePasswordVisibility() {
-        this.showPassword = !this.showPassword;
+        this.showPassword.set(!this.showPassword());
     }
 
     async onSubmit() {
         if (this.loginForm.valid) {
-            this.isLoading = true;
-            this.errorMessage = '';
+            this.isLoading.set(true);
+            this.errorMessage.set('');
 
             const { email, password } = this.loginForm.value;
+            if (!email || !password) {
+                this.errorMessage.set('Email and password are required');
+                this.isLoading.set(false);
+                return;
+            }
 
             try {
                 await this.authService.login(email, password);
                 this.router.navigate(['/']);
-            } catch (error: any) {
-                this.errorMessage = this.getErrorMessage(error.code);
+            } catch (error) {
+                if (error instanceof FirebaseError) {
+                    this.errorMessage.set(this.getErrorMessage(error.code));
+                }
             } finally {
-                this.isLoading = false;
+                this.isLoading.set(false);
             }
         } else {
             this.markFormGroupTouched(this.loginForm);
@@ -75,16 +79,18 @@ export class LoginComponent {
     }
 
     async onGoogleLogin() {
-        this.isLoading = true;
-        this.errorMessage = '';
+        this.isLoading.set(true);
+        this.errorMessage.set('');
 
         try {
             await this.authService.loginWithGoogle();
             this.router.navigate(['/projects']);
-        } catch (error: any) {
-            this.errorMessage = this.getErrorMessage(error.code);
+        } catch (error) {
+            if (error instanceof FirebaseError) {
+                this.errorMessage.set(this.getErrorMessage(error.code));
+            }
         } finally {
-            this.isLoading = false;
+            this.isLoading.set(false);
         }
     }
 
@@ -113,10 +119,10 @@ export class LoginComponent {
     }
 
     get email() {
-        return this.loginForm.get('email');
+        return this.loginForm.get('email')!;
     }
 
     get password() {
-        return this.loginForm.get('password');
+        return this.loginForm.get('password')!;
     }
 }

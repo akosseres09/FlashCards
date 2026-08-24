@@ -12,8 +12,8 @@
             class="bg-surface-raised border border-surface-border rounded-2xl shadow-2xl p-8 flex flex-col gap-6"
         >
             <!-- Error message -->
-            @if (errorMessage) {
-                <p-message severity="error" styleClass="w-full"> {{ errorMessage }} </p-message>
+            @if (errorMessage()) {
+                <p-message severity="error" styleClass="w-full"> {{ errorMessage() }} </p-message>
             }
 
             <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
@@ -33,14 +33,14 @@
                             formControlName="email"
                             placeholder="you@example.com"
                             class="w-full"
-                            [invalid]="!!(email?.invalid && email?.touched)"
+                            [invalid]="!!(email.invalid && email.touched)"
                         />
                     </p-iconfield>
-                    @if (email?.invalid && email?.touched) {
+                    @if (email.invalid && email.touched) {
                         <small class="text-error">
-                            @if (email?.errors?.['required']) {
+                            @if (email.errors?.['required']) {
                                 Email is required
-                            } @else if (email?.errors?.['email']) {
+                            } @else if (email.errors?.['email']) {
                                 Please enter a valid email
                             }
                         </small>
@@ -59,13 +59,13 @@
                         [feedback]="false"
                         class="w-full"
                         inputStyleClass="w-full"
-                        [invalid]="!!(password?.invalid && password?.touched)"
+                        [invalid]="!!(password.invalid && password.touched)"
                     />
-                    @if (password?.invalid && password?.touched) {
+                    @if (password.invalid && password.touched) {
                         <small class="text-error">
-                            @if (password?.errors?.['required']) {
+                            @if (password.errors?.['required']) {
                                 Password is required
-                            } @else if (password?.errors?.['minlength']) {
+                            } @else if (password.errors?.['minlength']) {
                                 Password must be at least 6 characters
                             }
                         </small>
