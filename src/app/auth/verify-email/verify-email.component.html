@@ -15,7 +15,7 @@
         <div class="bg-surface-raised rounded-2xl shadow-2xl p-8 border border-surface-border">
             <div class="text-center mb-6">
                 <p class="text-text-subtle mb-2">We've sent a verification email to:</p>
-                <p class="text-primary font-semibold text-lg">{{ userEmail }}</p>
+                <p class="text-primary font-semibold text-lg">{{ userEmail() }}</p>
             </div>
 
             <div class="bg-surface-overlay/50 border border-surface-border rounded-lg p-4 mb-6">
@@ -43,7 +43,7 @@
                 <p-button
                     type="button"
                     (onClick)="checkEmailVerification()"
-                    [loading]="isLoading"
+                    [loading]="isLoading()"
                     [fluid]="true"
                 >
                     <span class="flex gap-2 items-center">
@@ -55,14 +55,14 @@
                 <p-button
                     type="button"
                     (onClick)="resendVerificationEmail()"
-                    [disabled]="!canResend || isLoading"
+                    [disabled]="!canResend() || isLoading()"
                     severity="secondary"
                     [text]="true"
                     [fluid]="true"
                 >
                     <span class="flex gap-2 items-center text-text-subtle">
-                        @if (!canResend) {
-                            Resend in {{ resendCooldown }}s
+                        @if (!canResend()) {
+                            Resend in {{ resendCooldown() }}s
                         } @else {
                             <i class="pi pi-envelope"></i>
                             Send Verification Email
@@ -99,7 +99,7 @@
                 </li>
                 <li class="space-x-2">
                     <span class="text-warning mt-1">•</span>
-                    <span>Make sure {{ userEmail }} is correct</span>
+                    <span>Make sure {{ userEmail() }} is correct</span>
                 </li>
                 <li class="space-x-2">
                     <span class="text-warning mt-1">•</span>

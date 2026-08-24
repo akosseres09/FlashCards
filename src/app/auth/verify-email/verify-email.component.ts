@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { CommonModule } from '@angular/common';
@@ -6,6 +6,8 @@ import { LucideAngularModule } from 'lucide-angular';
 import { ToastService } from '../../services/toast/toast.service';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
+import { FirebaseError } from '@angular/fire/app';
+import { take } from 'rxjs';
 
 @Component({
     selector: 'app-verify-email',
@@ -13,79 +15,86 @@ import { DividerModule } from 'primeng/divider';
     templateUrl: './verify-email.component.html',
     styleUrl: './verify-email.component.scss',
 })
-export class VerifyEmailComponent implements OnInit {
-    private authService = inject(AuthService);
-    private router = inject(Router);
-    private toastService = inject(ToastService);
+export class VerifyEmailComponent implements OnInit, OnDestroy {
+    private readonly authService = inject(AuthService);
+    private readonly router = inject(Router);
+    private readonly toastService = inject(ToastService);
 
-    userEmail: string = '';
-    isLoading: boolean = false;
-    canResend: boolean = true;
-    resendCooldown: number = 60;
-    private cooldownInterval: any;
+    readonly userEmail = signal<string>('');
+    readonly isLoading = signal<boolean>(false);
+    readonly canResend = signal<boolean>(true);
+    readonly resendCooldown = signal<number>(0);
+    private readonly cooldownInterval = signal<number | null>(null);
 
     ngOnInit(): void {
-        this.authService.user$.subscribe((user) => {
+        this.authService.user$.pipe(take(1)).subscribe((user) => {
             if (user) {
-                this.userEmail = user.email || '';
+                this.userEmail.set(user.email || '');
             }
         });
     }
 
     async resendVerificationEmail() {
-        if (!this.canResend) return;
+        if (!this.canResend()) return;
 
-        this.isLoading = true;
+        this.isLoading.set(true);
 
         try {
             await this.authService.sendVerificationEmail();
             this.toastService.show('Verification email sent! Please check your inbox.');
             this.startCooldown();
-        } catch (error: any) {
-            this.toastService.show(this.getErrorMessage(error.code || error), 'error');
+        } catch (error) {
+            if (error instanceof FirebaseError) {
+                this.toastService.show(this.getErrorMessage(error.code), 'error');
+            }
         } finally {
-            this.isLoading = false;
+            this.isLoading.set(false);
         }
     }
 
     async checkEmailVerification() {
-        this.isLoading = true;
+        this.isLoading.set(true);
 
         try {
             const user = this.authService.getUser();
-            if (user) {
-                await user.reload();
-                if (user.emailVerified) {
-                    this.toastService.show('Email verified successfully!');
-                    this.router.navigate(['/']);
-                } else {
-                    this.toastService.show(
-                        'Email not verified yet. Please check your inbox and click the verification link.',
-                        'warning',
-                    );
-                }
+            if (!user) {
+                return;
             }
-        } catch (error: any) {
+
+            await user.reload();
+            if (user.emailVerified) {
+                this.toastService.show('Email verified successfully!');
+                this.router.navigate(['/']);
+            } else {
+                this.toastService.show(
+                    'Email not verified yet. Please check your inbox and click the verification link.',
+                    'warning',
+                );
+            }
+        } catch {
             this.toastService.show(
                 'Unable to check verification status. Please try again.',
                 'error',
             );
         } finally {
-            this.isLoading = false;
+            this.isLoading.set(false);
         }
     }
 
     private startCooldown() {
-        this.canResend = false;
-        this.resendCooldown = 60;
+        this.canResend.set(false);
+        this.resendCooldown.set(60);
 
-        this.cooldownInterval = setInterval(() => {
-            this.resendCooldown--;
-            if (this.resendCooldown <= 0) {
-                this.canResend = true;
-                clearInterval(this.cooldownInterval);
-            }
-        }, 1000);
+        this.cooldownInterval.set(
+            setInterval(() => {
+                this.resendCooldown.update((value) => value - 1);
+                const interval = this.cooldownInterval();
+                if (this.resendCooldown() <= 0 && interval) {
+                    this.canResend.set(true);
+                    clearInterval(interval);
+                }
+            }, 1000),
+        );
     }
 
     private getErrorMessage(errorCode: string): string {
@@ -107,8 +116,9 @@ export class VerifyEmailComponent implements OnInit {
     }
 
     ngOnDestroy(): void {
-        if (this.cooldownInterval) {
-            clearInterval(this.cooldownInterval);
+        const interval = this.cooldownInterval();
+        if (interval) {
+            clearInterval(interval);
         }
     }
 }
