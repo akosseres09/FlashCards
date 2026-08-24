@@ -3,17 +3,112 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // This rule allows anyone with your Firestore database reference to view, edit,
-    // and delete all data in your Firestore database. It is useful for getting
-    // started, but it is configured to expire after 30 days because it
-    // leaves your app open to attackers. At that time, all client
-    // requests to your Firestore database will be denied.
-    //
-    // Make sure to write security rules for your app before that time, or else
-    // all client requests to your Firestore database will be denied until you Update
-    // your rules
-    match /{document=**} {
-      allow read, write: if true
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function memberDocPath(projectId) {
+      return /databases/$(database)/documents/projectMembers/$(projectId + '_' + request.auth.uid);
+    }
+
+    function isMember(projectId) {
+      return exists(memberDocPath(projectId));
+    }
+
+    function getMemberRole(projectId) {
+      return get(memberDocPath(projectId)).data.role;
+    }
+
+    // editor or admin can modify questions/project content
+    function canEditProject(projectId) {
+      return isMember(projectId) && getMemberRole(projectId) in ['editor', 'admin'];
+    }
+
+    // admin can manage members and invitations (owner always can too, checked separately)
+    function canManageMembers(projectId) {
+      return isMember(projectId) && getMemberRole(projectId) == 'admin';
+    }
+
+    // ── Projects ─────────────────────────────────────────────────────────────
+
+    match /projects/{projectId} {
+      allow read: if isSignedIn() && (
+      resource.data.createdBy == request.auth.uid || isMember(projectId)
+      );
+      allow create: if isSignedIn() && request.resource.data.createdBy == request.auth.uid;
+      allow update: if isSignedIn() && (
+      resource.data.createdBy == request.auth.uid ||
+      canEditProject(projectId) ||
+      // any member (even viewer) may stamp lastStudied when studying
+      (
+      isMember(projectId) &&
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastStudied'])
+      )
+      );
+      allow delete: if isSignedIn() && resource.data.createdBy == request.auth.uid;
+
+      match /questions/{questionId} {
+        allow read: if isSignedIn() && (
+        get(/databases/$(database)/documents/projects/$(projectId)).data.createdBy == request.auth.uid
+          || isMember(projectId)
+        );
+        allow create, update, delete: if isSignedIn() && (
+        get(/databases/$(database)/documents/projects/$(projectId)).data.createdBy == request.auth.uid
+          || canEditProject(projectId)
+        );
+      }
+    }
+
+    // ── Project Members ───────────────────────────────────────────────────────
+
+    match /projectMembers/{memberId} {
+      // A member can read their own doc; owner and admins can read all members of their project
+      allow read: if isSignedIn() && (
+      resource.data.userId == request.auth.uid ||
+      get(/databases/$(database)/documents/projects/$(resource.data.projectId)).data.createdBy == request.auth.uid ||
+      canManageMembers(resource.data.projectId)
+      );
+      // Member docs are created by the acceptInvitation Cloud Function (Admin SDK).
+      // Client-side creation is only allowed for the project owner or an admin.
+      allow create: if isSignedIn() && (
+      get(/databases/$(database)/documents/projects/$(request.resource.data.projectId)).data.createdBy == request.auth.uid ||
+      canManageMembers(request.resource.data.projectId)
+      );
+      // Owner or admin can change a member's role
+      allow update: if isSignedIn() && (
+      get(/databases/$(database)/documents/projects/$(resource.data.projectId)).data.createdBy == request.auth.uid ||
+      canManageMembers(resource.data.projectId)
+      );
+      // Members can leave; owner or admin can remove others
+      allow delete: if isSignedIn() && (
+      resource.data.userId == request.auth.uid ||
+      get(/databases/$(database)/documents/projects/$(resource.data.projectId)).data.createdBy == request.auth.uid ||
+      canManageMembers(resource.data.projectId)
+      );
+    }
+
+    // ── Invitations ───────────────────────────────────────────────────────────
+
+    match /invitations/{invitationId} {
+      // The invited user (matched by email) or the inviter can read
+      allow read: if isSignedIn()
+      // Owner or admin can create invitations for their project
+      allow create: if isSignedIn() && (
+      get(/databases/$(database)/documents/projects/$(request.resource.data.projectId)).data.createdBy == request.auth.uid ||
+      canManageMembers(request.resource.data.projectId)
+      );
+      // Only the invited user may update the status field (accept / decline)
+      allow update: if isSignedIn() &&
+      request.auth.token.email == resource.data.get('invitedEmail', null) &&
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+      // Inviter or owner/admin can revoke a pending invitation
+      allow delete: if isSignedIn() && (
+      resource.data.invitedBy == request.auth.uid ||
+      get(/databases/$(database)/documents/projects/$(resource.data.projectId)).data.createdBy == request.auth.uid ||
+      canManageMembers(resource.data.projectId)
+      );
     }
   }
 }

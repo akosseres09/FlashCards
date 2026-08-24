@@ -1,18 +1,9 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
-
 import { setGlobalOptions } from 'firebase-functions';
 import { onDocumentCreated, onDocumentDeleted } from 'firebase-functions/v2/firestore';
 import { onCall } from 'firebase-functions/v2/https';
 import { initializeApp } from 'firebase-admin/app';
-import { getFirestore, FieldValue } from 'firebase-admin/firestore';
-import * as logger from 'firebase-functions/logger';
+import { onInvitationAccepted, onInvite, sendInvitationEmail } from './invitation/invitation';
+import { addQuestionBulk, createQuestion, deleteQuestion } from './question/question';
 
 initializeApp();
 setGlobalOptions({ maxInstances: 10 });
@@ -25,14 +16,7 @@ setGlobalOptions({ maxInstances: 10 });
 export const onQuestionCreated = onDocumentCreated(
     'projects/{projectId}/questions/{questionId}',
     async (event) => {
-        const data = event.data?.data();
-        if (data?.['_bulkImport'] === true) return;
-
-        const { projectId } = event.params;
-        await getFirestore()
-            .doc(`projects/${projectId}`)
-            .update({ cardCount: FieldValue.increment(1) });
-        logger.info(`cardCount +1 for project ${projectId}`);
+        return await createQuestion(event);
     },
 );
 
@@ -43,15 +27,7 @@ export const onQuestionCreated = onDocumentCreated(
 export const onQuestionDeleted = onDocumentDeleted(
     'projects/{projectId}/questions/{questionId}',
     async (event) => {
-        const { projectId } = event.params;
-        try {
-            await getFirestore()
-                .doc(`projects/${projectId}`)
-                .update({ cardCount: FieldValue.increment(-1) });
-            logger.info(`cardCount -1 for project ${projectId}`);
-        } catch {
-            // Parent project was already deleted; nothing to update.
-        }
+        return await deleteQuestion(event);
     },
 );
 
@@ -65,27 +41,39 @@ export const onQuestionDeleted = onDocumentDeleted(
  * onQuestionCreated trigger skips it and avoids double-counting.
  */
 export const bulkAddQuestions = onCall(async (request) => {
-    const { projectId, questions } = request.data as {
-        projectId: string;
-        questions: Array<Record<string, unknown>>;
-    };
+    return await addQuestionBulk(request);
+});
 
-    if (!projectId || !Array.isArray(questions) || questions.length === 0) {
-        throw new Error('Invalid arguments: projectId and non-empty questions[] are required.');
-    }
+// ── Invitation email ──────────────────────────────────────────────────────────
 
-    const firestore = getFirestore();
-    const batch = firestore.batch();
+/**
+ * Sends an invitation email when a new /invitations document is created.
+ * In emulator mode the email is logged but not actually sent.
+ */
+export const onInvitationCreated = onDocumentCreated(
+    {
+        document: 'invitations/{invitationId}',
+        secrets: ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASSWORD', 'SMTP_FROM', 'APP_URL'],
+    },
+    async (event) => {
+        return await sendInvitationEmail(event);
+    },
+);
 
-    for (const question of questions) {
-        const ref = firestore.collection(`projects/${projectId}/questions`).doc();
-        batch.set(ref, { ...question, _bulkImport: true });
-    }
+// ── Accept invitation (callable) ─────────────────────────────────────────────
 
-    batch.update(firestore.doc(`projects/${projectId}`), {
-        cardCount: FieldValue.increment(questions.length),
-    });
+/**
+ * Atomically creates the projectMember document and marks the invitation as
+ * accepted. Must be called by the invited user (email must match).
+ */
+export const acceptInvitation = onCall(async (request) => {
+    return await onInvitationAccepted(request);
+});
 
-    await batch.commit();
-    logger.info(`Bulk added ${questions.length} questions to project ${projectId}`);
+/**
+ * Callable function to create an invitation. Must be called by a project admin.
+ * The function will create an invitation document and trigger the email sending.
+ */
+export const invite = onCall(async (request) => {
+    return await onInvite(request);
 });
