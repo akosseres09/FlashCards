@@ -2,16 +2,16 @@ import { CommonModule } from '@angular/common';
 import { Component, input } from '@angular/core';
 
 @Component({
-    selector: 'flashcard-logo',
+    selector: 'app-flashcard-logo',
     imports: [CommonModule],
     templateUrl: './logo.component.html',
     styleUrl: './logo.component.scss',
 })
 export class LogoComponent {
-    height = input<number>(64);
-    width = input<number>(64);
-    showBottomMargin = input<boolean>(true);
-    roundness = input<'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>('2xl');
+    readonly height = input<number>(64);
+    readonly width = input<number>(64);
+    readonly showBottomMargin = input<boolean>(true);
+    readonly roundness = input<'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>('2xl');
 
     roundnessClasses = {
         xs: 'rounded-xs',
