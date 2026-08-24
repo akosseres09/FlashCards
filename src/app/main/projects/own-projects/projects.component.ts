@@ -35,20 +35,19 @@ export class ProjectsComponent implements OnInit {
     private readonly toastService = inject(ToastService);
     private readonly destroyRef = inject(DestroyRef);
 
-    isLoading = signal<boolean>(false);
-    isModalOpen = signal<boolean>(false);
-    isSaving = signal<boolean>(false);
-    devMode = signal<boolean>(isDevMode());
+    readonly isLoading = signal<boolean>(false);
+    readonly isModalOpen = signal<boolean>(false);
+    readonly devMode = signal<boolean>(isDevMode());
 
-    projects = signal<Project[]>([]);
+    readonly projects = signal<Project[]>([]);
 
-    modalMode = signal<'edit' | 'create' | 'delete'>('create');
-    editingProjectId = signal<string | null>(null);
-    projectName = signal<string | null>(null);
-    projectDescription = signal<string | null>(null);
-    user = signal<User | null>(null);
+    readonly modalMode = signal<'edit' | 'create' | 'delete'>('create');
+    readonly editingProjectId = signal<string | null>(null);
+    readonly projectName = signal<string | null>(null);
+    readonly projectDescription = signal<string | null>(null);
+    readonly user = signal<User | null>(null);
 
-    toastItems = [
+    readonly toastItems = [
         {
             label: 'Success',
             command: () => this.toastService.show('This is a success message', 'success'),

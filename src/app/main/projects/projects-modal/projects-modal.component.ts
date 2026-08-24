@@ -25,20 +25,19 @@ import { AuthService } from '../../../services/auth/auth.service';
     styleUrl: './projects-modal.component.scss',
 })
 export class ProjectsModalComponent {
-    modalClosed = output<void>();
-    projectId = input<string | null>(null);
-    projectName = input<string | null>(null);
-    projectDescription = input<string | null>(null);
-    userId = input<string | null>(null);
-    mode = input<'edit' | 'create' | 'delete'>('create');
-    visible = model<boolean>(true);
-
     private readonly fb = inject(FormBuilder);
     private readonly projectService = inject(ProjectService);
     private readonly toastService = inject(ToastService);
     private readonly authService = inject(AuthService);
 
-    createProjectForm = linkedSignal<FormGroup>(() =>
+    readonly modalClosed = output<void>();
+    readonly projectId = input<string | null>(null);
+    readonly projectName = input<string | null>(null);
+    readonly projectDescription = input<string | null>(null);
+    readonly userId = input<string | null>(null);
+    readonly mode = input<'edit' | 'create' | 'delete'>('create');
+    readonly visible = model<boolean>(true);
+    readonly createProjectForm = linkedSignal<FormGroup>(() =>
         this.fb.group({
             name: [this.projectName(), [Validators.required, Validators.minLength(3)]],
             description: [
@@ -47,7 +46,7 @@ export class ProjectsModalComponent {
             ],
         }),
     );
-    isSaving = signal<boolean>(false);
+    readonly isSaving = signal<boolean>(false);
 
     close() {
         this.visible.set(false);

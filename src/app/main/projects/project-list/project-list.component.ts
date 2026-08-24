@@ -11,22 +11,22 @@ import { Project } from '../../../models/Project';
     styleUrl: './project-list.component.scss',
 })
 export class ProjectListComponent {
-    projects = input.required<Project[]>();
-    isLoading = input<boolean>(false);
+    readonly projects = input.required<Project[]>();
+    readonly isLoading = input<boolean>(false);
 
     /** Show Edit / Delete action buttons on each card */
-    showActions = input<boolean>(false);
+    readonly showActions = input<boolean>(false);
 
     /** projectId → role string, for displaying a role badge */
-    roleMap = input<Record<string, string>>({});
+    readonly roleMap = input<Record<string, string>>({});
 
     /** Empty state configuration */
-    emptyIcon = input<string>('pi pi-folder-open');
-    emptyTitle = input<string>('No Projects');
-    emptyText = input<string>('');
-    emptyActionLabel = input<string | null>(null);
+    readonly emptyIcon = input<string>('pi pi-folder-open');
+    readonly emptyTitle = input<string>('No Projects');
+    readonly emptyText = input<string>('');
+    readonly emptyActionLabel = input<string | null>(null);
 
-    emptyActionClick = output<void>();
-    editClick = output<Project>();
-    deleteClick = output<Project>();
+    readonly emptyActionClick = output<void>();
+    readonly editClick = output<Project>();
+    readonly deleteClick = output<Project>();
 }

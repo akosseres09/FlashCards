@@ -53,9 +53,10 @@
                     @let role = roleMap()[project.id];
                     @if (role) {
                         <span
-                            class="ml-3 shrink-0 text-xs font-semibold px-2 py-1 rounded-full capitalize"
                             [class]="
-                                role === 'admin'
+                                'ml-3 shrink-0 text-xs font-semibold px-2 py-1 rounded-full capitalize ' +
+                                    role ===
+                                'admin'
                                     ? 'bg-success/10 text-success'
                                     : role === 'editor'
                                       ? 'bg-warning/10 text-warning'

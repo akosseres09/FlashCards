@@ -31,19 +31,19 @@ import { CustomValidators } from '../../../shared/validators/validators';
     styleUrl: './questions-modal.component.scss',
 })
 export class QuestionsModalComponent {
-    modalClosed = output<void>();
-    projectId = input<string | null>(null);
-    questionId = input<string | null>(null);
-    mode = input<'edit' | 'create' | 'delete' | 'json'>('create');
-    questionData = input<ViewQuestion | null>(null);
-    visible = model<boolean>(true);
+    private readonly fb = inject(FormBuilder);
+    private readonly questionService = inject(QuestionService);
+    private readonly toastService = inject(ToastService);
 
-    private fb = inject(FormBuilder);
-    private questionService = inject(QuestionService);
-    private toastService = inject(ToastService);
+    readonly modalClosed = output<void>();
+    readonly projectId = input<string | null>(null);
+    readonly questionId = input<string | null>(null);
+    readonly mode = input<'edit' | 'create' | 'delete' | 'json'>('create');
+    readonly questionData = input<ViewQuestion | null>(null);
+    readonly visible = model<boolean>(true);
 
-    protected questions = signal<Question[]>([]);
-    protected questionForm = linkedSignal(() => {
+    protected readonly questions = signal<Question[]>([]);
+    protected readonly questionForm = linkedSignal(() => {
         return this.fb.group({
             question: [this.questionData()?.question, Validators.required],
             answer: [this.questionData()?.answer, Validators.required],
@@ -51,12 +51,12 @@ export class QuestionsModalComponent {
             options: this.fb.array([this.fb.control('')]),
         });
     });
-    protected jsonForm = this.fb.group({
+    protected readonly jsonForm = this.fb.group({
         questions: ['', [Validators.required, CustomValidators.json]],
     });
-    isSaving = signal<boolean>(false);
-    protected selectedType = signal<Question['type']>('Multiple Choice');
-    protected selectionOptions = [...QUESTION_TYPES];
+    readonly isSaving = signal<boolean>(false);
+    protected readonly selectedType = signal<Question['type']>('Multiple Choice');
+    protected readonly selectionOptions = [...QUESTION_TYPES];
 
     addOption() {
         this.optionsArray.push(this.fb.control(''));
@@ -69,7 +69,7 @@ export class QuestionsModalComponent {
     }
 
     get optionsArray() {
-        return this.questionForm().get('options') as any;
+        return this.questionForm().controls.options;
     }
 
     get showOptions() {
@@ -112,9 +112,11 @@ export class QuestionsModalComponent {
         try {
             await this.questionService.addOne(newQuestion, projectId);
             this.toastService.show('Question created successfully.');
-        } catch (error: any) {
-            const message = error.message || 'Error creating question.';
-            this.toastService.show(message, 'error');
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                const message = error.message || 'Error creating question.';
+                this.toastService.show(message, 'error');
+            }
         } finally {
             this.close();
             this.isSaving.set(false);
@@ -144,9 +146,11 @@ export class QuestionsModalComponent {
         try {
             await this.questionService.updateOne(questionId, projectId, updatedQuestion);
             this.toastService.show('Question updated successfully.');
-        } catch (error: any) {
-            const message = error.message || 'Error updating question.';
-            this.toastService.show(message, 'error');
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                const message = error.message || 'Error updating question.';
+                this.toastService.show(message, 'error');
+            }
         } finally {
             this.close();
             this.isSaving.set(false);
@@ -165,9 +169,11 @@ export class QuestionsModalComponent {
         try {
             await this.questionService.deleteOne(questionId, projectId);
             this.toastService.show('Question deleted successfully.');
-        } catch (error: any) {
-            const message = error.message || 'Error deleting question.';
-            this.toastService.show(message, 'error');
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                const message = error.message || 'Error deleting question.';
+                this.toastService.show(message, 'error');
+            }
         } finally {
             this.close();
             this.isSaving.set(false);
@@ -185,7 +191,7 @@ export class QuestionsModalComponent {
         this.isSaving.set(true);
         const textValue = this.questionsForm?.value || '';
         try {
-            const questions = JSON.parse(textValue) as Array<Partial<Question>>;
+            const questions = JSON.parse(textValue) as Partial<Question>[];
             if (!Array.isArray(questions) || questions.length === 0) {
                 throw new Error('Data must be a non-empty array of questions.');
             }
@@ -197,9 +203,11 @@ export class QuestionsModalComponent {
 
             await this.questionService.addMany(questions, projectId);
             this.toastService.show('Questions imported successfully.');
-        } catch (error: any) {
-            const message = error.message || 'No questions imported! Invalid JSON format.';
-            this.toastService.show(message, 'error');
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                const message = error.message || 'No questions imported! Invalid JSON format.';
+                this.toastService.show(message, 'error');
+            }
         } finally {
             this.close();
             this.jsonForm.reset();
@@ -252,23 +260,23 @@ export class QuestionsModalComponent {
     }
 
     get questionsForm() {
-        return this.jsonForm.get('questions');
+        return this.jsonForm.get('questions')!;
     }
 
     get question() {
-        return this.questionForm().get('question');
+        return this.questionForm().get('question')!;
     }
 
     get answer() {
-        return this.questionForm().get('answer');
+        return this.questionForm().get('answer')!;
     }
 
     get type() {
-        return this.questionForm().get('type');
+        return this.questionForm().get('type')!;
     }
 
     get options() {
-        return this.questionForm().get('options');
+        return this.questionForm().get('options')!;
     }
 
     get submitButtonText() {

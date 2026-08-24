@@ -18,12 +18,12 @@
                             id="question-type"
                             formControlName="type"
                             [options]="selectionOptions"
-                            styleClass="w-full"
+                            class="w-full"
                             appendTo="body"
                         />
-                        @if (type?.invalid && type?.touched) {
+                        @if (type.invalid && type.touched) {
                             <p class="mt-1 text-sm text-error">
-                                @if (type?.errors?.['required']) {
+                                @if (type.errors?.['required']) {
                                     Question type is required
                                 }
                             </p>
@@ -42,13 +42,13 @@
                             type="text"
                             formControlName="question"
                             class="w-full"
-                            [class.ng-invalid]="question?.invalid && question?.touched"
-                            [class.ng-dirty]="question?.touched"
+                            [class.ng-invalid]="question.invalid && question.touched"
+                            [class.ng-dirty]="question.touched"
                             placeholder="e.g., What is the capital of France?"
                         />
-                        @if (question?.invalid && question?.touched) {
+                        @if (question.invalid && question.touched) {
                             <p class="mt-1 text-sm text-error">
-                                @if (question?.errors?.['required']) {
+                                @if (question.errors?.['required']) {
                                     Question is required
                                 }
                             </p>
@@ -67,13 +67,13 @@
                             type="text"
                             formControlName="answer"
                             class="w-full"
-                            [class.ng-invalid]="answer?.invalid && answer?.touched"
-                            [class.ng-dirty]="answer?.touched"
+                            [class.ng-invalid]="answer.invalid && answer.touched"
+                            [class.ng-dirty]="answer.touched"
                             placeholder="e.g., Paris"
                         />
-                        @if (answer?.invalid && answer?.touched) {
+                        @if (answer.invalid && answer.touched) {
                             <p class="mt-1 text-sm text-error">
-                                @if (answer?.errors?.['required']) {
+                                @if (answer.errors?.['required']) {
                                     Answer is required
                                 }
                             </p>
@@ -81,20 +81,24 @@
                     </div>
                     @if (showOptions) {
                         <div>
-                            <label class="block text-sm font-medium text-text-subtle mb-2">
+                            <label
+                                for="options-text"
+                                class="block text-sm font-medium text-text-subtle mb-2"
+                            >
                                 Options <span class="text-error">*</span>
                             </label>
                             <div class="space-y-3">
                                 @for (control of optionsArray.controls; track $index) {
                                     <div class="flex items-center gap-2">
                                         <input
+                                            id="options-text"
                                             pInputText
                                             type="text"
                                             [formControl]="control"
                                             class="flex-1"
                                             [placeholder]="'Option ' + ($index + 1)"
                                         />
-                                        @if (optionsArray.controls.length > 1) {
+                                        @if ($count > 1) {
                                             <p-button
                                                 type="button"
                                                 (onClick)="removeOption($index)"
@@ -135,16 +139,16 @@
                             formControlName="questions"
                             rows="10"
                             class="w-full resize-none"
-                            [class.ng-invalid]="questionsForm?.invalid && questionsForm?.touched"
-                            [class.ng-dirty]="questionsForm?.touched"
+                            [class.ng-invalid]="questionsForm.invalid && questionsForm.touched"
+                            [class.ng-dirty]="questionsForm.touched"
                             placeholder='e.g., [{"question": "What is 2 + 2?", "answer": "4", "type": "Short Answer"}]'
                         ></textarea>
-                        @if (questionsForm?.invalid && questionsForm?.touched) {
+                        @if (questionsForm.invalid && questionsForm.touched) {
                             <p class="mt-1 text-sm text-error">
-                                @if (questionsForm?.errors?.['required']) {
+                                @if (questionsForm.errors?.['required']) {
                                     Data is required
                                 }
-                                @if (questionsForm?.errors?.['invalidJson']) {
+                                @if (questionsForm.errors?.['invalidJson']) {
                                     Invalid JSON format
                                 }
                             </p>
