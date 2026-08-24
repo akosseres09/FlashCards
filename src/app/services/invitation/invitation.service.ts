@@ -15,11 +15,9 @@ export class InvitationService {
     getByEmail(email: string): Observable<ProjectInvitation[]> {
         return new Observable<ProjectInvitation[]>((subscriber) => {
             const off = db.invitations
-                .query(($) => $.field('invitedEmail').eq(email))
+                .query(($) => [$.field('invitedEmail').eq(email), $.field('status').eq('pending')])
                 .on((docs) => {
-                    const pending = docs
-                        .map((doc) => toData<ProjectInvitationData>(doc))
-                        .filter((inv) => inv.status === 'pending');
+                    const pending = docs.map((doc) => toData<ProjectInvitationData>(doc));
                     subscriber.next(pending);
                 })
                 .catch((err) => subscriber.error(err));
@@ -31,11 +29,9 @@ export class InvitationService {
     getByProject(projectId: string): Observable<ProjectInvitation[]> {
         return new Observable<ProjectInvitation[]>((subscriber) => {
             const off = db.invitations
-                .query(($) => $.field('projectId').eq(projectId))
+                .query(($) => [$.field('projectId').eq(projectId), $.field('status').eq('pending')])
                 .on((docs) => {
-                    const pending = docs
-                        .map((doc) => toData<ProjectInvitationData>(doc))
-                        .filter((inv) => inv.status === 'pending');
+                    const pending = docs.map((doc) => toData<ProjectInvitationData>(doc));
                     subscriber.next(pending);
                 })
                 .catch((err) => subscriber.error(err));
@@ -60,13 +56,13 @@ export class InvitationService {
         await httpsCallable(this.functions, 'invite')(invitation);
     }
 
-    updateStatus(id: string, status: InvitationStatus): Promise<void> {
-        const typedId = id as Schema['invitations']['Id'];
+    async updateStatus(id: string, status: InvitationStatus): Promise<void> {
+        const typedId = await db.invitations.id(id);
         return db.invitations.update(typedId, { status }).then(() => undefined);
     }
 
-    delete(id: string): Promise<void> {
-        const typedId = id as Schema['invitations']['Id'];
+    async delete(id: string): Promise<void> {
+        const typedId = await db.invitations.id(id);
         return db.invitations.remove(typedId).then(() => undefined);
     }
 }
